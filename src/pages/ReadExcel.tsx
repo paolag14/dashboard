@@ -1,40 +1,39 @@
 import * as React from 'react';
-import Box from '@mui/material/Box';
-import Collapse from '@mui/material/Collapse';
-import IconButton from '@mui/material/IconButton';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import CreateIcon from '@mui/icons-material/Create';
-import AddIcon from '@mui/icons-material/Add';
-import Button from '@mui/material/Button';
-import Link from 'next/link';
+
+import IconButton from '@mui/joy/IconButton';
+import Typography from '@mui/material/Typography';
+
+
 
 import { ExcelImport } from './ExcelImport';
 import { useState } from 'react';
 
-export const ReadExcel = ()  =>{
+
+export const ReadExcel = (props:any)  =>{
 
     const [sheetData, setSheetData] = useState("");
-    //const [sheet, setSheet] = useState(null);
+
+    const [open, setOpen] = useState(false);
+
 
     const handleFileUploaded = async (e: any) =>{
         console.log("file uploaded", e);
 
-        if(e){
-            //setSheet(Object.keys(e)[0]);
-        }
-
         setSheetData(e);
-
+       
     }
+
+ 
+    
 
   return (
     <>
@@ -44,12 +43,13 @@ export const ReadExcel = ()  =>{
 
     {sheetData && 
 
+    <React.Fragment>
     <TableContainer component={Paper}>
-       <Table aria-label="collapsible table">
-       <TableHead>
+      <Table aria-label="collapsible table">
+      <TableHead>
           <TableRow>
             {sheetData[0].map(
-                (h:any) => <TableCell key={h}> <Typography variant="h6" >{h}</Typography>  </TableCell>
+                (h:any) => <TableCell key={h}> <Typography variant="h6">{h}</Typography>  </TableCell>
             )}
         
           </TableRow>
@@ -57,18 +57,43 @@ export const ReadExcel = ()  =>{
 
         <TableBody>
             {sheetData.slice(1).map((row:any) => (
-                <TableRow>
-                    {row.map((c:any)=> <TableCell key={c}> <Typography variant="subtitle1">{c}</Typography>  </TableCell>)}
+                <><td>
+                <IconButton
+                  aria-label="expand row"
+                  variant="plain"
+                  color="neutral"
+                  size="sm"
+                  onClick={() => setOpen(!open)}
+                >
+                  {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                </IconButton>
+              </td>
+              
+              <TableRow>
+                  {row.map((c: any) => <TableCell key={c}> <Typography variant="subtitle1">{c}</Typography>  </TableCell>)}
 
-                </TableRow>
+                </TableRow></>
             )
                 )}
           
         </TableBody>
 
-       </Table> 
+      </Table> 
     </TableContainer>
-    };
+    </React.Fragment>
+
+}; 
+
+    
+
+     
+    
+
+    
+    
+
+    
+      
 
     </>
   );

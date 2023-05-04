@@ -1,66 +1,142 @@
 import * as React from 'react';
-import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
-import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Input from '@mui/material/Input';
-import styles from '../styles/Home.module.css'
 import Container from '@mui/material/Container';
-import Grid from '@mui/material/Grid';
 import { CardActionArea } from '@mui/material';
-
-
+import Grid from '@mui/material/Grid';
 import * as XLSX from "xlsx";
 import { useState } from 'react';
+import { useRouter } from 'next/router';
+import Link from 'next/link';
+import Box from '@mui/material/Box';
+import { makeStyles } from '@material-ui/core/styles';
+import Tooltip from '@mui/material/Tooltip';
+import DonutChart from '@/components/donutChart';
 
-import { Link } from 'react-router-dom';
+
+const useStyles = makeStyles(theme => ({
+  iconHover: {
+    '&:hover': {
+      border: '2px solid green',
+      //TODO display the text CREATE ITEM instead of AddIcon
+    }
+  },
+
+  floatBtn: {
+    marginRight: theme.spacing(1),
+  },
+}));
 
 
-import { ExcelImport } from './ExcelImport';
-  
-
-export default function Home() {
+export default function Home(props:any) {
   const [fileName, setFileName] = useState(null);
 
-  const [columns, setColumns] = useState([]);
+  //cards
   const [total, setTotal] = useState(0);
   const [solved, setSolved] = useState(0);
   const [closed, setClosed] = useState(0);
   const [forwarded, setForwarded] = useState(0);
   const [reopened, setReopened] = useState(0);
 
-  const [data, setData] = useState([]);
+  //inside card total
+  const [low, setLow] = useState(0);
+  const [medium, setMedium] = useState(0);
+  const [high, setHigh] = useState(0);
+  const [critical, setCritical] = useState(0);
+  const [assigned, setAssigned] = useState(0);
+  const [inProgress, setInProgress] = useState(0);
+  const [pending, setPending] = useState(0);
+  const [resolved, setResolved] = useState(0);
 
+  //inside card resolved
+  const [lowR, setLowR] = useState(0);
+  const [mediumR, setMediumR] = useState(0);
+  const [highR, setHighR] = useState(0);
+  const [criticalR, setCriticalR] = useState(0);
+
+  //inside card closed
+  const [lowC, setLowC] = useState(0);
+  const [mediumC, setMediumC] = useState(0);
+  const [highC, setHighC] = useState(0);
+  const [criticalC, setCriticalC] = useState(0);
+
+  //inside card forwarded
+  const [lowF, setLowF] = useState(0);
+  const [mediumF, setMediumF] = useState(0);
+  const [highF, setHighF] = useState(0);
+  const [criticalF, setCriticalF] = useState(0);
+
+  //inside card reopened
+  const [lowReopened, setLowReopened] = useState(0);
+  const [mediumReopened, setMediumReopened] = useState(0);
+  const [highReopened, setHighReopened] = useState(0);
+  const [criticalReopened, setCriticalReopened] = useState(0);
+
+
+  // data
+  const [allData, setData] = useState("");
+  const [resolvedData, setResolvedData] = useState("");
+
+  const [backlog, setBacklog] = useState(false);
+  const [openTickets, setOpenTickets] = useState(0);
+  const [backlogTotal, setBacklogTotal] = useState(0);
+
+  const [restrictionTotal, setRestrictionTotal] = useState(0);
+
+  //hover card total
+  const [hover, setHover] = useState(false);
+
+  //hover card resolved
+  const [hoverR, setHoverR] = useState(false);
+
+  //hover card closed
+  const [hoverC, setHoverC] = useState(false);
+
+  //hover card forwarded
+  const [hoverF, setHoverF] = useState(false);
+
+   //hover card reopened
+   const [hoverReopened, setHoverReopened] = useState(false);
+
+  //hover card backlog
+  const [hoverBacklog, setHoverBacklog] = useState(false);
+
+
+  const router = useRouter();
+  
   const handleFile = async (e: any) =>{
     
     const file = e.target.files[0];
     setFileName(file.name);
     const data = await file.arrayBuffer();
+
+    //todo el archivo
     const workbook = XLSX.read(data);
+
+    //primeras 50 filas
+    //const workbook = XLSX.read(data, {sheetRows:50});
 
     //esto da la primera página del excel
     const worksheet = workbook.Sheets[workbook.SheetNames[0]]
 
     //convierte a array de arrays
-    const jsonData = XLSX.utils.sheet_to_json(worksheet, {
+    /* const jsonData = XLSX.utils.sheet_to_json(worksheet, {
       header: 1,
       defval:"",
-    });
+    }); */
 
     //leer como json
-    //const jsonData = XLSX.utils.sheet_to_json(worksheet);
+    const jsonData = XLSX.utils.sheet_to_json(worksheet, {
+      //blankrows: "",
+      header: 1});
 
 
     //jsonData[0] son el nombre de todas las columnas cuando es array
-    setColumns(jsonData[0]);
 
     //set data
     setData(jsonData);
-
-    let allData = jsonData;
-
 
     //obtener total de tickets en archivo
     let counter = 0;
@@ -69,74 +145,278 @@ export default function Home() {
     }
     setTotal(counter-1);
 
-    //contar específico
-    //esto se puede hacer función para cada columna y valor específico
-    let contadorS = 0;
-    for (let i = 1; i<jsonData.length-1; i++){
-      if (jsonData[i][6] === "Medium"){
-        contadorS++;
-      }
-    }
 
-    //contar resueltos
+    //contar 
     let contadorSolved = 0;
-    for (let i = 1; i<jsonData.length-1; i++){
+    let contadorClosed = 0;
+    let contadorForwarded = 0;
+    let contadorReopened = 0;
+
+    //contadores generales
+    let contadorLow = 0;
+    let contadorMedium = 0;
+    let contadorHigh = 0;
+    let contadorCritical = 0;
+
+    //contadores card total
+    let contadorAssigned = 0;
+    let contadorInProgress = 0;
+    let contadorPending = 0;
+    let contadorResolved = 0;
+
+    //contadores card resolved
+    let contadorLowR = 0;
+    let contadorMediumR = 0;
+    let contadorHighR = 0;
+    let contadorCriticalR = 0;
+
+    //contadores card closed
+    let contadorLowC = 0;
+    let contadorMediumC = 0;
+    let contadorHighC = 0;
+    let contadorCriticalC = 0;
+
+    //contadores card forwarded
+    let contadorLowF = 0;
+    let contadorMediumF = 0;
+    let contadorHighF = 0;
+    let contadorCriticalF = 0;
+
+    //contadores card reopened
+    let contadorLowReopened = 0;
+    let contadorMediumReopened  = 0;
+    let contadorHighReopened  = 0;
+    let contadorCriticalReopened  = 0;
+
+    let contadorOpenedTickets = 0;
+
+
+    let arrayResolved=[];
+    arrayResolved.push(jsonData[0]);
+   
+
+    for (let i = 1; i<jsonData.length; i++){
+
+      //backlog
+      if(jsonData[i][13] == 1){
+        contadorOpenedTickets++;
+      }
+
+        //total tickets 
+      if (jsonData[i][6] == "Low"){
+        contadorLow++;
+      }
+
+      if (jsonData[i][6] == "Medium"){
+        contadorMedium++;
+      }
+
+      if (jsonData[i][6] == "High"){
+        contadorHigh++;
+      }
+
+      if (jsonData[i][6] == "Critical"){
+        contadorCritical++;
+      }
+
+
+      //Assigned
+      if (jsonData[i][7] === "Assigned"){
+        contadorAssigned++;
+      }
+
+      //In progress
+      if (jsonData[i][7] === "In Progress"){
+        contadorInProgress++;
+      }
+
+      //Pending
+      if (jsonData[i][7] === "Pending"){
+        contadorPending++;
+      }
+
+      //Resolved
+      if (jsonData[i][7] === "Resolved"){
+        contadorResolved++;
+      }
+
+        //solved
       if (jsonData[i][7] === "Resolved" && jsonData[i][14] === 1 ){ //columna status y solved=1
         contadorSolved++;
-      }
-    }
-    setSolved(contadorSolved);
+        arrayResolved.push(jsonData[i]);
 
-    //contar closed
-    let contadorClosed = 0;
-    for (let i = 1; i<jsonData.length-1; i++){
+        if (jsonData[i][6] == "Low"){
+          contadorLowR++;
+        }
+  
+        if (jsonData[i][6] == "Medium"){
+          contadorMediumR++;
+        }
+  
+        if (jsonData[i][6] == "High"){
+          contadorHighR++;
+        }
+  
+        if (jsonData[i][6] == "Critical"){
+          contadorCriticalR++;
+        }
+        
+      }
+
+
+        //closed
       if (jsonData[i][7] === "Closed"){
         contadorClosed++;
-      }
-    }
-    setClosed(contadorClosed);
+        //poner el array
 
-    //contar forwarded
-    let contadorForwarded = 0;
-    for (let i = 1; i<jsonData.length-1; i++){
+        if (jsonData[i][6] == "Low"){
+          contadorLowC++;
+        }
+  
+        if (jsonData[i][6] == "Medium"){
+          contadorMediumC++;
+        }
+  
+        if (jsonData[i][6] == "High"){
+          contadorHighC++;
+        }
+  
+        if (jsonData[i][6] == "Critical"){
+          contadorCriticalC++;
+        }
+      }
+
+
+        //forwarded
       if (jsonData[i][16] === 1){
         contadorForwarded++;
-      }
-    }
-    setForwarded(contadorForwarded);
+        //poner el array
 
-    //contar reopen
-    let contadorReopened = 0;
-    for (let i = 1; i<jsonData.length-1; i++){
+        if (jsonData[i][6] == "Low"){
+          contadorLowF++;
+        }
+  
+        if (jsonData[i][6] == "Medium"){
+          contadorMediumF++;
+        }
+  
+        if (jsonData[i][6] == "High"){
+          contadorHighF++;
+        }
+  
+        if (jsonData[i][6] == "Critical"){
+          contadorCriticalF++;
+        }
+      }
+
+
+        //reoponed
       if (jsonData[i][15] === 1){
         contadorReopened++;
+        //poner el array
+
+        if (jsonData[i][6] == "Low"){
+          contadorLowReopened++;
+        }
+  
+        if (jsonData[i][6] == "Medium"){
+          contadorMediumReopened++;
+        }
+  
+        if (jsonData[i][6] == "High"){
+          contadorHighReopened++;
+        }
+  
+        if (jsonData[i][6] == "Critical"){
+          contadorCriticalReopened++;
+        }
       }
+      
     }
+
+    //set generales
+    setSolved(contadorSolved);
+    setClosed(contadorClosed);
+    setForwarded(contadorForwarded);
     setReopened(contadorReopened);
+    
+    //set card total
+    setLow(contadorLow);
+    setMedium(contadorMedium);
+    setHigh(contadorHigh);
+    setCritical(contadorCritical);
+
+    setAssigned(contadorAssigned);
+    setPending(contadorPending);
+    setInProgress(contadorInProgress);
+    setResolved(contadorResolved);
+
+    //set card resolved
+    setLowR(contadorLowR);
+    setMediumR(contadorMediumR);
+    setHighR(contadorHighR);
+    setCriticalR(contadorCriticalR);
+
+    //set card closed
+    setLowC(contadorLowC);
+    setMediumC(contadorMediumC);
+    setHighC(contadorHighC);
+    setCriticalC(contadorCriticalC);
+
+    //set card forwarded
+    setLowF(contadorLowF);
+    setMediumF(contadorMediumF);
+    setHighF(contadorHighF);
+    setCriticalF(contadorCriticalF);
+
+    //set card reopened
+    setLowReopened(contadorLowReopened);
+    setMediumReopened(contadorMediumReopened);
+    setHighReopened(contadorHighReopened);
+    setCriticalReopened(contadorCriticalReopened);
+
+    setOpenTickets(contadorOpenedTickets);
+
+
+    setResolvedData(arrayResolved);
+
+    console.log("el nuevo", arrayResolved);
+
+    console.log("open tickets", contadorOpenedTickets);
+    console.log("assigned tickets", contadorAssigned);
 
 
 
+    let restriction = (counter-1) * 0.5;
 
-    console.log(jsonData);
+    console.log("restriction", restriction);
 
-    console.log("esto es el id:" , jsonData[1][0]);
-    console.log("total de filas", jsonData.length -1);
-    console.log("contar medium", contadorS);
+    //Backlog: cuantos quedaron abiertos contra cuantos fueron asignados. Esto no debe exceder más del 5% del total del mes. 
+    
+    //setBacklog(((contadorOpenedTickets/contadorAssigned)*100));
 
-   
+    if (((contadorOpenedTickets/contadorAssigned)*100) > restriction){
+      setBacklog(true);
+    }
+
+    setRestrictionTotal(restriction);
+
+    setBacklogTotal(((contadorOpenedTickets/contadorAssigned)*100))
+
+
+    console.log("backlog", backlog);
+    
+
   }
-
-
-
 
 
     return( 
         <>
                 
         <Container>
+        <br />
 
-        
-        <Typography variant="h4" align="center">Tickets</Typography>
+        <Typography variant="h3" align="center">Tickets</Typography>
         <br></br>
 
         <div className='center'>
@@ -148,17 +428,13 @@ export default function Home() {
         <div className='center'>
         {fileName && (
           <React.Fragment> 
-        <Typography variant="h5" align="center">File Name: <span>{fileName}</span></Typography>
+        <Typography variant="h4" align="center">File Name: <span>{fileName}</span></Typography>
           </React.Fragment>
         ) }
         
-        
         </div>
 
-
         <br></br>
-
-        
 
         <Container disableGutters maxWidth="xl" component="main" sx={{ pt: 1, pb: 1 }} >
             
@@ -167,36 +443,182 @@ export default function Home() {
 
             {/* Total de tickets*/}
             <Grid item xs={3}>
-            <Card sx={{ maxWidth: 300, height: 300 }}>
-            
-                <CardActionArea href="/tickets">
-                    <CardContent>
-                    <Typography gutterBottom variant="h5" component="div">
-                        Total tickets
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                        {total}
-                    </Typography>
-                    </CardContent>
-                </CardActionArea>
-                
+              <Tooltip title= {
+                <Typography gutterBottom variant="subtitle2" component="div">
+                See all tickets </Typography>} arrow>
+
+                <Card sx={{ maxWidth: 300, minHeight: 300 }}>
+              
+                  <CardActionArea >
+                    
+                  <Link href={{ pathname: '/tickets', query: { data: JSON.stringify(allData) } }}>
+
+                      <CardContent 
+                          onMouseOver={() => setHover(true)}
+                          onMouseOut={() => setHover(false)} >
+                    
+                      <Typography gutterBottom variant="h5" component="div">
+                          Total tickets
+                        
+                      </Typography>
+
+                      <Typography variant="h6" color="text.secondary">
+                          <Box sx={{ fontWeight: 'bold' }}> {total} </Box>
+                      </Typography>
+
+
+                      {/* {fileName && (
+                          <DonutChart data={{ 
+                              labels: ['Low', 'Medium', 'High', 'Critical'], 
+                              values: [low, medium, high, critical], 
+                              colors: ['#FFFF00', '#FFBF00', '#FF7518', '#FF0000'] }} />
+
+                      )} */}
+
+                      {fileName && (
+                        <DonutChart data={{ 
+                          labels: ['Resolved', 'Closed', 'Forwarded', 'Reopened'], 
+                          values: [solved, closed, forwarded, reopened], 
+                          colors: ['#74b72e', '#FF7518', '#FFBF00', '#FF0000'] }} />
+
+                      )}
+
+                      <Typography variant="subtitle1" color="text.secondary">
+                          {hover? 
+                              <Box sx={{ fontWeight: 'bold' }}> Priority </Box>
+                          : null} 
+                      </Typography>
+
+                      <Typography variant="subtitle1" color="text.secondary">
+                          {hover? 
+                              "Low: " + low.toString()
+                          : null} 
+                      </Typography>
+
+                      <Typography variant="subtitle1" color="text.secondary">
+                          {hover? 
+                              "Medium: " + medium.toString()
+                          : null} 
+                      </Typography>
+
+                      <Typography variant="subtitle1" color="text.secondary">
+                          {hover? 
+                              "High: " + high.toString() 
+                          : null} 
+                      </Typography>
+
+                      <Typography variant="subtitle1" color="text.secondary">
+                          {hover? 
+                              "Critical: " + critical.toString() 
+                          : null} 
+                      </Typography>
+
+                      <br />
+
+                      <Typography variant="subtitle1" color="text.secondary">
+                          {hover? 
+                              <Box sx={{ fontWeight: 'bold' }}> Status </Box>
+                          : null} 
+                      </Typography> 
+
+                      <Typography variant="subtitle1" color="text.secondary">
+                          {hover? 
+                              "Assigned: " + assigned.toString() 
+                          : null} 
+                      </Typography>
+
+                      <Typography variant="subtitle1" color="text.secondary">
+                          {hover? 
+                              "Closed: " + closed.toString() 
+                          : null} 
+                      </Typography>
+
+                      <Typography variant="subtitle1" color="text.secondary">
+                          {hover? 
+                              "In Progress: " + inProgress.toString() 
+                          : null} 
+                      </Typography>
+
+                      <Typography variant="subtitle1" color="text.secondary">
+                          {hover? 
+                              "Pending: " + pending.toString() 
+                          : null} 
+                      </Typography>
+
+                      <Typography variant="subtitle1" color="text.secondary">
+                          {hover? 
+                              "Resolved: " + resolved.toString() 
+                          : null} 
+                      </Typography>
+
+                    
+                      </CardContent>
+
+                  </Link>
+                  </CardActionArea>
+                  
                 </Card>
+              </Tooltip>
             </Grid>
 
 
             {/*Resolved tickets*/}
             <Grid item xs={3}>
-            <Card sx={{ maxWidth: 300, height: 300 }}>
+            <Card sx={{ maxWidth: 300, minHeight: 300 }}>
             
-                <CardActionArea href="/">
-                    <CardContent>
+                <CardActionArea >
+                <Link href={{ pathname: '/tickets', query: { data: JSON.stringify(resolvedData) } }}> 
+                  <CardContent 
+                        onMouseOver={() => setHoverR(true)}
+                        onMouseOut={() => setHoverR(false)} >
                     <Typography gutterBottom variant="h5" component="div">
                         Resolved tickets
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="h6" color="text.secondary">
                         {solved}
                     </Typography>
+
+                    {fileName && (
+                       <DonutChart data={{ 
+                        labels: ['Low', 'Medium', 'High', 'Critical'], 
+                        values: [lowR, mediumR, highR, criticalR], 
+                        colors: ['#FFEE99', '#FF9F00', '#FF4500', '#E12901'] }} />
+
+                    )}
+                    <br />
+
+                    <Typography variant="subtitle1" color="text.secondary">
+                        {hoverR? 
+                            <Box sx={{ fontWeight: 'bold' }}> Priority </Box>
+                        : null} 
+                    </Typography>
+
+                    <Typography variant="subtitle1" color="text.secondary">
+                        {hoverR? 
+                            "Low: " + lowR.toString()
+                        : null} 
+                    </Typography>
+
+                    <Typography variant="subtitle1" color="text.secondary">
+                        {hoverR? 
+                            "Medium: " + mediumR.toString()
+                        : null} 
+                    </Typography>
+
+                    <Typography variant="subtitle1" color="text.secondary">
+                        {hoverR? 
+                            "High: " + highR.toString() 
+                        : null} 
+                    </Typography>
+
+                    <Typography variant="subtitle1" color="text.secondary">
+                        {hoverR? 
+                            "Critical: " + criticalR.toString() 
+                        : null} 
+                    </Typography>
+
                     </CardContent>
+                </Link>
                 </CardActionArea>
                 
                 </Card>
@@ -205,54 +627,180 @@ export default function Home() {
 
              {/*Closed tickets*/}
              <Grid item xs={3}>
-            <Card sx={{ maxWidth: 300, height: 300 }}>
-            
-                <CardActionArea href="/">
-                    <CardContent>
-                    <Typography gutterBottom variant="h5" component="div">
-                        Closed tickets
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                        {closed}
-                    </Typography>
-                    </CardContent>
-                </CardActionArea>
-                
-                </Card>
-            </Grid>
+              <Card sx={{ maxWidth: 300, minHeight: 300 }}>
+              
+                  <CardActionArea href="/" >
+                    <CardContent 
+                            onMouseOver={() => setHoverC(true)}
+                            onMouseOut={() => setHoverC(false)} >
+                      <Typography gutterBottom variant="h5" component="div">
+                          Closed tickets
+                      </Typography>
+                      <Typography variant="h6" color="text.secondary">
+                          {closed}
+                      </Typography>
+
+                      {fileName && (
+                        <DonutChart data={{ 
+                          labels: ['Low', 'Medium', 'High', 'Critical'], 
+                          values: [lowC, mediumC, highC, criticalC], 
+                          colors: ['#FFEE99', '#FF9F00', '#FF4500', '#E12901'] }} />
+
+                      )}
+                      <br />
+
+                      <Typography variant="subtitle1" color="text.secondary">
+                          {hoverC? 
+                              <Box sx={{ fontWeight: 'bold' }}> Priority </Box>
+                          : null} 
+                      </Typography>
+
+                      <Typography variant="subtitle1" color="text.secondary">
+                          {hoverC? 
+                              "Low: " + lowC.toString()
+                          : null} 
+                      </Typography>
+
+                      <Typography variant="subtitle1" color="text.secondary">
+                          {hoverC? 
+                              "Medium: " + mediumC.toString()
+                          : null} 
+                      </Typography>
+
+                      <Typography variant="subtitle1" color="text.secondary">
+                          {hoverC? 
+                              "High: " + highC.toString() 
+                          : null} 
+                      </Typography>
+
+                      <Typography variant="subtitle1" color="text.secondary">
+                          {hoverC? 
+                              "Critical: " + criticalC.toString() 
+                          : null} 
+                      </Typography>
+
+                      </CardContent>
+                  </CardActionArea>
+                  
+                  </Card>
+             </Grid>
 
 
             {/*Forwarded tickets*/}
             <Grid item xs={3}>
-            <Card sx={{ maxWidth: 300, height: 300 }}>
+            <Card sx={{ maxWidth: 300, minHeight: 300 }}>
             
                 <CardActionArea href="/">
-                    <CardContent>
+                    <CardContent 
+                          onMouseOver={() => setHoverF(true)}
+                          onMouseOut={() => setHoverF(false)} >
                     <Typography gutterBottom variant="h5" component="div">
                         Forwarded tickets
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="h6" color="text.secondary">
                         {forwarded}
                     </Typography>
+
+                    {fileName && (
+                       <DonutChart data={{ 
+                        labels: ['Low', 'Medium', 'High', 'Critical'], 
+                        values: [lowF, mediumF, highF, criticalF], 
+                        colors: ['#FFEE99', '#FF9F00', '#FF4500', '#E12901'] }} />
+
+                    )}
+                    <br />
+
+                      <Typography variant="subtitle1" color="text.secondary">
+                          {hoverF? 
+                              <Box sx={{ fontWeight: 'bold' }}> Priority </Box>
+                          : null} 
+                      </Typography>
+
+                      <Typography variant="subtitle1" color="text.secondary">
+                          {hoverF? 
+                              "Low: " + lowF.toString()
+                          : null} 
+                      </Typography>
+
+                      <Typography variant="subtitle1" color="text.secondary">
+                          {hoverF? 
+                              "Medium: " + mediumF.toString()
+                          : null} 
+                      </Typography>
+
+                      <Typography variant="subtitle1" color="text.secondary">
+                          {hoverF? 
+                              "High: " + highF.toString() 
+                          : null} 
+                      </Typography>
+
+                      <Typography variant="subtitle1" color="text.secondary">
+                          {hoverF? 
+                              "Critical: " + criticalF.toString() 
+                          : null} 
+                      </Typography>
+
                     </CardContent>
                 </CardActionArea>
                 </Card>
             </Grid>
 
 
-
-            {/*Reopen tickets*/}
+            {/*Reopened tickets*/}
             <Grid item xs={3}>
-            <Card sx={{ maxWidth: 300, height: 300 }}>
+            <Card sx={{ maxWidth: 300, minHeight: 300 }}>
             
-                <CardActionArea href="/">
-                    <CardContent>
+                <CardActionArea >
+                  <CardContent 
+                          onMouseOver={() => setHoverReopened(true)}
+                          onMouseOut={() => setHoverReopened(false)} >
                     <Typography gutterBottom variant="h5" component="div">
                         Reopened tickets
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="h6" color="text.secondary">
                         {reopened}
                     </Typography>
+
+                    {fileName && (
+                       <DonutChart data={{ 
+                        labels: ['Low', 'Medium', 'High', 'Critical'], 
+                        values: [lowReopened, mediumReopened, highReopened, criticalReopened], 
+                        colors: ['#FFEE99', '#FF9F00', '#FF4500', '#E12901'] }} />
+
+                    )}
+                    <br />
+
+                      <Typography variant="subtitle1" color="text.secondary">
+                          {hoverReopened? 
+                              <Box sx={{ fontWeight: 'bold' }}> Priority </Box>
+                          : null} 
+                      </Typography>
+
+                      <Typography variant="subtitle1" color="text.secondary">
+                          {hoverReopened? 
+                              "Low: " + lowReopened.toString()
+                          : null} 
+                      </Typography>
+
+                      <Typography variant="subtitle1" color="text.secondary">
+                          {hoverReopened? 
+                              "Medium: " + mediumReopened.toString()
+                          : null} 
+                      </Typography>
+
+                      <Typography variant="subtitle1" color="text.secondary">
+                          {hoverReopened? 
+                              "High: " + highReopened.toString() 
+                          : null} 
+                      </Typography>
+
+                      <Typography variant="subtitle1" color="text.secondary">
+                          {hoverReopened? 
+                              "Critical: " + criticalReopened.toString() 
+                          : null} 
+                      </Typography>
+
+
                     </CardContent>
                 </CardActionArea>
                 </Card>
@@ -261,28 +809,101 @@ export default function Home() {
 
             {/*Backlog tickets*/}
             <Grid item xs={3}>
-            <Card sx={{ maxWidth: 300, height: 300 }}>
+            <Card sx={{ maxWidth: 300, minHeight: 300 }}>
             
                 <CardActionArea href="/">
-                    <CardContent>
+                <CardContent 
+                          onMouseOver={() => setHoverBacklog(true)}
+                          onMouseOut={() => setHoverBacklog(false)} >
                     <Typography gutterBottom variant="h5" component="div">
                         Backlog
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                        poner variable
-                    </Typography>
+                    <br />
+                    
+                        {/* si hay backlog, o sea es true */}
+
+                        {backlog && fileName? 
+                              <DonutChart data={{ 
+                                labels: ['Over limit'], 
+                                values: [lowReopened], 
+                                colors: ['#FF2400	'] }} /> 
+                          : null
+                          } 
+
+                        {!backlog && fileName? 
+                          <DonutChart data={{ 
+                            labels: ['Below limit'], 
+                            values: [lowReopened], 
+                            colors: ['#32CD32	'] }} />
+                          : null }
+
+                        {/* si no hay, si es false */}
+
+                       {/*  agregar un hover que enseñe tickets abiertos, assigned,
+                        el limite de 5% y cuánto queda el backlog */}
+                        <br />
+                        <br />
+
+                        <Typography variant="subtitle1" color="text.secondary">
+                          {hoverBacklog? 
+                              "Open tickets: " + openTickets.toString() 
+                          : null} 
+                        </Typography>
+
+                        <Typography variant="subtitle1" color="text.secondary">
+                          {hoverBacklog? 
+                              "Asigned tickets: " + assigned.toString() 
+                          : null} 
+                        </Typography>
+
+                        <Typography variant="subtitle1" color="text.secondary">
+                          {hoverBacklog? 
+                              "5% limit: " + restrictionTotal.toString() 
+                          : null} 
+                        </Typography>
+
+                        <Typography variant="subtitle1" color="text.secondary">
+                          {hoverBacklog? 
+                              "Backlog total: " + (Math.floor(backlogTotal)).toString() 
+                          : null} 
+                        </Typography>
+  
                     </CardContent>
+                    
                 </CardActionArea>
                 </Card>
             </Grid>
 
 
 
+            {/*Graphics*/}
+            <Grid item xs={3}>
+            <Card sx={{ maxWidth: 300, minHeight: 300 }}>
+            
+                <CardActionArea >
+                <Link href={{ pathname: '/graficas', query: { data: JSON.stringify(allData) } }}>
+                <CardContent >
+                    <Typography gutterBottom variant="h5" component="div">
+                        Graphics
+                    </Typography>
+                    
+  
+                    </CardContent>
+                </Link>
+                </CardActionArea>
+                
+                </Card>
+            </Grid>
+
            
         </Grid>
+        
         </Container>
 
+     
+
     </Container>
+    <br />
         
         
         </>
