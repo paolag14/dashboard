@@ -8,6 +8,7 @@ import Modal from '@mui/material/Modal';
 import Button from '@mui/material/Button';
 import StackedBarChart from '@/components/stackedBarChart';
 
+
 /* 
 - Bar chart: You can use a bar chart to show the number of incidents by each category or service. 
 This can give you a quick overview of which category or service has the highest number of incidents.
@@ -51,12 +52,13 @@ export default function Graficas() {
     const { data } = router.query;
     const allData = JSON.parse(data);
 
+
+    //tickets by service bar chart
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
     
     const services2 = Array.from(new Set(allData.slice(1).map((row:any) => row[2] ? row[2] : null)))
-    console.log(services2);
 
     const services: Service[] = services2.map(type => ({ type }));
 
@@ -70,7 +72,54 @@ export default function Graficas() {
 
     const serviceCounts = countServices(services, allData);
 
-    console.log(serviceCounts);
+
+    //priority and status stacked bar chart 
+    const countByStatusAndPriority = (data) => {
+        const counts = {};
+        data.forEach(row => {
+          const status = row[7];
+          const priority = row[6];
+          if (status && priority) {
+            const key = `${status}-${priority}`;
+            counts[key] = (counts[key] || 0) + 1;
+          }
+        });
+        return counts;
+      };
+      
+    const statusPriorityCounts = countByStatusAndPriority(allData);
+      
+    console.log("aver", statusPriorityCounts);
+
+        /* const counts = countByStatusAndPriority(allData);
+        const statusValues = Array.from(new Set(allData.map(row => row[7] || 'Unknown')));
+        const priorityValues = Array.from(new Set(allData.map(row => row[6] || 'Unknown')));
+        const chartData = priorityValues.map(priority => {
+          const values = statusValues.map(status => counts[`${status}-${priority}`] || 0);
+          return { priority, ...Object.fromEntries(statusValues.map((status, i) => [status, values[i]])) };
+        });
+ */
+    //en statusPriorityCounts tenemos toda la info, solo tenemos que leerla bien en el chart y ya
+        const statusValues = ['Assigned', 'Closed', 'In Progress', 'Pending', 'Resolved'];
+        const priorityValues = ['Low', 'Medium', 'High'];
+        const chartData = priorityValues.map((priority) => {
+          const values = statusValues.map((status) => statusPriorityCounts[`${status}-${priority}`] || 0);
+          return { priority, values };
+        });
+
+        const stackedBarChartData = {
+            labels: statusValues,
+            datasets: priorityValues.map((priority, i) => ({
+              label: priority,
+              values: chartData.map((d) => d.values[i]),
+              colors: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.2)`,
+            })),
+          };
+
+    
+
+
+
 
 
   return(
@@ -82,7 +131,7 @@ export default function Graficas() {
         <br />
 
         <Box display="flex" width={"100%"} justifyContent="center" alignItems="center">
-            <Box display="flex" m={2}  flexDirection="row" width="50%" alignItems="center" sx={{ backgroundColor: "white" }} >
+            <Box display="flex" m={2} flexDirection="row" width="50%" alignItems="center" sx={{ backgroundColor: "white" }} >
                 <Box display="flex" flexDirection="column" width="100%" alignItems="center">
                     <Typography align='center' variant='h6'  sx={{ fontWeight: 'bold'  }}> Number of tickets by Service </Typography> 
                     <br />
@@ -128,7 +177,7 @@ export default function Graficas() {
 
             <Box width="50%" m={2} alignItems="center" sx={{ backgroundColor: "white" }}>
                 <Typography align='center' variant='h6'  sx={{ fontWeight: 'bold'  }}> Tickets by Status and Priority </Typography> 
-                <StackedBarChart data={{
+                {/* <StackedBarChart data={{
                     labels: ['Assigned', 'Closed', 'In Progress', 'Pending', 'Resolved'],
                     datasets: [
                         {
@@ -147,9 +196,14 @@ export default function Graficas() {
                         colors: 'rgba(255, 206, 86, 0.2)',
                         },
                     ],
-                }} />
+                }} /> */}
+
+                <StackedBarChart data={stackedBarChartData} />
+
 
             </Box>
+
+            
             
            {/*  <Box width="34%" p={4}>
                 <BarChart data={{ 
