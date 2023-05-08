@@ -86,41 +86,31 @@ export default function Graficas() {
         });
         return counts;
       };
-      
-    const statusPriorityCounts = countByStatusAndPriority(allData);
-      
-    console.log("aver", statusPriorityCounts);
 
-        /* const counts = countByStatusAndPriority(allData);
-        const statusValues = Array.from(new Set(allData.map(row => row[7] || 'Unknown')));
-        const priorityValues = Array.from(new Set(allData.map(row => row[6] || 'Unknown')));
-        const chartData = priorityValues.map(priority => {
-          const values = statusValues.map(status => counts[`${status}-${priority}`] || 0);
-          return { priority, ...Object.fromEntries(statusValues.map((status, i) => [status, values[i]])) };
-        });
- */
-    //en statusPriorityCounts tenemos toda la info, solo tenemos que leerla bien en el chart y ya
-        const statusValues = ['Assigned', 'Closed', 'In Progress', 'Pending', 'Resolved'];
-        const priorityValues = ['Low', 'Medium', 'High'];
-        const chartData = priorityValues.map((priority) => {
-          const values = statusValues.map((status) => statusPriorityCounts[`${status}-${priority}`] || 0);
-          return { priority, values };
-        });
+ 
 
-        const stackedBarChartData = {
-            labels: statusValues,
-            datasets: priorityValues.map((priority, i) => ({
-              label: priority,
-              values: chartData.map((d) => d.values[i]),
-              colors: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.2)`,
-            })),
-          };
+  const transformData = (counts: any) => {
+    const labels = ['Assigned', 'Closed', 'In Progress', 'Pending', 'Resolved'];
+    const priorities = ['High', 'Medium', 'Low'];
+    const datasets = priorities.map((priority) => {
+      return {
+        label: priority,
+        values: labels.map((status) => counts[`${status}-${priority}`] || 0),
+        colors: `rgba(${Math.floor(Math.random() * 256)}, 
+                    ${Math.floor(Math.random() * 256)}, 
+                    ${Math.floor(Math.random() * 256)})`,
+      };
+    }).reverse();
+    return { labels, datasets };
+  };
 
-    
+  const statusPriorityCounts = countByStatusAndPriority(allData);
+  const transformedData = transformData(statusPriorityCounts);
+
+  console.log("aver", statusPriorityCounts);
 
 
-
-
+          
 
   return(
     <>
@@ -132,7 +122,7 @@ export default function Graficas() {
 
         <Box display="flex" width={"100%"} justifyContent="center" alignItems="center">
             <Box display="flex" m={2} flexDirection="row" width="50%" alignItems="center" sx={{ backgroundColor: "white" }} >
-                <Box display="flex" flexDirection="column" width="100%" alignItems="center">
+                <Box display="flex" flexDirection="column" width="100%" minHeight={"820px"} alignItems="center">
                     <Typography align='center' variant='h6'  sx={{ fontWeight: 'bold'  }}> Number of tickets by Service </Typography> 
                     <br />
                     <Button variant="text" onClick={handleOpen}>See Details</Button>
@@ -175,7 +165,7 @@ export default function Graficas() {
             </Box>
             
 
-            <Box width="50%" m={2} alignItems="center" sx={{ backgroundColor: "white" }}>
+            <Box width="50%" minHeight={"820px"} m={2} alignItems="center" sx={{ backgroundColor: "white" }}>
                 <Typography align='center' variant='h6'  sx={{ fontWeight: 'bold'  }}> Tickets by Status and Priority </Typography> 
                 {/* <StackedBarChart data={{
                     labels: ['Assigned', 'Closed', 'In Progress', 'Pending', 'Resolved'],
@@ -198,7 +188,9 @@ export default function Graficas() {
                     ],
                 }} /> */}
 
-                <StackedBarChart data={stackedBarChartData} />
+                {/* <StackedBarChart data={stackedBarChartData} /> */}
+                <StackedBarChart data={transformedData} />
+
 
 
             </Box>

@@ -26,6 +26,7 @@ const StackedBarChart = ({ data }) => {
           }),
         },
         options: {
+          
           responsive: true,
           maintainAspectRatio: true,
           scales: {
@@ -39,7 +40,7 @@ const StackedBarChart = ({ data }) => {
           },
           plugins: {
             legend: {
-              display: false,
+              display: true,
               position: 'bottom',
               align: 'center',
               labels: {
