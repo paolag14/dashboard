@@ -457,100 +457,91 @@ export default function Home(props:any) {
                           onMouseOver={() => setHover(true)}
                           onMouseOut={() => setHover(false)} >
                     
-                      <Typography gutterBottom variant="h5" component="div">
-                          Total tickets
-                        
-                      </Typography>
+                        <Typography gutterBottom variant="h5" component="div">
+                            Total tickets
+                          
+                        </Typography>
 
-                      <Typography variant="h6" color="text.secondary">
-                          <Box sx={{ fontWeight: 'bold' }}> {total} </Box>
-                      </Typography>
+                        <Typography variant="h6" color="text.secondary">
+                            <Box sx={{ fontWeight: 'bold' }}> {total} </Box>
+                        </Typography>
 
 
-                      {/* {fileName && (
+                        {fileName && (
                           <DonutChart data={{ 
-                              labels: ['Low', 'Medium', 'High', 'Critical'], 
-                              values: [low, medium, high, critical], 
-                              colors: ['#FFFF00', '#FFBF00', '#FF7518', '#FF0000'] }} />
+                            labels: ['Resolved', 'Closed', 'Forwarded', 'Reopened'], 
+                            values: [solved, closed, forwarded, reopened], 
+                            colors: ['#74b72e', '#FF7518', '#FFBF00', '#FF0000'] }} />
 
-                      )} */}
+                        )}
 
-                      {fileName && (
-                        <DonutChart data={{ 
-                          labels: ['Resolved', 'Closed', 'Forwarded', 'Reopened'], 
-                          values: [solved, closed, forwarded, reopened], 
-                          colors: ['#74b72e', '#FF7518', '#FFBF00', '#FF0000'] }} />
+                        <Typography variant="subtitle1" color="text.secondary">
+                            {hover? 
+                                <Box sx={{ fontWeight: 'bold' }}> Priority </Box>
+                            : null} 
+                        </Typography>
 
-                      )}
+                        <Typography variant="subtitle1" color="text.secondary">
+                            {hover? 
+                                "Low: " + low.toString()
+                            : null} 
+                        </Typography>
 
-                      <Typography variant="subtitle1" color="text.secondary">
-                          {hover? 
-                              <Box sx={{ fontWeight: 'bold' }}> Priority </Box>
-                          : null} 
-                      </Typography>
+                        <Typography variant="subtitle1" color="text.secondary">
+                            {hover? 
+                                "Medium: " + medium.toString()
+                            : null} 
+                        </Typography>
 
-                      <Typography variant="subtitle1" color="text.secondary">
-                          {hover? 
-                              "Low: " + low.toString()
-                          : null} 
-                      </Typography>
+                        <Typography variant="subtitle1" color="text.secondary">
+                            {hover? 
+                                "High: " + high.toString() 
+                            : null} 
+                        </Typography>
 
-                      <Typography variant="subtitle1" color="text.secondary">
-                          {hover? 
-                              "Medium: " + medium.toString()
-                          : null} 
-                      </Typography>
+                        <Typography variant="subtitle1" color="text.secondary">
+                            {hover? 
+                                "Critical: " + critical.toString() 
+                            : null} 
+                        </Typography>
 
-                      <Typography variant="subtitle1" color="text.secondary">
-                          {hover? 
-                              "High: " + high.toString() 
-                          : null} 
-                      </Typography>
+                        <br />
 
-                      <Typography variant="subtitle1" color="text.secondary">
-                          {hover? 
-                              "Critical: " + critical.toString() 
-                          : null} 
-                      </Typography>
+                        <Typography variant="subtitle1" color="text.secondary">
+                            {hover? 
+                                <Box sx={{ fontWeight: 'bold' }}> Status </Box>
+                            : null} 
+                        </Typography> 
 
-                      <br />
+                        <Typography variant="subtitle1" color="text.secondary">
+                            {hover? 
+                                "Assigned: " + assigned.toString() 
+                            : null} 
+                        </Typography>
 
-                      <Typography variant="subtitle1" color="text.secondary">
-                          {hover? 
-                              <Box sx={{ fontWeight: 'bold' }}> Status </Box>
-                          : null} 
-                      </Typography> 
+                        <Typography variant="subtitle1" color="text.secondary">
+                            {hover? 
+                                "Closed: " + closed.toString() 
+                            : null} 
+                        </Typography>
 
-                      <Typography variant="subtitle1" color="text.secondary">
-                          {hover? 
-                              "Assigned: " + assigned.toString() 
-                          : null} 
-                      </Typography>
+                        <Typography variant="subtitle1" color="text.secondary">
+                            {hover? 
+                                "In Progress: " + inProgress.toString() 
+                            : null} 
+                        </Typography>
 
-                      <Typography variant="subtitle1" color="text.secondary">
-                          {hover? 
-                              "Closed: " + closed.toString() 
-                          : null} 
-                      </Typography>
+                        <Typography variant="subtitle1" color="text.secondary">
+                            {hover? 
+                                "Pending: " + pending.toString() 
+                            : null} 
+                        </Typography>
 
-                      <Typography variant="subtitle1" color="text.secondary">
-                          {hover? 
-                              "In Progress: " + inProgress.toString() 
-                          : null} 
-                      </Typography>
-
-                      <Typography variant="subtitle1" color="text.secondary">
-                          {hover? 
-                              "Pending: " + pending.toString() 
-                          : null} 
-                      </Typography>
-
-                      <Typography variant="subtitle1" color="text.secondary">
-                          {hover? 
-                              "Resolved: " + resolved.toString() 
-                          : null} 
-                      </Typography>
-
+                        <Typography variant="subtitle1" color="text.secondary">
+                            {hover? 
+                                "Resolved: " + resolved.toString() 
+                            : null} 
+                        </Typography>
                     
                       </CardContent>
 

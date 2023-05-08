@@ -8,6 +8,7 @@ import Modal from '@mui/material/Modal';
 import Button from '@mui/material/Button';
 import StackedBarChart from '@/components/stackedBarChart';
 import PieChart from '@/components/pieChart';
+import WordCloudChart from '@/components/wordCloudChart';
 
 
 /* 
@@ -20,17 +21,24 @@ This can give you an idea of how many incidents are open, closed, or in progress
 - Pie chart: A pie chart can be used to show the percentage of incidents by support group or assignee. 
 This can help you identify which support group or assignee is handling the highest number of incidents.
 
-- Heatmap: A heatmap can be used to visualize the distribution of incidents by created date and support group. 
-This can help you identify if there are any support groups that are experiencing a high volume of incidents during a specific time period.
+- Word cloud: You can create a word cloud to show the most common words or phrases in the incident summaries. 
+This can help you identify common themes or issues that are occurring across incidents.
 
-- Scatter plot: A scatter plot can be used to show the relationship between the duration of incidents and the priority level. 
-This can help you identify if there is any correlation between the priority level of an incident and how long it takes to resolve it. */
+- Donut chart: You can use a donut chart to show the percentage of incidents that were reopened and the 
+reason for reopening. This can help you identify the most common reasons for reopening incidents and take action 
+to prevent these from occurring in the future.
+
+*/
 
 interface Service {
     type: string;
 }
 
 interface Asignee {
+  type: string;
+}
+
+interface SupportGroup {
   type: string;
 }
 
@@ -62,8 +70,7 @@ export default function Graficas() {
     const handleOpenAssignee = () => setOpenAssignee(true);
     const handleCloseAssignee = () => setOpenAssignee(false);
 
-
-    //tickets by service bar chart
+    //tickets by service bar chart modal
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
@@ -81,7 +88,6 @@ export default function Graficas() {
     };
 
     const serviceCounts = countServices(services, allData);
-
 
     //pie chart assignee name
     const assigneeName = Array.from(new Set(allData.slice(1).map((row:any) => row[18] ? row[18] : null)))
@@ -176,6 +182,14 @@ export default function Graficas() {
 
     //console.log("aver", statusPriorityCounts);
 
+
+    const dataWordCloud = [
+      { text: 'apple', value: 10, color: '#FF6384' },
+      { text: 'banana', value: 8, color: '#36A2EB' },
+      { text: 'orange', value: 6, color: '#FFCE56' },
+      { text: 'grape', value: 4, color: '#4BC0C0' },
+      { text: 'kiwi', value: 2, color: '#9966FF' },
+    ];
 
 
 
@@ -276,6 +290,14 @@ export default function Graficas() {
           </Box>
  
         </Box>
+
+        <Box display="flex" width={"100%"} justifyContent="center" alignItems="center">
+          <WordCloudChart data={dataWordCloud} />
+
+        </Box>
+
+
+
 
     </Container>
     
