@@ -7,6 +7,7 @@ import BarChart from '../components/barChart';
 import Modal from '@mui/material/Modal';
 import Button from '@mui/material/Button';
 import StackedBarChart from '@/components/stackedBarChart';
+import PieChart from '@/components/pieChart';
 
 
 /* 
@@ -27,6 +28,10 @@ This can help you identify if there is any correlation between the priority leve
 
 interface Service {
     type: string;
+}
+
+interface Asignee {
+  type: string;
 }
 
 const style = {
@@ -52,6 +57,11 @@ export default function Graficas() {
     const { data } = router.query;
     const allData = JSON.parse(data);
 
+    //asignee names modal
+    const [openAssignee, setOpenAssignee] = useState(false);
+    const handleOpenAssignee = () => setOpenAssignee(true);
+    const handleCloseAssignee = () => setOpenAssignee(false);
+
 
     //tickets by service bar chart
     const [open, setOpen] = useState(false);
@@ -73,10 +83,69 @@ export default function Graficas() {
     const serviceCounts = countServices(services, allData);
 
 
+    //pie chart assignee name
+    const assigneeName = Array.from(new Set(allData.slice(1).map((row:any) => row[18] ? row[18] : null)))
+
+    //const assigneeNames: Asignee[] = assigneeName.map(type => ({ type }));
+
+    const assigneeNames: Asignee[] = assigneeName.map(type => ({ type })).sort((a, b) => {
+      if (a.type < b.type) return -1;
+      if (a.type > b.type) return 1;
+      return 0;
+    });
+
+    const countAsigneeNamesAll = (assigneeNames: Asignee[], data: any[]) => {
+    return assigneeNames.reduce((counts, name) => {
+        const type = name.type;
+        counts[type] = data.filter(row => row[18] === type).length;
+        return counts;
+    }, {});
+    };
+
+    const asigneeNameCountsAll = countAsigneeNamesAll(assigneeNames, allData);
+
+    const countAsigneeNames = (assigneeNames: Service[], data: any[]) => {
+      const counts = assigneeNames.reduce((counts, name) => {
+        const type = name.type;
+        counts[type] = data.filter(row => row[18] === type).length;
+        return counts;
+      }, {});
+      const entries = Object.entries(counts);
+      const sortedEntries = entries.sort((a, b) => b[1] - a[1]).slice(0, 10);
+      return Object.fromEntries(sortedEntries);
+    };
+    
+    const asigneeNameCounts = countAsigneeNames(assigneeNames, allData);
+
+    console.log("names", asigneeNameCounts);
+
+    // Create an array of the top 10 names with highest counts
+    const topNames = Object.entries(asigneeNameCounts)
+    .sort(([, countA], [, countB]) => countB - countA) // sort by count in descending order
+    .slice(0, 10) // take only the top 10 names
+    .map(([name]) => name); // extract the names only
+
+    // Create an array of the counts corresponding to the top names
+    const topCounts = topNames.map(name => asigneeNameCounts[name]);
+    
+    // Define the data object required by Chart.js
+    const dataPie = {
+    labels: topNames,
+    values: topCounts,
+    colors:  assigneeNames.slice(0, 10).map(() => {
+      const r = Math.floor(Math.random() * 256);
+      const g = Math.floor(Math.random() * 256);
+      const b = Math.floor(Math.random() * 256);
+      const a = Math.random();
+      return `rgba(${r}, ${g}, ${b}, ${a})`;
+    }), 
+    };
+
+
     //priority and status stacked bar chart 
-    const countByStatusAndPriority = (data) => {
+    const countByStatusAndPriority = (data:any) => {
         const counts = {};
-        data.forEach(row => {
+        data.forEach((row: any[]) => {
           const status = row[7];
           const priority = row[6];
           if (status && priority) {
@@ -87,30 +156,28 @@ export default function Graficas() {
         return counts;
       };
 
- 
+    const transformData = (counts: any) => {
+      const labels = ['Assigned', 'Closed', 'In Progress', 'Pending', 'Resolved'];
+      const priorities = ['High', 'Medium', 'Low'];
+      const datasets = priorities.map((priority) => {
+        return {
+          label: priority,
+          values: labels.map((status) => counts[`${status}-${priority}`] || 0),
+          colors: `rgba(${Math.floor(Math.random() * 256)}, 
+                      ${Math.floor(Math.random() * 256)}, 
+                      ${Math.floor(Math.random() * 256)})`,
+        };
+      }).reverse();
+      return { labels, datasets };
+    };
 
-  const transformData = (counts: any) => {
-    const labels = ['Assigned', 'Closed', 'In Progress', 'Pending', 'Resolved'];
-    const priorities = ['High', 'Medium', 'Low'];
-    const datasets = priorities.map((priority) => {
-      return {
-        label: priority,
-        values: labels.map((status) => counts[`${status}-${priority}`] || 0),
-        colors: `rgba(${Math.floor(Math.random() * 256)}, 
-                    ${Math.floor(Math.random() * 256)}, 
-                    ${Math.floor(Math.random() * 256)})`,
-      };
-    }).reverse();
-    return { labels, datasets };
-  };
+    const statusPriorityCounts = countByStatusAndPriority(allData);
+    const transformedData = transformData(statusPriorityCounts);
 
-  const statusPriorityCounts = countByStatusAndPriority(allData);
-  const transformedData = transformData(statusPriorityCounts);
-
-  console.log("aver", statusPriorityCounts);
+    //console.log("aver", statusPriorityCounts);
 
 
-          
+
 
   return(
     <>
@@ -121,8 +188,9 @@ export default function Graficas() {
         <br />
 
         <Box display="flex" width={"100%"} justifyContent="center" alignItems="center">
-            <Box display="flex" m={2} flexDirection="row" width="50%" alignItems="center" sx={{ backgroundColor: "white" }} >
-                <Box display="flex" flexDirection="column" width="100%" minHeight={"820px"} alignItems="center">
+            <Box display="flex" m={2} flexDirection="row" width="100%" alignItems="center" sx={{ backgroundColor: "white" }} >
+                <Box display="flex" flexDirection="column" width="100%"  alignItems="center">
+                    <br />
                     <Typography align='center' variant='h6'  sx={{ fontWeight: 'bold'  }}> Number of tickets by Service </Typography> 
                     <br />
                     <Button variant="text" onClick={handleOpen}>See Details</Button>
@@ -165,45 +233,48 @@ export default function Graficas() {
             </Box>
             
 
-            <Box width="50%" minHeight={"820px"} m={2} alignItems="center" sx={{ backgroundColor: "white" }}>
-                <Typography align='center' variant='h6'  sx={{ fontWeight: 'bold'  }}> Tickets by Status and Priority </Typography> 
-                {/* <StackedBarChart data={{
-                    labels: ['Assigned', 'Closed', 'In Progress', 'Pending', 'Resolved'],
-                    datasets: [
-                        {
-                        label: 'Low',
-                        values: [10, 20, 30, 40, 50, 60, 70],
-                        colors: 'rgba(255, 99, 132, 0.2)',
-                        },
-                        {
-                        label: 'Medium',
-                        values: [20, 30, 40, 50, 60, 70, 80],
-                        colors: 'rgba(54, 162, 235, 0.2)',
-                        },
-                        {
-                        label: 'High',
-                        values: [5, 15, 25, 35, 45, 55, 65],
-                        colors: 'rgba(255, 206, 86, 0.2)',
-                        },
-                    ],
-                }} /> */}
+          
+        </Box>
 
-                {/* <StackedBarChart data={stackedBarChartData} /> */}
-                <StackedBarChart data={transformedData} />
+        <Box display="flex" width={"100%"} justifyContent="center" alignItems="center">
 
+          <Box width="50%"  m={2} alignItems="center" sx={{ backgroundColor: "white" }}>
+              <br />
+              <Typography align='center' variant='h6'  sx={{ fontWeight: 'bold'  }}> Tickets by Status and Priority </Typography> 
+              <StackedBarChart data={transformedData} />
+          </Box>
 
-
-            </Box>
-
-            
-            
-           {/*  <Box width="34%" p={4}>
-                <BarChart data={{ 
-                                labels: ['Resolved', 'Closed', 'Forwarded', 'Reopened'], 
-                                values: [4, 6, 33, 9], 
-                                colors: ['#74b72e', '#FF7518', '#FFBF00', '#FF0000'] }} />
-
-            </Box> */}
+          <Box width="50%" minHeight={"770px"} m={2} alignItems="center" sx={{ backgroundColor: "white" }}>
+            <br />
+            <Typography align='center' variant='h6'  sx={{ fontWeight: 'bold'  }}> Tickets by Assignee Name </Typography> 
+            <Box display="flex" flexDirection="column" width="100%"  alignItems="center">
+              <br />
+              <Button variant="text" onClick={handleOpenAssignee}>See Details</Button>
+                <Modal
+                  open={openAssignee}
+                  onClose={handleCloseAssignee}
+                  aria-labelledby="modal-modal-title"
+                  aria-describedby="modal-modal-description"
+                >
+                  <Box sx={style}>
+                    <Typography id="modal-modal-title2" align='center' variant='h6' sx={{ fontWeight: 'bold' }}> Number of tickets by Service Details </Typography>
+                    <br />
+                      {Object.entries(asigneeNameCountsAll).map(([name, count]) => (
+                      <Typography variant="body2" align='justify' display="inline" sx={{ fontSize: "12px", fontWeight: "bold" }}>
+                          {name}: {" "}
+                        <Typography variant="body2" align='justify' display="inline" sx={{ fontSize: "12px" }}>
+                            {count}
+                        </Typography>
+                        <Typography> </Typography>
+                      </Typography>
+                      ))}
+                   </Box>
+                  </Modal>
+             </Box>
+             <br />
+              <PieChart data={dataPie} ></PieChart>
+          </Box>
+ 
         </Box>
 
     </Container>
