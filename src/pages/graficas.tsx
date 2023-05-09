@@ -291,10 +291,10 @@ export default function Graficas() {
  
         </Box>
 
-        <Box display="flex" width={"100%"} justifyContent="center" alignItems="center">
+        {/* <Box display="flex" width={"100%"} justifyContent="center" alignItems="center" sx={{ backgroundColor: "white" }}>
           <WordCloudChart data={dataWordCloud} />
 
-        </Box>
+        </Box> */}
 
 
 

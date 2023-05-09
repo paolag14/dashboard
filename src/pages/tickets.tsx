@@ -357,7 +357,16 @@ const handleSearchChange = (event:any) => {
 
                     {allData[0].slice(-16).map((header:any, headerIndex:any) => (
                         <TableRow key={headerIndex}>
-                        <TableCell> {header}: {row[row.length - 16 + headerIndex]}  </TableCell>
+                        <TableCell > 
+{/*                           <Typography sx={{ fontWeight: 'bold'  }}> {header}: </Typography>  {row[row.length - 16 + headerIndex]}  
+ */}                          <Typography  display="inline" sx={{ fontSize: "13px", fontWeight: "bold" }}>
+                                        {header}: {" "}
+                                        <Typography display="inline" sx={{ fontSize: "13px" }} >
+                                          {row[row.length - 16 + headerIndex]}
+                                        </Typography>
+                                        <Typography> </Typography>
+                                    </Typography>
+                          </TableCell>
                         </TableRow>
                     ))}
                     </TableHead>
