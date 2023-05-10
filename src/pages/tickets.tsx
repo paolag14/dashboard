@@ -61,6 +61,9 @@ export default function Tickets() {
   const classes = useStyles();
 
   const theme = useTheme();
+
+  const [selectedHeader, setSelectedHeader] = useState('');
+
   
   // state to keep track of which rows are expanded
   const [expandedRow, setExpandedRow] = useState(-1);
@@ -93,34 +96,36 @@ export default function Tickets() {
     setSelectedPriority(selectedPriority);
     setSelectedStatus(selectedStatus);
   }
+  
+
 
   const handleServiceChange = (event:any) => {
     const service = event.target.value;
     const priority = selectedPriority;
     const status = selectedStatus;
     
-    if (service === "" && priority === "" && status === "") {
+    if (service === "" && priority === "" && status === "" && selectedHeader === "") {
       setFilteredData(allData.slice(1));
-    } else if (service === "" && priority === "" && status !== "") {
+    } else if (service === "" && priority === "" && status !== "" && selectedHeader === "") {
       const newFilteredData = allData.slice(1).filter((row:any) => row[5] === status);
       setFilteredData(newFilteredData);
-    } else if (service === "" && priority !== "" && status === "") {
+    } else if (service === "" && priority !== "" && status === "" && selectedHeader === "") {
       const newFilteredData = allData.slice(1).filter((row:any) => row[6] === priority);
       setFilteredData(newFilteredData);
-    } else if (service === "" && priority !== "" && status !== "") {
+    } else if (service === "" && priority !== "" && status !== "" && selectedHeader === "") {
       const newFilteredData = allData.slice(1).filter((row:any) => row[5] === status && row[6] === priority);
       setFilteredData(newFilteredData);
-    } else if (service !== "" && priority === "" && status === "") {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[2] === service);
+    } else if (service !== "" && priority === "" && status === "" && selectedHeader !== "") {
+      const newFilteredData = allData.slice(1).filter((row:any) => row[2] === service && row[0] === selectedHeader);
       setFilteredData(newFilteredData);
-    } else if (service !== "" && priority === "" && status !== "") {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[2] === service && row[5] === status);
+    } else if (service !== "" && priority === "" && status !== "" && selectedHeader !== "") {
+      const newFilteredData = allData.slice(1).filter((row:any) => row[2] === service && row[5] === status && row[0] === selectedHeader);
       setFilteredData(newFilteredData);
-    } else if (service !== "" && priority !== "" && status === "") {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[2] === service && row[6] === priority);
+    } else if (service !== "" && priority !== "" && status === "" && selectedHeader !== "") {
+      const newFilteredData = allData.slice(1).filter((row:any) => row[2] === service && row[6] === priority && row[0] === selectedHeader);
       setFilteredData(newFilteredData);
     } else {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[2] === service && row[5] === status && row[6] === priority);
+      const newFilteredData = allData.slice(1).filter((row:any) => row[2] === service && row[5] === status && row[6] === priority && row[0] === selectedHeader);
       setFilteredData(newFilteredData);
     }
 
@@ -172,7 +177,7 @@ export default function Tickets() {
     const service = selectedService;
     const priority = selectedPriority;
       
-    if (service === "" && priority === "" && status === "") {
+    if (service === "" && priority === "" && status === "" ) {
       setFilteredData(allData.slice(1));
     } else if (service === "" && priority === "" && status !== "") {
       const newFilteredData = allData.slice(1).filter((row:any) => row[7] === status);
@@ -204,10 +209,17 @@ export default function Tickets() {
 
 
 // handle text field value change
-const handleSearchChange = (event:any) => {
+const handleSearchChange = (event) => {
   const value = event.target.value;
   setSearchValue(value);
-}
+
+  const filtered = allData.slice(1).filter((row) =>
+    Object.values(row).some((value) =>
+      String(value).toLowerCase().includes(searchValue.toLowerCase())
+    )
+  );
+  setFilteredData(filtered);
+};
 
 // filter data based on search value
 /* useEffect(() => {
@@ -236,7 +248,7 @@ const handleSearchChange = (event:any) => {
       <Box sx={{ display: 'flex', alignItems: 'center' }}>
         <OutlinedInput
           value={searchValue}
-          //onChange={handleSearchChange}
+          onChange={handleSearchChange}
           placeholder="Search"
           sx={{ ml: 1, width: '100%' }}
           startAdornment={
@@ -251,6 +263,8 @@ const handleSearchChange = (event:any) => {
     
     <br />
     <br />
+
+
     
 
     {/* Service filter */}
