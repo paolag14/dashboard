@@ -14,10 +14,13 @@ import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
-import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
 import SearchIcon from '@mui/icons-material/Search';
 import { InputAdornment, OutlinedInput } from '@mui/material';
+import Button from '@mui/material/Button';
+import ClearIcon from '@mui/icons-material/Clear';
+import Stack from '@mui/material/Stack';
+
 
 const theme2 = createTheme();
 
@@ -62,8 +65,6 @@ export default function Tickets() {
 
   const theme = useTheme();
 
-  const [selectedHeader, setSelectedHeader] = useState('');
-
   
   // state to keep track of which rows are expanded
   const [expandedRow, setExpandedRow] = useState(-1);
@@ -83,6 +84,10 @@ export default function Tickets() {
   // state to keep track of the filtered data
    const [filteredData, setFilteredData] = useState(allData.slice(1));
    //const [filteredData, setFilteredData] = useState(allData);
+
+   // state to clear filters
+   const [resetFilters, setResetFilters] = useState(false);
+
 
    console.log("data recibida", allData);
 
@@ -221,6 +226,21 @@ const handleSearchChange = (event) => {
   setFilteredData(filtered);
 };
 
+const handleResetFilters = () => {
+  setResetFilters(true);
+};
+
+if (resetFilters) {
+  setFilteredData(allData.slice(1));
+  setSelectedService('');
+  setSelectedPriority('');
+  setSelectedStatus('');
+  setSearchValue('');
+  setResetFilters(false);
+}
+
+
+
 // filter data based on search value
 /* useEffect(() => {
   const filtered = allData.slice(1).filter((row) =>
@@ -265,7 +285,7 @@ const handleSearchChange = (event) => {
     <br />
 
 
-    
+    <Stack direction="row" spacing={2} alignItems="center">
 
     {/* Service filter */}
     <FormControl variant="outlined" className={classes.formControl}> 
@@ -333,6 +353,17 @@ const handleSearchChange = (event) => {
         ))}
       </Select>
     </FormControl>
+
+    
+    <Box marginLeft="auto">
+      <Button variant="outlined" onClick={handleResetFilters} startIcon={<ClearIcon />}>
+        Clear
+      </Button>
+    </Box>
+
+    </Stack>
+
+    
   
     <br /><br />
 
