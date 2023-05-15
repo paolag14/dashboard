@@ -74,7 +74,8 @@ export default function Graficas() {
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
-    
+
+    //bar chart services
     const services2 = Array.from(new Set(allData.slice(1).map((row:any) => row[2] ? row[2] : null)))
 
     const services: Service[] = services2.map(type => ({ type }));
@@ -88,6 +89,23 @@ export default function Graficas() {
     };
 
     const serviceCounts = countServices(services, allData);
+
+    // Sort services in descending order based on counts
+    const sortedServices = Object.entries(serviceCounts)
+    .sort(([, countA], [, countB]) => countB - countA)
+    .reduce((sortedObj, [type, count]) => {
+      sortedObj[type] = count;
+      return sortedObj;
+    }, {});
+
+    //top 10 services
+    const topServices = Object.entries(serviceCounts)
+    .sort(([, countA], [, countB]) => countB - countA)
+    .slice(0, 10)
+    .map(([type, count]) => ({ type, count }));
+
+    console.log("top 10", topServices);
+
 
     //pie chart assignee name
     const assigneeName = Array.from(new Set(allData.slice(1).map((row:any) => row[18] ? row[18] : null)))
@@ -217,7 +235,7 @@ export default function Graficas() {
                         <Box sx={style}>
                         
                         <Typography id="modal-modal-title" align='center' variant='h6' sx={{ fontWeight: 'bold' }}> Number of tickets by Service Details </Typography>
-                                {Object.entries(serviceCounts).map(([serviceName, count]) => (
+                                {Object.entries(sortedServices).map(([serviceName, count]) => (
                                     <Typography variant="body2" align='justify' display="inline" sx={{ fontSize: "12px", fontWeight: "bold" }}>
                                         {serviceName}: {" "}
                                         <Typography variant="body2" align='justify' display="inline" sx={{ fontSize: "12px" }}>
@@ -231,9 +249,9 @@ export default function Graficas() {
 
                     <Box display="flex" width="100%" alignItems="center" justifyContent="center">
                         <BarChart data={{ 
-                            labels: Object.keys(serviceCounts),
-                            values: Object.values(serviceCounts),
-                            colors: Object.keys(serviceCounts).map(() => {
+                            labels: topServices.map(service => service.type),
+                            values: topServices.map(service => service.count),
+                            colors: topServices.map(() => {
                             const r = Math.floor(Math.random() * 255);
                             const g = Math.floor(Math.random() * 255);
                             const b = Math.floor(Math.random() * 255);

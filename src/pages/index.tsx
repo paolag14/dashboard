@@ -113,10 +113,10 @@ export default function Home(props:any) {
     const data = await file.arrayBuffer();
 
     //todo el archivo
-    //const workbook = XLSX.read(data);
+    const workbook = XLSX.read(data);
 
     //primeras 50 filas
-    const workbook = XLSX.read(data, {sheetRows:50});
+    //const workbook = XLSX.read(data, {sheetRows:50});
 
     //esto da la primera página del excel
     const worksheet = workbook.Sheets[workbook.SheetNames[0]]
