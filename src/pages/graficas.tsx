@@ -220,7 +220,7 @@ export default function Graficas() {
         <br />
 
         <Box display="flex" width={"100%"} justifyContent="center" alignItems="center">
-            <Box display="flex" m={2} flexDirection="row" width="100%" alignItems="center" sx={{ backgroundColor: "white" }} >
+            <Box display="flex" m={2} flexDirection="row" width="100%"  alignItems="center" sx={{ backgroundColor: "white" }} >
                 <Box display="flex" flexDirection="column" width="100%"  alignItems="center">
                     <br />
                     <Typography align='center' variant='h6'  sx={{ fontWeight: 'bold'  }}> Number of tickets by Service </Typography> 

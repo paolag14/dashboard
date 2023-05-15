@@ -104,28 +104,28 @@ export default function Tickets() {
     const priority = selectedPriority;
     const status = selectedStatus;
     
-    if (service === "" && priority === "" && status === "" && selectedHeader === "") {
+    if (service === "" && priority === "" && status === "" ) {
       setFilteredData(allData.slice(1));
-    } else if (service === "" && priority === "" && status !== "" && selectedHeader === "") {
+    } else if (service === "" && priority === "" && status !== "" ) {
       const newFilteredData = allData.slice(1).filter((row:any) => row[5] === status);
       setFilteredData(newFilteredData);
-    } else if (service === "" && priority !== "" && status === "" && selectedHeader === "") {
+    } else if (service === "" && priority !== "" && status === "" ) {
       const newFilteredData = allData.slice(1).filter((row:any) => row[6] === priority);
       setFilteredData(newFilteredData);
-    } else if (service === "" && priority !== "" && status !== "" && selectedHeader === "") {
+    } else if (service === "" && priority !== "" && status !== "" ) {
       const newFilteredData = allData.slice(1).filter((row:any) => row[5] === status && row[6] === priority);
       setFilteredData(newFilteredData);
-    } else if (service !== "" && priority === "" && status === "" && selectedHeader !== "") {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[2] === service && row[0] === selectedHeader);
+    } else if (service !== "" && priority === "" && status === "") {
+      const newFilteredData = allData.slice(1).filter((row:any) => row[2] === service );
       setFilteredData(newFilteredData);
-    } else if (service !== "" && priority === "" && status !== "" && selectedHeader !== "") {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[2] === service && row[5] === status && row[0] === selectedHeader);
+    } else if (service !== "" && priority === "" && status !== "" ) {
+      const newFilteredData = allData.slice(1).filter((row:any) => row[2] === service && row[5] === status );
       setFilteredData(newFilteredData);
-    } else if (service !== "" && priority !== "" && status === "" && selectedHeader !== "") {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[2] === service && row[6] === priority && row[0] === selectedHeader);
+    } else if (service !== "" && priority !== "" && status === "" ) {
+      const newFilteredData = allData.slice(1).filter((row:any) => row[2] === service && row[6] === priority);
       setFilteredData(newFilteredData);
     } else {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[2] === service && row[5] === status && row[6] === priority && row[0] === selectedHeader);
+      const newFilteredData = allData.slice(1).filter((row:any) => row[2] === service && row[5] === status && row[6] === priority );
       setFilteredData(newFilteredData);
     }
 

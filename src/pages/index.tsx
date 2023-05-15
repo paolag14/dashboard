@@ -78,6 +78,9 @@ export default function Home(props:any) {
   // data
   const [allData, setData] = useState("");
   const [resolvedData, setResolvedData] = useState("");
+  const [closedData, setClosedData] = useState("");
+  const [forwardedData, setForwardedData] = useState("");
+  const [reopenedData, setReopenedData] = useState("");
 
   const [backlog, setBacklog] = useState(false);
   const [openTickets, setOpenTickets] = useState(0);
@@ -145,7 +148,6 @@ export default function Home(props:any) {
     }
     setTotal(counter-1);
 
-
     //contar 
     let contadorSolved = 0;
     let contadorClosed = 0;
@@ -192,7 +194,13 @@ export default function Home(props:any) {
 
 
     let arrayResolved=[];
+    let arrayClosed=[];
+    let arrayForwarded=[];
+    let arrayReopened=[];
     arrayResolved.push(jsonData[0]);
+    arrayClosed.push(jsonData[0]);
+    arrayForwarded.push(jsonData[0]);
+    arrayReopened.push(jsonData[0]);
    
 
     for (let i = 1; i<jsonData.length; i++){
@@ -267,7 +275,7 @@ export default function Home(props:any) {
         //closed
       if (jsonData[i][7] === "Closed"){
         contadorClosed++;
-        //poner el array
+        arrayClosed.push(jsonData[i]);
 
         if (jsonData[i][6] == "Low"){
           contadorLowC++;
@@ -290,7 +298,7 @@ export default function Home(props:any) {
         //forwarded
       if (jsonData[i][16] === 1){
         contadorForwarded++;
-        //poner el array
+        arrayForwarded.push(jsonData[i]);
 
         if (jsonData[i][6] == "Low"){
           contadorLowF++;
@@ -313,7 +321,7 @@ export default function Home(props:any) {
         //reoponed
       if (jsonData[i][15] === 1){
         contadorReopened++;
-        //poner el array
+        arrayReopened.push(jsonData[i]);
 
         if (jsonData[i][6] == "Low"){
           contadorLowReopened++;
@@ -378,13 +386,11 @@ export default function Home(props:any) {
     setOpenTickets(contadorOpenedTickets);
 
 
+    //data arrays
     setResolvedData(arrayResolved);
-
-    console.log("el nuevo", arrayResolved);
-
-    console.log("open tickets", contadorOpenedTickets);
-    console.log("assigned tickets", contadorAssigned);
-
+    setClosedData(arrayClosed);
+    setForwardedData(arrayForwarded);
+    setReopenedData(arrayReopened);
 
 
     let restriction = (counter-1) * 0.5;
@@ -620,7 +626,8 @@ export default function Home(props:any) {
              <Grid item xs={3}>
               <Card sx={{ maxWidth: 300, minHeight: 300 }}>
               
-                  <CardActionArea href="/" >
+                  <CardActionArea >
+                  <Link href={{ pathname: '/tickets', query: { data: JSON.stringify(closedData) } }}>
                     <CardContent 
                             onMouseOver={() => setHoverC(true)}
                             onMouseOut={() => setHoverC(false)} >
@@ -671,6 +678,7 @@ export default function Home(props:any) {
                       </Typography>
 
                       </CardContent>
+                      </Link>
                   </CardActionArea>
                   
                   </Card>
@@ -681,7 +689,9 @@ export default function Home(props:any) {
             <Grid item xs={3}>
             <Card sx={{ maxWidth: 300, minHeight: 300 }}>
             
-                <CardActionArea href="/">
+                <CardActionArea >
+                <Link href={{ pathname: '/tickets', query: { data: JSON.stringify(forwardedData) } }}>
+                  
                     <CardContent 
                           onMouseOver={() => setHoverF(true)}
                           onMouseOut={() => setHoverF(false)} >
@@ -732,6 +742,7 @@ export default function Home(props:any) {
                       </Typography>
 
                     </CardContent>
+                    </Link>
                 </CardActionArea>
                 </Card>
             </Grid>
@@ -742,6 +753,7 @@ export default function Home(props:any) {
             <Card sx={{ maxWidth: 300, minHeight: 300 }}>
             
                 <CardActionArea >
+                <Link href={{ pathname: '/tickets', query: { data: JSON.stringify(reopenedData) } }}>
                   <CardContent 
                           onMouseOver={() => setHoverReopened(true)}
                           onMouseOut={() => setHoverReopened(false)} >
@@ -793,6 +805,7 @@ export default function Home(props:any) {
 
 
                     </CardContent>
+                    </Link>
                 </CardActionArea>
                 </Card>
             </Grid>
