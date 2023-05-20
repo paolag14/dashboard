@@ -8,27 +8,11 @@ import Modal from '@mui/material/Modal';
 import Button from '@mui/material/Button';
 import StackedBarChart from '@/components/stackedBarChart';
 import PieChart from '@/components/pieChart';
-import WordCloudChart from '@/components/wordCloudChart';
+import DownloadIcon from '@mui/icons-material/Download';
+import html2canvas from 'html2canvas'; 
+import Tooltip from '@mui/material/Tooltip';
+import jsPDF from 'jspdf';
 
-
-/* 
-- Bar chart: You can use a bar chart to show the number of incidents by each category or service. 
-This can give you a quick overview of which category or service has the highest number of incidents.
-
-- Stacked bar chart: A stacked bar chart can be used to show the distribution of incidents by priority and status. 
-This can give you an idea of how many incidents are open, closed, or in progress for each priority level.
-
-- Pie chart: A pie chart can be used to show the percentage of incidents by support group or assignee. 
-This can help you identify which support group or assignee is handling the highest number of incidents.
-
-- Word cloud: You can create a word cloud to show the most common words or phrases in the incident summaries. 
-This can help you identify common themes or issues that are occurring across incidents.
-
-- Donut chart: You can use a donut chart to show the percentage of incidents that were reopened and the 
-reason for reopening. This can help you identify the most common reasons for reopening incidents and take action 
-to prevent these from occurring in the future.
-
-*/
 
 interface Service {
     type: string;
@@ -58,7 +42,6 @@ const style = {
     overflowY: 'scroll',
 
 };
-
 
 export default function Graficas() {
     const router = useRouter();
@@ -105,7 +88,6 @@ export default function Graficas() {
     .map(([type, count]) => ({ type, count }));
 
     console.log("top 10", topServices);
-
 
     //pie chart assignee name
     const assigneeName = Array.from(new Set(allData.slice(1).map((row:any) => row[18] ? row[18] : null)))
@@ -198,32 +180,56 @@ export default function Graficas() {
     const statusPriorityCounts = countByStatusAndPriority(allData);
     const transformedData = transformData(statusPriorityCounts);
 
-    //console.log("aver", statusPriorityCounts);
+    const handleDownloadImage = (elementId:any) => {
+      const chartContainer = document.getElementById(elementId); // Get the chart container element
+      html2canvas(chartContainer).then(canvas => {
+        const image = canvas.toDataURL('image/png'); // Convert canvas to image data URL
+        const downloadLink = document.createElement('a'); // Create a download link element
+        downloadLink.href = image; // Set the image data URL as the link's href
+        downloadLink.download = 'graph.png'; // Set the download filename
+        downloadLink.click(); // Trigger the download
+      });
+    };
 
-
-    const dataWordCloud = [
-      { text: 'apple', value: 10, color: '#FF6384' },
-      { text: 'banana', value: 8, color: '#36A2EB' },
-      { text: 'orange', value: 6, color: '#FFCE56' },
-      { text: 'grape', value: 4, color: '#4BC0C0' },
-      { text: 'kiwi', value: 2, color: '#9966FF' },
-    ];
-
+    const handleDownloadPdf = (elementId:any) => {
+      const chartContainer = document.getElementById("elementId");
+      html2canvas(chartContainer).then(canvas => {
+        const image = canvas.toDataURL('image/png');
+        const pdf = new jsPDF();
+        const imgWidth = pdf.internal.pageSize.getWidth();
+        const imgHeight = pdf.internal.pageSize.getHeight();
+        pdf.addImage(image, 'PNG', 0, 0, imgWidth, imgHeight);
+        pdf.save('graph.pdf');
+      });
+    };
 
 
   return(
     <>
 
-    <Container >
+    <Container id="all-data">
         <br />
-        <Typography variant='h3' align='center'>Graphics</Typography>
+        <Box display="flex" justifyContent="center" alignItems="center">
+          <Typography variant='h3' align='center'>Graphics</Typography> 
+          <Tooltip title="Download pdf graphics">
+            <Button size="large" endIcon={<DownloadIcon />} sx={{ color: 'grey' }} onClick={() => handleDownloadPdf('chart-container1')}></Button>
+          </Tooltip>
+        </Box>
+        
+        
         <br />
 
-        <Box display="flex" width={"100%"} justifyContent="center" alignItems="center">
+        <Box id= "chart-container1" display="flex" width={"100%"} justifyContent="center" alignItems="center">
             <Box display="flex" m={2} flexDirection="row" width="100%"  alignItems="center" sx={{ backgroundColor: "white" }} >
                 <Box display="flex" flexDirection="column" width="100%"  alignItems="center">
                     <br />
-                    <Typography align='center' variant='h6'  sx={{ fontWeight: 'bold'  }}> Number of tickets by Service </Typography> 
+                    <Typography align='center' variant='h6'  sx={{ fontWeight: 'bold'  }}> Number of tickets by Service </Typography>
+                    <Box display="flex" justifyContent="flex-end" sx={{ marginTop: "-10px", marginBottom: "-10px", marginRight: "-90%", cursor: "pointer" }}>
+                      <Tooltip title= "Click to download graph image">
+                        <Button size="large" endIcon={<DownloadIcon />} onClick={() => handleDownloadImage('chart-container1')}></Button>
+                      </Tooltip>
+                    </Box>
+
                     <br />
                     <Button variant="text" onClick={handleOpen}>See Details</Button>
                     <Modal
@@ -248,6 +254,7 @@ export default function Graficas() {
                     </Modal>
 
                     <Box display="flex" width="100%" alignItems="center" justifyContent="center">
+
                         <BarChart data={{ 
                             labels: topServices.map(service => service.type),
                             values: topServices.map(service => service.count),
@@ -258,13 +265,11 @@ export default function Graficas() {
                             return `rgb(${r}, ${g}, ${b})`;
                             })
                         }} />
+                      
                     </Box>
-
                 </Box>
 
             </Box>
-            
-
           
         </Box>
 
@@ -315,11 +320,8 @@ export default function Graficas() {
         </Box> */}
 
 
-
-
     </Container>
     
-   
     </>
   )
 }
