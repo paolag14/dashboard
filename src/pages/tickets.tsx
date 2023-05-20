@@ -20,6 +20,7 @@ import { InputAdornment, OutlinedInput } from '@mui/material';
 import Button from '@mui/material/Button';
 import ClearIcon from '@mui/icons-material/Clear';
 import Stack from '@mui/material/Stack';
+import TablePagination from '@mui/material/TablePagination';
 
 
 const theme2 = createTheme();
@@ -88,8 +89,16 @@ export default function Tickets() {
    // state to clear filters
    const [resetFilters, setResetFilters] = useState(false);
 
+   const [page, setPage] = useState(0);
+   const [rowsPerPage, setRowsPerPage] = useState(25);
+
+   const indexOfLastRow = (page + 1) * rowsPerPage;
+   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
+   const paginatedData = filteredData.slice(indexOfFirstRow, indexOfLastRow);
+
 
    console.log("data recibida", allData);
+
 
   const handleRowClick = (index:any) => {
     if (expandedRow === index) {
@@ -102,7 +111,6 @@ export default function Tickets() {
     setSelectedStatus(selectedStatus);
   }
   
-
 
   const handleServiceChange = (event:any) => {
     const service = event.target.value;
@@ -379,7 +387,7 @@ if (resetFilters) {
           </StyledTableRow>
         </TableHead>
         <TableBody>
-          {filteredData.map((row:any, index:any) => (
+          {paginatedData.map((row:any, index:any) => (
             <>
               <StyledTableRow key={index} onClick={() => handleRowClick(index)}>
                 <StyledTableCell>
@@ -423,8 +431,20 @@ if (resetFilters) {
             </>
           ))}
         </TableBody>
+        
       </Table>
     </TableContainer>
+    <TablePagination
+          component="div"
+          count={filteredData.length}
+          page={page}
+          onPageChange={(event, newPage) => setPage(newPage)}
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={(event) => {
+            setRowsPerPage(parseInt(event.target.value, 10));
+            setPage(0);
+          }}
+        />
 
     </Box>
    
