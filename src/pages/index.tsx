@@ -133,7 +133,53 @@ export default function Home(props:any) {
     //leer como json
     const jsonData = XLSX.utils.sheet_to_json(worksheet, {
       //blankrows: "",
-      header: 1});
+      header: 1,
+      raw: true,
+      
+    });
+
+    const moment = require('moment');
+
+    const dateColumnIndex = 8; // Column 8 (index 7)
+
+  // Format the date values in column 8 as strings
+  for (let i = 1; i < jsonData.length; i++) {
+    const row = jsonData[i];
+    const dateValue = row[dateColumnIndex];
+
+    if (typeof dateValue === "number") {
+      // Convert the numeric date value to a moment object
+      //const momentDate = moment(XLSX.SSF.parse_date_code(dateValue));
+      const momentDate = dateValue;
+
+      // Format the moment object as a string with the desired format
+      //const formattedDate = momentDate.format("DD/MM/YYYY hh:mm:ss a");
+
+      const formattedDate = moment(momentDate, "DD/MM/YYYY hh:mm:ss a").toDate();
+
+
+      // Update the value in column 8 with the formatted date string
+      row[dateColumnIndex] = formattedDate;
+    }
+  }
+
+  console.log("jsonData", jsonData);
+
+/* const row8Value = "07/01/2022  02:23:46 p. m.";
+const formattedDate = moment(row8Value, "DD/MM/YYYY hh:mm:ss a").toDate();
+
+console.log("fecha", formattedDate); */
+
+    /* for (let i = 1; i < jsonData.length; i++) {
+      const row = jsonData[i];
+      const row8Value = row[8]; // Column 8 (index 7) of the current row
+
+      // Parse the date string and update the value in column 8 (index 7)
+      const formattedDate = moment(row8Value, "DD/MM/YYYY hh:mm:ss a").toDate();
+      row[8] = formattedDate;
+    }
+
+    console.log("jsonData", jsonData); */
 
 
     //jsonData[0] son el nombre de todas las columnas cuando es array
@@ -759,6 +805,68 @@ export default function Home(props:any) {
                           onMouseOut={() => setHoverReopened(false)} >
                     <Typography gutterBottom variant="h5" component="div">
                         Reopened tickets
+                    </Typography>
+                    <Typography variant="h6" color="text.secondary">
+                        {reopened}
+                    </Typography>
+
+                    {fileName && (
+                       <DonutChart data={{ 
+                        labels: ['Low', 'Medium', 'High', 'Critical'], 
+                        values: [lowReopened, mediumReopened, highReopened, criticalReopened], 
+                        colors: ['#FFEE99', '#FF9F00', '#FF4500', '#E12901'] }} />
+
+                    )}
+                    <br />
+
+                      <Typography variant="subtitle1" color="text.secondary">
+                          {hoverReopened? 
+                              <Box sx={{ fontWeight: 'bold' }}> Priority </Box>
+                          : null} 
+                      </Typography>
+
+                      <Typography variant="subtitle1" color="text.secondary">
+                          {hoverReopened? 
+                              "Low: " + lowReopened.toString()
+                          : null} 
+                      </Typography>
+
+                      <Typography variant="subtitle1" color="text.secondary">
+                          {hoverReopened? 
+                              "Medium: " + mediumReopened.toString()
+                          : null} 
+                      </Typography>
+
+                      <Typography variant="subtitle1" color="text.secondary">
+                          {hoverReopened? 
+                              "High: " + highReopened.toString() 
+                          : null} 
+                      </Typography>
+
+                      <Typography variant="subtitle1" color="text.secondary">
+                          {hoverReopened? 
+                              "Critical: " + criticalReopened.toString() 
+                          : null} 
+                      </Typography>
+
+
+                    </CardContent>
+                    </Link>
+                </CardActionArea>
+                </Card>
+            </Grid>
+
+            {/*Más de dos semanas tickets*/}
+            <Grid item xs={3}>
+            <Card sx={{ maxWidth: 300, minHeight: 300 }}>
+            
+                <CardActionArea >
+                <Link href={{ pathname: '/tickets', query: { data: JSON.stringify(reopenedData) } }}>
+                  <CardContent 
+                          onMouseOver={() => setHoverReopened(true)}
+                          onMouseOut={() => setHoverReopened(false)} >
+                    <Typography gutterBottom variant="h5" component="div">
+                        Más de dos semanas tickets
                     </Typography>
                     <Typography variant="h6" color="text.secondary">
                         {reopened}

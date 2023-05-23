@@ -90,8 +90,12 @@ export default function Graficas() {
     console.log("top 10", topServices);
 
     //pie chart assignee name
-    const assigneeName = Array.from(new Set(allData.slice(1).map((row:any) => row[18] ? row[18] : null)))
-
+    const assigneeName = Array.from(new Set(allData.slice(1).map((row:any) => {
+      if (row[4] === "Order Management Customizing and Services") {
+        return row[18] ? row[18] : null;
+      }
+    })));
+    
     //const assigneeNames: Asignee[] = assigneeName.map(type => ({ type }));
 
     const assigneeNames: Asignee[] = assigneeName.map(type => ({ type })).sort((a, b) => {
@@ -103,7 +107,7 @@ export default function Graficas() {
     const countAsigneeNamesAll = (assigneeNames: Asignee[], data: any[]) => {
     return assigneeNames.reduce((counts, name) => {
         const type = name.type;
-        counts[type] = data.filter(row => row[18] === type).length;
+        counts[type] = data.filter(row => row[18] === type && row[4] === "Order Management Customizing and Services").length;
         return counts;
     }, {});
     };
@@ -113,7 +117,7 @@ export default function Graficas() {
     const countAsigneeNames = (assigneeNames: Service[], data: any[]) => {
       const counts = assigneeNames.reduce((counts, name) => {
         const type = name.type;
-        counts[type] = data.filter(row => row[18] === type).length;
+        counts[type] = data.filter(row => row[18] === type && row[4] === "Order Management Customizing and Services").length;
         return counts;
       }, {});
       const entries = Object.entries(counts);
@@ -211,12 +215,11 @@ export default function Graficas() {
         <br />
         <Box display="flex" justifyContent="center" alignItems="center">
           <Typography variant='h3' align='center'>Graphics</Typography> 
-          <Tooltip title="Download pdf graphics">
+          <Tooltip title="Download all graphics as PDF">
             <Button size="large" endIcon={<DownloadIcon />} sx={{ color: 'grey' }} onClick={() => handleDownloadPdf('chart-container1')}></Button>
           </Tooltip>
         </Box>
-        
-        
+      
         <br />
 
         <Box id= "chart-container1" display="flex" width={"100%"} justifyContent="center" alignItems="center">
@@ -224,7 +227,7 @@ export default function Graficas() {
                 <Box display="flex" flexDirection="column" width="100%"  alignItems="center">
                     <br />
                     <Typography align='center' variant='h6'  sx={{ fontWeight: 'bold'  }}> Number of tickets by Service </Typography>
-                    <Box display="flex" justifyContent="flex-end" sx={{ marginTop: "-10px", marginBottom: "-10px", marginRight: "-90%", cursor: "pointer" }}>
+                    <Box display="flex" justifyContent="flex-end" sx={{ marginTop: "-20px", marginBottom: "-20px", marginRight: "-90%", cursor: "pointer" }}>
                       <Tooltip title= "Click to download graph image">
                         <Button size="large" endIcon={<DownloadIcon />} onClick={() => handleDownloadImage('chart-container1')}></Button>
                       </Tooltip>
@@ -283,7 +286,7 @@ export default function Graficas() {
 
           <Box width="50%" minHeight={"770px"} m={2} alignItems="center" sx={{ backgroundColor: "white" }}>
             <br />
-            <Typography align='center' variant='h6'  sx={{ fontWeight: 'bold'  }}> Tickets by Assignee Name </Typography> 
+            <Typography align='center' variant='h6'  sx={{ fontWeight: 'bold'  }}> Tickets solved by Order Management Customizing and Services </Typography> 
             <Box display="flex" flexDirection="column" width="100%"  alignItems="center">
               <br />
               <Button variant="text" onClick={handleOpenAssignee}>See Details</Button>
@@ -314,10 +317,10 @@ export default function Graficas() {
  
         </Box>
 
-        {/* <Box display="flex" width={"100%"} justifyContent="center" alignItems="center" sx={{ backgroundColor: "white" }}>
-          <WordCloudChart data={dataWordCloud} />
+        <Box display="flex" width={"100%"} justifyContent="center" alignItems="center" sx={{ backgroundColor: "white" }}>
+          
 
-        </Box> */}
+        </Box>
 
 
     </Container>
