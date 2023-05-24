@@ -87,8 +87,6 @@ export default function Graficas() {
     .slice(0, 10)
     .map(([type, count]) => ({ type, count }));
 
-    console.log("top 10", topServices);
-
     //pie chart assignee name
     const assigneeName = Array.from(new Set(allData.slice(1).map((row:any) => {
       if (row[4] === "Order Management Customizing and Services") {
@@ -114,6 +112,24 @@ export default function Graficas() {
 
     const asigneeNameCountsAll = countAsigneeNamesAll(assigneeNames, allData);
 
+    //count total sum of tickets solved by team
+    const countTeamAll = (assigneeNames, data) => {
+      const counts = assigneeNames.reduce((counts, name) => {
+        const type = name.type; 
+        counts[type] = data.filter(row => row[18] === type && row[4] === "Order Management Customizing and Services").length;
+        return counts;
+      }, {});
+    
+      const totalCount = Object.values(counts).reduce((sum, count) => sum + count, 0);
+      
+      return {
+        totalCount
+      };
+    };
+    
+    const countTeam = countTeamAll(assigneeNames, allData);
+    const totalCount = countTeam.totalCount;
+
     const countAsigneeNames = (assigneeNames: Service[], data: any[]) => {
       const counts = assigneeNames.reduce((counts, name) => {
         const type = name.type;
@@ -126,8 +142,6 @@ export default function Graficas() {
     };
     
     const asigneeNameCounts = countAsigneeNames(assigneeNames, allData);
-
-    console.log("names", asigneeNameCounts);
 
     // Create an array of the top 10 names with highest counts
     const topNames = Object.entries(asigneeNameCounts)
@@ -222,6 +236,7 @@ export default function Graficas() {
       
         <br />
 
+       {/*  Number of tickets by Service */}
         <Box id= "chart-container1" display="flex" width={"100%"} justifyContent="center" alignItems="center">
             <Box display="flex" m={2} flexDirection="row" width="100%"  alignItems="center" sx={{ backgroundColor: "white" }} >
                 <Box display="flex" flexDirection="column" width="100%"  alignItems="center">
@@ -275,7 +290,8 @@ export default function Graficas() {
             </Box>
           
         </Box>
-
+        
+        {/* Tickets by status and priority and tickets solved by team */}
         <Box display="flex" width={"100%"} justifyContent="center" alignItems="center">
 
           <Box width="50%"  m={2} alignItems="center" sx={{ backgroundColor: "white" }}>
@@ -297,8 +313,17 @@ export default function Graficas() {
                   aria-describedby="modal-modal-description"
                 >
                   <Box sx={style}>
-                    <Typography id="modal-modal-title2" align='center' variant='h6' sx={{ fontWeight: 'bold' }}> Number of tickets by Service Details </Typography>
+                    <Typography id="modal-modal-title2" align='center' variant='h6' sx={{ fontWeight: 'bold' }}> Tickets solved by Team </Typography>
                     <br />
+                        <Typography variant="body2" align='justify' display="inline" sx={{ fontSize: "14px", fontWeight: "bold" }}>
+                          Tickets solved by Team: {" "}
+                        <Typography variant="body2" align='justify' display="inline" sx={{ fontSize: "14px" }}>
+                          {totalCount}
+                        </Typography>
+                        <Typography> </Typography>
+                      </Typography>
+                      <br />
+                        
                       {Object.entries(asigneeNameCountsAll).map(([name, count]) => (
                       <Typography variant="body2" align='justify' display="inline" sx={{ fontSize: "12px", fontWeight: "bold" }}>
                           {name}: {" "}
@@ -317,9 +342,45 @@ export default function Graficas() {
  
         </Box>
 
-        <Box display="flex" width={"100%"} justifyContent="center" alignItems="center" sx={{ backgroundColor: "white" }}>
-          
+        <Box display="flex" width={"100%"} justifyContent="center" alignItems="center">
 
+          <Box width="50%"  m={2} alignItems="center" sx={{ backgroundColor: "white" }}>
+              <br />
+              <Typography align='center' variant='h6'  sx={{ fontWeight: 'bold'  }}> Tickets Forwarded </Typography> 
+              {/* <StackedBarChart data={transformedData} /> */}
+          </Box>
+
+          <Box width="50%" minHeight={"770px"} m={2} alignItems="center" sx={{ backgroundColor: "white" }}>
+            <br />
+            <Typography align='center' variant='h6'  sx={{ fontWeight: 'bold'  }}> Tickets solved by Order Management Customizing and Services </Typography> 
+            <Box display="flex" flexDirection="column" width="100%"  alignItems="center">
+              <br />
+              <Button variant="text" onClick={handleOpenAssignee}>See Details</Button>
+                {/* <Modal
+                  open={openAssignee}
+                  onClose={handleCloseAssignee}
+                  aria-labelledby="modal-modal-title"
+                  aria-describedby="modal-modal-description"
+                >
+                  <Box sx={style}>
+                    <Typography id="modal-modal-title2" align='center' variant='h6' sx={{ fontWeight: 'bold' }}> Tickets solved by Team </Typography>
+                    <br />
+                      {Object.entries(asigneeNameCountsAll).map(([name, count]) => (
+                      <Typography variant="body2" align='justify' display="inline" sx={{ fontSize: "12px", fontWeight: "bold" }}>
+                          {name}: {" "}
+                        <Typography variant="body2" align='justify' display="inline" sx={{ fontSize: "12px" }}>
+                            {count}
+                        </Typography>
+                        <Typography> </Typography>
+                      </Typography>
+                      ))}
+                   </Box>
+                  </Modal> */}
+             </Box>
+             <br />
+              {/* <PieChart data={dataPie} ></PieChart> */}
+          </Box>
+ 
         </Box>
 
 
