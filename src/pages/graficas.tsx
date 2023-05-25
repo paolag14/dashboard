@@ -181,9 +181,6 @@ export default function Graficas() {
     };
 
     const categoryCounts = countCategories(categories, allData);
-    console.log("Category Counts:", categoryCounts);
-
-
 
     //priority and status stacked bar chart 
     const countByStatusAndPriority = (data:any) => {
@@ -197,7 +194,66 @@ export default function Graficas() {
           }
         });
         return counts;
-      };
+    };
+
+
+    //count forwarded tickets
+    const forwardedToGroup = Array.from(
+      new Set(
+        allData.slice(1).map((row: any) => {
+          if (
+            row[4] === "Order Management Customizing and Services" &&
+            row[16] === 1
+          ) {
+            return row[33] ? row[33] : null;
+          }
+        })
+      )
+    );
+
+    const forwardedToGroups: Asignee[] = forwardedToGroup
+      .map((type) => ({ type }))
+      .sort((a, b) => {
+        if (a.type < b.type) return -1;
+        if (a.type > b.type) return 1;
+        return 0;
+    });
+
+    const countForwardedToGroups = (forwardedToGroups: Asignee[], data: any[]) => {
+      return forwardedToGroups.reduce((counts, name) => {
+        const type = name.type;
+        counts[type] = data.filter(
+          (row) =>
+            row[33] === type &&
+            row[4] === "Order Management Customizing and Services" &&
+            row[16] === 1
+        ).length;
+        return counts;
+      }, {});
+    };
+
+    const countAllForwardedToGropus = countForwardedToGroups(forwardedToGroups, allData);
+    console.log("forwardeados", countAllForwardedToGropus);
+
+    // Remove first 7 characters of each name
+    const modifiedCounts = {};
+    for (const [name, count] of Object.entries(countAllForwardedToGropus)) {
+      const modifiedName = name.substring(7, name.length - 1);
+      modifiedCounts[modifiedName] = count;
+    }
+
+    console.log("Forwarded names and counts after removing first 7 characters:");
+    console.log(modifiedCounts);
+
+    // Find the top 10 names with the greatest counts
+    const sortedNames = Object.entries(modifiedCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10);
+
+    console.log("Top 10 names and counts:");
+    console.log(sortedNames);
+
+
 
     const transformData = (counts: any) => {
       const labels = ['Assigned', 'Closed', 'In Progress', 'Pending', 'Resolved'];
@@ -361,14 +417,13 @@ export default function Graficas() {
  
         </Box>
 
-
         {/* Forwared y de categoria */}
         <Box display="flex" width={"100%"} justifyContent="center" alignItems="center">
 
           <Box width="50%"  m={2} alignItems="center" sx={{ backgroundColor: "white" }}>
               <br />
               <Typography align='center' variant='h6'  sx={{ fontWeight: 'bold'  }}> Tickets Forwarded </Typography> 
-              {/* <StackedBarChart data={transformedData} /> */}
+              
           </Box>
 
           <Box width="50%"  m={2} alignItems="center" sx={{ backgroundColor: "white" }}>
@@ -389,6 +444,8 @@ export default function Graficas() {
           </Box>
  
         </Box>
+
+        aqui copiar y pegar el primero y poner lo de los forwarded
 
 
     </Container>
