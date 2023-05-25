@@ -26,6 +26,10 @@ interface SupportGroup {
   type: string;
 }
 
+interface Category {
+  type: string;
+}
+
 const style = {
     position: 'absolute' as 'absolute',
     top: '50%',
@@ -94,8 +98,6 @@ export default function Graficas() {
       }
     })));
     
-    //const assigneeNames: Asignee[] = assigneeName.map(type => ({ type }));
-
     const assigneeNames: Asignee[] = assigneeName.map(type => ({ type })).sort((a, b) => {
       if (a.type < b.type) return -1;
       if (a.type > b.type) return 1;
@@ -113,7 +115,7 @@ export default function Graficas() {
     const asigneeNameCountsAll = countAsigneeNamesAll(assigneeNames, allData);
 
     //count total sum of tickets solved by team
-    const countTeamAll = (assigneeNames, data) => {
+    const countTeamAll = (assigneeNames: Asignee[], data:any[]) => {
       const counts = assigneeNames.reduce((counts, name) => {
         const type = name.type; 
         counts[type] = data.filter(row => row[18] === type && row[4] === "Order Management Customizing and Services").length;
@@ -152,7 +154,7 @@ export default function Graficas() {
     // Create an array of the counts corresponding to the top names
     const topCounts = topNames.map(name => asigneeNameCounts[name]);
     
-    // Define the data object required by Chart.js
+    // data for pie chart tickets solved by team
     const dataPie = {
     labels: topNames,
     values: topCounts,
@@ -164,6 +166,23 @@ export default function Graficas() {
       return `rgba(${r}, ${g}, ${b}, ${a})`;
     }), 
     };
+
+    //pie chart assignee name
+    const categories2 = Array.from(new Set(allData.slice(1).map((row: any) => row[19] ? row[19] : null)));
+
+    const categories: Category[] = categories2.map(type => ({ type }));
+
+    const countCategories = (categories: Category[], data: any[]) => {
+      return categories.reduce((counts, category) => {
+        const type = category.type;
+        counts[type] = data.filter(row => row[19] === type).length;
+        return counts;
+      }, {});
+    };
+
+    const categoryCounts = countCategories(categories, allData);
+    console.log("Category Counts:", categoryCounts);
+
 
 
     //priority and status stacked bar chart 
@@ -316,7 +335,7 @@ export default function Graficas() {
                     <Typography id="modal-modal-title2" align='center' variant='h6' sx={{ fontWeight: 'bold' }}> Tickets solved by Team </Typography>
                     <br />
                         <Typography variant="body2" align='justify' display="inline" sx={{ fontSize: "14px", fontWeight: "bold" }}>
-                          Tickets solved by Team: {" "}
+                          Total tickets solved by Team: {" "}
                         <Typography variant="body2" align='justify' display="inline" sx={{ fontSize: "14px" }}>
                           {totalCount}
                         </Typography>
@@ -342,6 +361,8 @@ export default function Graficas() {
  
         </Box>
 
+
+        {/* Forwared y de categoria */}
         <Box display="flex" width={"100%"} justifyContent="center" alignItems="center">
 
           <Box width="50%"  m={2} alignItems="center" sx={{ backgroundColor: "white" }}>
@@ -350,35 +371,21 @@ export default function Graficas() {
               {/* <StackedBarChart data={transformedData} /> */}
           </Box>
 
-          <Box width="50%" minHeight={"770px"} m={2} alignItems="center" sx={{ backgroundColor: "white" }}>
+          <Box width="50%"  m={2} alignItems="center" sx={{ backgroundColor: "white" }}>
             <br />
-            <Typography align='center' variant='h6'  sx={{ fontWeight: 'bold'  }}> Tickets solved by Order Management Customizing and Services </Typography> 
-            <Box display="flex" flexDirection="column" width="100%"  alignItems="center">
-              <br />
-              <Button variant="text" onClick={handleOpenAssignee}>See Details</Button>
-                {/* <Modal
-                  open={openAssignee}
-                  onClose={handleCloseAssignee}
-                  aria-labelledby="modal-modal-title"
-                  aria-describedby="modal-modal-description"
-                >
-                  <Box sx={style}>
-                    <Typography id="modal-modal-title2" align='center' variant='h6' sx={{ fontWeight: 'bold' }}> Tickets solved by Team </Typography>
-                    <br />
-                      {Object.entries(asigneeNameCountsAll).map(([name, count]) => (
-                      <Typography variant="body2" align='justify' display="inline" sx={{ fontSize: "12px", fontWeight: "bold" }}>
-                          {name}: {" "}
-                        <Typography variant="body2" align='justify' display="inline" sx={{ fontSize: "12px" }}>
-                            {count}
-                        </Typography>
-                        <Typography> </Typography>
-                      </Typography>
-                      ))}
-                   </Box>
-                  </Modal> */}
-             </Box>
-             <br />
-              {/* <PieChart data={dataPie} ></PieChart> */}
+            <Typography align='center' variant='h6'  sx={{ fontWeight: 'bold'  }}> Tickets category</Typography> 
+            <BarChart
+              data={{
+                labels: Object.keys(categoryCounts).filter(type => categoryCounts[type] !== 0),
+                values: Object.values(categoryCounts).filter(count => count !== 0),
+                colors: Object.keys(categoryCounts).map(() => {
+                  const r = Math.floor(Math.random() * 255);
+                  const g = Math.floor(Math.random() * 255);
+                  const b = Math.floor(Math.random() * 255);
+                  return `rgb(${r}, ${g}, ${b})`;
+                })
+              }}
+            />
           </Box>
  
         </Box>
