@@ -143,17 +143,19 @@ export default function Home(props:any) {
     const formattedData = jsonData.slice(1).map(row => {
       let dateString = String(row[8]);
 
-      if (typeof dateString === "number") {
-        dateString = String(dateString);
-        
-      }
-    
-      const formattedDate = moment(dateString, "DD/MM/YYYY hh:mm:ss a")
+      const momentDate = moment(dateString, "DD/MM/YYYY hh:mm:ss a");
+      const isFormatDayFirst = momentDate.date() > 12; // Check if the day is greater than 12
+
+      const formattedDate = momentDate
         .tz('America/Mexico_City')
-        .format('DD/MM/YYYY HH:mm:ss');
+        .format(`${isFormatDayFirst ? 'DD/MM/YYYY' : 'MM/DD/YYYY'} HH:mm:ss`);
       row[8] = formattedDate;
       return row;
-    });
+    })/* .filter(row => {
+      const date = moment(row[8], 'DD/MM/YYYY');
+      const comparisonDate = moment('09/07/2022', 'DD/MM/YYYY');
+      return date.isBefore(comparisonDate);
+    }) */;
     
     console.log(formattedData);
 
