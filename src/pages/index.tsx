@@ -134,54 +134,30 @@ export default function Home(props:any) {
     const jsonData = XLSX.utils.sheet_to_json(worksheet, {
       //blankrows: "",
       header: 1,
-      raw: true,
-      
+      raw: false,
+      //dateNF: "DD/MM/YYYY hh:mm:ss",
     });
 
-    const moment = require('moment');
+    const moment = require('moment-timezone')
 
-    const dateColumnIndex = 8; // Column 8 (index 7)
+    const formattedData = jsonData.slice(1).map(row => {
+      let dateString = String(row[8]);
 
-  // Format the date values in column 8 as strings
-  for (let i = 1; i < jsonData.length; i++) {
-    const row = jsonData[i];
-    const dateValue = row[dateColumnIndex];
-
-    if (typeof dateValue === "number") {
-      // Convert the numeric date value to a moment object
-      //const momentDate = moment(XLSX.SSF.parse_date_code(dateValue));
-      const momentDate = dateValue;
-
-      // Format the moment object as a string with the desired format
-      //const formattedDate = momentDate.format("DD/MM/YYYY hh:mm:ss a");
-
-      const formattedDate = moment(momentDate, "DD/MM/YYYY hh:mm:ss a").toDate();
-
-
-      // Update the value in column 8 with the formatted date string
-      row[dateColumnIndex] = formattedDate;
-    }
-  }
-
-  console.log("jsonData", jsonData);
-
-/* const row8Value = "07/01/2022  02:23:46 p. m.";
-const formattedDate = moment(row8Value, "DD/MM/YYYY hh:mm:ss a").toDate();
-
-console.log("fecha", formattedDate); */
-
-    /* for (let i = 1; i < jsonData.length; i++) {
-      const row = jsonData[i];
-      const row8Value = row[8]; // Column 8 (index 7) of the current row
-
-      // Parse the date string and update the value in column 8 (index 7)
-      const formattedDate = moment(row8Value, "DD/MM/YYYY hh:mm:ss a").toDate();
+      if (typeof dateString === "number") {
+        dateString = String(dateString);
+        
+      }
+    
+      const formattedDate = moment(dateString, "DD/MM/YYYY hh:mm:ss a")
+        .tz('America/Mexico_City')
+        .format('DD/MM/YYYY HH:mm:ss');
       row[8] = formattedDate;
-    }
+      return row;
+    });
+    
+    console.log(formattedData);
 
-    console.log("jsonData", jsonData); */
-
-
+  
     //jsonData[0] son el nombre de todas las columnas cuando es array
 
     //set data
@@ -252,7 +228,7 @@ console.log("fecha", formattedDate); */
     for (let i = 1; i<jsonData.length; i++){
 
       //backlog
-      if(jsonData[i][13] == 1){
+      if(jsonData[i][13] == "1"){
         contadorOpenedTickets++;
       }
 
@@ -295,7 +271,7 @@ console.log("fecha", formattedDate); */
       }
 
         //solved
-      if (jsonData[i][7] === "Resolved" && jsonData[i][14] === 1 ){ //columna status y solved=1
+      if (jsonData[i][7] === "Resolved" && jsonData[i][14] === "1" ){ //columna status y solved=1
         contadorSolved++;
         arrayResolved.push(jsonData[i]);
 
@@ -342,7 +318,7 @@ console.log("fecha", formattedDate); */
 
 
         //forwarded
-      if (jsonData[i][16] === 1){
+      if (jsonData[i][16] === "1"){
         contadorForwarded++;
         arrayForwarded.push(jsonData[i]);
 
@@ -365,7 +341,7 @@ console.log("fecha", formattedDate); */
 
 
         //reoponed
-      if (jsonData[i][15] === 1){
+      if (jsonData[i][15] === "1"){
         contadorReopened++;
         arrayReopened.push(jsonData[i]);
 
@@ -441,8 +417,6 @@ console.log("fecha", formattedDate); */
 
     let restriction = (counter-1) * 0.5;
 
-    console.log("restriction", restriction);
-
     //Backlog: cuantos quedaron abiertos contra cuantos fueron asignados. Esto no debe exceder más del 5% del total del mes. 
     
     //setBacklog(((contadorOpenedTickets/contadorAssigned)*100));
@@ -453,11 +427,7 @@ console.log("fecha", formattedDate); */
 
     setRestrictionTotal(restriction);
 
-    setBacklogTotal(((contadorOpenedTickets/contadorAssigned)*100))
-
-
-    console.log("backlog", backlog);
-    
+    setBacklogTotal(((contadorOpenedTickets/contadorAssigned)*100))    
 
   }
 
@@ -1011,8 +981,6 @@ console.log("fecha", formattedDate); */
         </Grid>
         
         </Container>
-
-     
 
     </Container>
     <br />
