@@ -12,7 +12,8 @@ import DownloadIcon from '@mui/icons-material/Download';
 import html2canvas from 'html2canvas'; 
 import Tooltip from '@mui/material/Tooltip';
 import jsPDF from 'jspdf';
-
+import DonutChart from '@/components/donutChart';
+import domtoimage from 'dom-to-image';
 
 interface Service {
     type: string;
@@ -61,6 +62,11 @@ export default function Graficas() {
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
+
+    //forwared gropus modal
+    const [openGroups, setOpenGroups] = useState(false);
+    const handleOpenGroups = () => setOpenGroups(true);
+    const handleCloseGroups = () => setOpenGroups(false);
 
     //bar chart services
     const services2 = Array.from(new Set(allData.slice(1).map((row:any) => row[2] ? row[2] : null)))
@@ -114,7 +120,7 @@ export default function Graficas() {
 
     const asigneeNameCountsAll = countAsigneeNamesAll(assigneeNames, allData);
 
-    //count total sum of tickets solved by team
+    //count total sum of tickets handled by team
     const countTeamAll = (assigneeNames: Asignee[], data:any[]) => {
       const counts = assigneeNames.reduce((counts, name) => {
         const type = name.type; 
@@ -154,7 +160,7 @@ export default function Graficas() {
     // Create an array of the counts corresponding to the top names
     const topCounts = topNames.map(name => asigneeNameCounts[name]);
     
-    // data for pie chart tickets solved by team
+    // data for pie chart tickets handled by team
     const dataPie = {
     labels: topNames,
     values: topCounts,
@@ -253,8 +259,6 @@ export default function Graficas() {
     console.log("Top 10 names and counts:");
     console.log(sortedNames);
 
-
-
     const transformData = (counts: any) => {
       const labels = ['Assigned', 'Closed', 'In Progress', 'Pending', 'Resolved'];
       const priorities = ['High', 'Medium', 'Low'];
@@ -284,16 +288,42 @@ export default function Graficas() {
       });
     };
 
-    const handleDownloadPdf = (elementId:any) => {
-      const chartContainer = document.getElementById("elementId");
-      html2canvas(chartContainer).then(canvas => {
-        const image = canvas.toDataURL('image/png');
-        const pdf = new jsPDF();
-        const imgWidth = pdf.internal.pageSize.getWidth();
-        const imgHeight = pdf.internal.pageSize.getHeight();
-        pdf.addImage(image, 'PNG', 0, 0, imgWidth, imgHeight);
-        pdf.save('graph.pdf');
-      });
+    const handleDownloadPdf = async (elementId: any) => {
+      const chartContainer = document.getElementById(elementId);
+    
+      const options = {
+        style: {
+          'transform-origin': 'center',
+        },
+        quality: 1,
+        height: chartContainer.offsetHeight * 2, // Increase the height to improve image quality
+        width: chartContainer.offsetWidth * 2, // Increase the width to improve image quality
+      };
+    
+      try {
+        const dataUrl = await domtoimage.toPng(chartContainer, options);
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const imgProps = pdf.getImageProperties(dataUrl);
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+        pdf.addImage(dataUrl, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        pdf.save('graphs_pdf.pdf');
+      } catch (error) {
+        console.error('Error generating PDF:', error);
+      }
+    };
+
+    // Generate random colors
+    const generateRandomColors = (count: number) => {
+      const colors = [];
+      for (let i = 0; i < count; i++) {
+        const r = Math.floor(Math.random() * 255);
+        const g = Math.floor(Math.random() * 255);
+        const b = Math.floor(Math.random() * 255);
+        const color = `rgb(${r}, ${g}, ${b})`;
+        colors.push(color);
+      }
+      return colors;
     };
 
 
@@ -305,7 +335,7 @@ export default function Graficas() {
         <Box display="flex" justifyContent="center" alignItems="center">
           <Typography variant='h3' align='center'>Graphics</Typography> 
           <Tooltip title="Download all graphics as PDF">
-            <Button size="large" endIcon={<DownloadIcon />} sx={{ color: 'grey' }} onClick={() => handleDownloadPdf('chart-container1')}></Button>
+            <Button size="large" endIcon={<DownloadIcon />} sx={{ color: 'grey' }} onClick={() => handleDownloadPdf('all-data')}></Button>
           </Tooltip>
         </Box>
       
@@ -366,18 +396,52 @@ export default function Graficas() {
           
         </Box>
         
-        {/* Tickets by status and priority and tickets solved by team */}
-        <Box display="flex" width={"100%"} justifyContent="center" alignItems="center">
+        {/* Tickets by status and priority and tickets handled by team */}
+        <Box display="flex" width={"100%"} justifyContent="center" alignItems="stretch">
 
-          <Box width="50%"  m={2} alignItems="center" sx={{ backgroundColor: "white" }}>
+          <Box width="50%"  m={2} alignItems="center" sx={{ backgroundColor: "white", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
               <br />
               <Typography align='center' variant='h6'  sx={{ fontWeight: 'bold'  }}> Tickets by Status and Priority </Typography> 
               <StackedBarChart data={transformedData} />
           </Box>
 
-          <Box width="50%" minHeight={"770px"} m={2} alignItems="center" sx={{ backgroundColor: "white" }}>
+          <Box width="50%"  m={2} alignItems="center" sx={{ backgroundColor: "white", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
             <br />
-            <Typography align='center' variant='h6'  sx={{ fontWeight: 'bold'  }}> Tickets solved by Order Management Customizing and Services </Typography> 
+            <Typography align='center' variant='h6'  sx={{ fontWeight: 'bold'  }}> Tickets category</Typography> 
+              <BarChart
+                data={{
+                  labels: Object.keys(categoryCounts).filter(type => categoryCounts[type] !== 0),
+                  values: Object.values(categoryCounts).filter(count => count !== 0),
+                  colors: Object.keys(categoryCounts).map(() => {
+                    const r = Math.floor(Math.random() * 255);
+                    const g = Math.floor(Math.random() * 255);
+                    const b = Math.floor(Math.random() * 255);
+                    return `rgb(${r}, ${g}, ${b})`;
+                  })
+                }}
+                
+
+              />
+          </Box>
+ 
+        </Box>
+
+        {/* Forwared y de categoria */}
+        <Box display="flex" width={"100%"} justifyContent="center" alignItems="stretch">
+
+          <Box width="50%"  m={2} alignItems="center" sx={{ backgroundColor: "white", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
+              <br />
+              <Typography align='center' variant='h6'  sx={{ fontWeight: 'bold'  }}> Tickets handled by Support Group </Typography> 
+              <br />
+              <DonutChart data={{ 
+                        labels: ['Order Management Customizing and Services', 'Others'], 
+                        values: [totalCount, (allData.length - totalCount - 1)], 
+                        colors: generateRandomColors(2) }} />
+          </Box>
+
+          <Box width="50%"  m={2} alignItems="center" sx={{ backgroundColor: "white", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"  }}>
+            <br />
+            <Typography align='center' variant='h6'  sx={{ fontWeight: 'bold'  }}> Tickets handled by Order Management Customizing and Services </Typography> 
             <Box display="flex" flexDirection="column" width="100%"  alignItems="center">
               <br />
               <Button variant="text" onClick={handleOpenAssignee}>See Details</Button>
@@ -388,10 +452,10 @@ export default function Graficas() {
                   aria-describedby="modal-modal-description"
                 >
                   <Box sx={style}>
-                    <Typography id="modal-modal-title2" align='center' variant='h6' sx={{ fontWeight: 'bold' }}> Tickets solved by Team </Typography>
+                    <Typography id="modal-modal-title2" align='center' variant='h6' sx={{ fontWeight: 'bold' }}> Tickets handled by Team </Typography>
                     <br />
                         <Typography variant="body2" align='justify' display="inline" sx={{ fontSize: "14px", fontWeight: "bold" }}>
-                          Total tickets solved by Team: {" "}
+                          Total tickets handled by Team: {" "}
                         <Typography variant="body2" align='justify' display="inline" sx={{ fontSize: "14px" }}>
                           {totalCount}
                         </Typography>
@@ -414,38 +478,64 @@ export default function Graficas() {
              <br />
               <PieChart data={dataPie} ></PieChart>
           </Box>
+          
  
         </Box>
 
-        {/* Forwared y de categoria */}
-        <Box display="flex" width={"100%"} justifyContent="center" alignItems="center">
+        {/*  forwarded */}
+        <Box id= "chart-container4" display="flex" width={"100%"} justifyContent="center" alignItems="center">
+            <Box display="flex" m={2} flexDirection="row" width="100%"  alignItems="center" sx={{ backgroundColor: "white" }} >
+                <Box display="flex" flexDirection="column" width="100%"  alignItems="center">
+                    <br />
+                    <Typography align='center' variant='h6'  sx={{ fontWeight: 'bold'  }}> Forwarded Tickets </Typography>
+                    <Box display="flex" justifyContent="flex-end" sx={{ marginTop: "-20px", marginBottom: "-20px", marginRight: "-90%", cursor: "pointer" }}>
+                      <Tooltip title= "Click to download graph image">
+                        <Button size="large" endIcon={<DownloadIcon />} onClick={() => handleDownloadImage('chart-container1')}></Button>
+                      </Tooltip>
+                    </Box>
 
-          <Box width="50%"  m={2} alignItems="center" sx={{ backgroundColor: "white" }}>
-              <br />
-              <Typography align='center' variant='h6'  sx={{ fontWeight: 'bold'  }}> Tickets Forwarded </Typography> 
-              
-          </Box>
+                    <br />
+                    <Button variant="text" onClick={handleOpenGroups}>See Details</Button>
+                    <Modal
+                        open={openGroups}
+                        onClose={handleCloseGroups}
+                        aria-labelledby="modal-modal-title"
+                        aria-describedby="modal-modal-description"
+                    >
+                        <Box sx={style}>
+                        
+                        <Typography id="modal-modal-title" align='center' variant='h6' sx={{ fontWeight: 'bold' }}> Tickets forwarded from Team to Other Groups </Typography>
+                                {Object.entries(modifiedCounts).map(([groupName, count]) => (
+                                    <Typography variant="body2" align='justify' display="inline" sx={{ fontSize: "12px", fontWeight: "bold" }}>
+                                        {groupName}: {" "}
+                                        <Typography variant="body2" align='justify' display="inline" sx={{ fontSize: "12px" }}>
+                                            {count}
+                                        </Typography>
+                                        <Typography> </Typography>
+                                    </Typography>
+                                ))}
+                        </Box>
+                    </Modal>
 
-          <Box width="50%"  m={2} alignItems="center" sx={{ backgroundColor: "white" }}>
-            <br />
-            <Typography align='center' variant='h6'  sx={{ fontWeight: 'bold'  }}> Tickets category</Typography> 
-            <BarChart
-              data={{
-                labels: Object.keys(categoryCounts).filter(type => categoryCounts[type] !== 0),
-                values: Object.values(categoryCounts).filter(count => count !== 0),
-                colors: Object.keys(categoryCounts).map(() => {
-                  const r = Math.floor(Math.random() * 255);
-                  const g = Math.floor(Math.random() * 255);
-                  const b = Math.floor(Math.random() * 255);
-                  return `rgb(${r}, ${g}, ${b})`;
-                })
-              }}
-            />
-          </Box>
- 
+                    <Box display="flex" width="100%" alignItems="center" justifyContent="center">
+
+                        <BarChart data={{ 
+                            labels: sortedNames.map(([name]) => name),
+                            values: sortedNames.map(([, count]) => count),
+                            colors: sortedNames.map(() => {
+                              const r = Math.floor(Math.random() * 255);
+                              const g = Math.floor(Math.random() * 255);
+                              const b = Math.floor(Math.random() * 255);
+                              return `rgb(${r}, ${g}, ${b})`;
+                            })
+                        }} />
+                      
+                    </Box>
+                </Box>
+
+            </Box>
+          
         </Box>
-
-        aqui copiar y pegar el primero y poner lo de los forwarded
 
 
     </Container>
