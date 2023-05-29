@@ -141,17 +141,17 @@ export default function Home(props:any) {
     const moment = require('moment-timezone')
 
     const formattedData = jsonData.slice(1).map(row => {
-      let dateString = String(row[8]);
+      /* let dateString = String(row[8]);
       const momentDate = moment(dateString, "DD/MM/YYYY hh:mm:ss a");
       const isFormatDayFirst = momentDate.date() > 12;
     
       const formattedDate = momentDate
         .tz('America/Mexico_City')
         .format(`${isFormatDayFirst ? 'DD/MM/YYYY' : 'MM/DD/YYYY'} HH:mm:ss`);
-      row[8] = formattedDate;
+      row[8] = formattedDate; */
     
       // Format rows 9 and 10 as well
-      for (let i = 9; i <= 10; i++) {
+      for (let i = 8; i <= 10; i++) {
         const stringVal = row[i];
         if (stringVal !== null && stringVal !== '') {
           const momentString = moment(stringVal, "DD/MM/YYYY hh:mm:ss a");

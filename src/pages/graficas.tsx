@@ -138,7 +138,7 @@ export default function Graficas() {
     const countTeam = countTeamAll(assigneeNames, allData);
     const totalCount = countTeam.totalCount;
 
-    const countAsigneeNames = (assigneeNames: Service[], data: any[]) => {
+    const countAsigneeNames = (assigneeNames: Asignee[], data: any[]) => {
       const counts = assigneeNames.reduce((counts, name) => {
         const type = name.type;
         counts[type] = data.filter(row => row[18] === type && row[4] === "Order Management Customizing and Services").length;
@@ -209,7 +209,7 @@ export default function Graficas() {
         allData.slice(1).map((row: any) => {
           if (
             row[4] === "Order Management Customizing and Services" &&
-            row[16] === 1
+            row[16] === "1"
           ) {
             return row[33] ? row[33] : null;
           }
@@ -217,7 +217,7 @@ export default function Graficas() {
       )
     );
 
-    const forwardedToGroups: Asignee[] = forwardedToGroup
+    const forwardedToGroups: SupportGroup[] = forwardedToGroup
       .map((type) => ({ type }))
       .sort((a, b) => {
         if (a.type < b.type) return -1;
@@ -225,14 +225,14 @@ export default function Graficas() {
         return 0;
     });
 
-    const countForwardedToGroups = (forwardedToGroups: Asignee[], data: any[]) => {
+    const countForwardedToGroups = (forwardedToGroups: SupportGroup[], data: any[]) => {
       return forwardedToGroups.reduce((counts, name) => {
         const type = name.type;
         counts[type] = data.filter(
           (row) =>
             row[33] === type &&
             row[4] === "Order Management Customizing and Services" &&
-            row[16] === 1
+            row[16] === "1"
         ).length;
         return counts;
       }, {});
@@ -248,16 +248,21 @@ export default function Graficas() {
       modifiedCounts[modifiedName] = count;
     }
 
-    console.log("Forwarded names and counts after removing first 7 characters:");
-    console.log(modifiedCounts);
-
     // Find the top 10 names with the greatest counts
     const sortedNames = Object.entries(modifiedCounts)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 10);
 
-    console.log("Top 10 names and counts:");
-    console.log(sortedNames);
+    // Get groups and counts in descending order
+    const sortedNamesAll = Object.entries(modifiedCounts)
+      .sort((a, b) => b[1] - a[1])
+      .reduce((obj, [groupName, count]) => {
+        obj[groupName] = count;
+        return obj;
+      }, {});
+
+    console.log("nombres sorteads", sortedNamesAll);
+
 
     const transformData = (counts: any) => {
       const labels = ['Assigned', 'Closed', 'In Progress', 'Pending', 'Resolved'];
@@ -505,7 +510,7 @@ export default function Graficas() {
                         <Box sx={style}>
                         
                         <Typography id="modal-modal-title" align='center' variant='h6' sx={{ fontWeight: 'bold' }}> Tickets forwarded from Team to Other Groups </Typography>
-                                {Object.entries(modifiedCounts).map(([groupName, count]) => (
+                                {Object.entries(sortedNamesAll).map(([groupName, count]) => (
                                     <Typography variant="body2" align='justify' display="inline" sx={{ fontSize: "12px", fontWeight: "bold" }}>
                                         {groupName}: {" "}
                                         <Typography variant="body2" align='justify' display="inline" sx={{ fontSize: "12px" }}>
@@ -514,6 +519,9 @@ export default function Graficas() {
                                         <Typography> </Typography>
                                     </Typography>
                                 ))}
+
+                                
+                                
                         </Box>
                     </Modal>
 
