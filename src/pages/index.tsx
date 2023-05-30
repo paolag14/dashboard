@@ -74,6 +74,10 @@ export default function Home(props:any) {
   const [highReopened, setHighReopened] = useState(0);
   const [criticalReopened, setCriticalReopened] = useState(0);
 
+  //inside card 2 weeks
+  const [count2weeks, setCount2weeks] = useState(0);
+  const [openNotSolved, setOpenNotSolved] = useState(0);
+
 
   // data
   const [allData, setData] = useState("");
@@ -81,6 +85,8 @@ export default function Home(props:any) {
   const [closedData, setClosedData] = useState("");
   const [forwardedData, setForwardedData] = useState("");
   const [reopenedData, setReopenedData] = useState("");
+  const [open2weeksData, setOpen2weeksData] = useState("");
+
 
   const [backlog, setBacklog] = useState(false);
   const [openTickets, setOpenTickets] = useState(0);
@@ -168,7 +174,32 @@ export default function Home(props:any) {
       return row;
     });
     
-    console.log(formattedData);
+    // Tickets open more than 2 weeks
+    // Define the conditions
+    const daysThreshold = 14; // Number of days threshold since the date in row 8
+
+    // Filter the rows based on the conditions
+    let cont2weeks = 0;
+    let contOpenNotSolved = 0;
+
+    const filteredRows = jsonData.filter(row => {
+      if (row[13] === "1" && row[14] === "0" && row[37] > 14) {
+        cont2weeks++;
+        return true;
+      }
+
+      if (row[13] === "1" && row[14] === "0") {
+        contOpenNotSolved++;
+        return true;
+      }
+
+      
+      
+      return false;
+    });
+    console.log("Count:", cont2weeks);
+    setCount2weeks(cont2weeks);
+    setOpenNotSolved(contOpenNotSolved);
 
   
     //jsonData[0] son el nombre de todas las columnas cuando es array
@@ -232,10 +263,13 @@ export default function Home(props:any) {
     let arrayClosed=[];
     let arrayForwarded=[];
     let arrayReopened=[];
+    let arrayOpen2Weeks=[];
     arrayResolved.push(jsonData[0]);
     arrayClosed.push(jsonData[0]);
     arrayForwarded.push(jsonData[0]);
     arrayReopened.push(jsonData[0]);
+    arrayForwarded.push(jsonData[0]);
+    arrayOpen2Weeks.push(jsonData[0]);
    
 
     for (let i = 1; i<jsonData.length; i++){
@@ -352,7 +386,6 @@ export default function Home(props:any) {
         }
       }
 
-
         //reoponed
       if (jsonData[i][15] === "1"){
         contadorReopened++;
@@ -373,6 +406,11 @@ export default function Home(props:any) {
         if (jsonData[i][6] == "Critical"){
           contadorCriticalReopened++;
         }
+      }
+
+      //tickets open more than 2 weeks
+      if (jsonData[i][13] === "1" && jsonData[i][14] === "0" && jsonData[i][37] > 14) {
+        arrayOpen2Weeks.push(jsonData[i]);
       }
       
     }
@@ -426,6 +464,7 @@ export default function Home(props:any) {
     setClosedData(arrayClosed);
     setForwardedData(arrayForwarded);
     setReopenedData(arrayReopened);
+    setOpen2weeksData(arrayOpen2Weeks);
 
 
     let restriction = (counter-1) * 0.5;
@@ -779,7 +818,7 @@ export default function Home(props:any) {
 
             {/*Reopened tickets*/}
             <Grid item xs={3}>
-            <Card sx={{ maxWidth: 300, minHeight: 300 }}>
+            <Card sx={{ maxWidth: 300, minHeight: 380 }}>
             
                 <CardActionArea >
                 <Link href={{ pathname: '/tickets', query: { data: JSON.stringify(reopenedData) } }}>
@@ -841,28 +880,27 @@ export default function Home(props:any) {
 
             {/*Más de dos semanas tickets*/}
             <Grid item xs={3}>
-            <Card sx={{ maxWidth: 300, minHeight: 300 }}>
+            <Card sx={{ maxWidth: 300, minHeight: 380 }}>
             
                 <CardActionArea >
-                <Link href={{ pathname: '/tickets', query: { data: JSON.stringify(reopenedData) } }}>
+                <Link href={{ pathname: '/tickets', query: { data: JSON.stringify(open2weeksData) } }}>
                   <CardContent 
                           onMouseOver={() => setHoverReopened(true)}
                           onMouseOut={() => setHoverReopened(false)} >
                     <Typography gutterBottom variant="h5" component="div">
-                        Más de dos semanas tickets
+                        Open tickets more than 2 weeks
                     </Typography>
                     <Typography variant="h6" color="text.secondary">
-                        {reopened}
+                        {count2weeks}
                     </Typography>
 
                     {fileName && (
                        <DonutChart data={{ 
-                        labels: ['Low', 'Medium', 'High', 'Critical'], 
-                        values: [lowReopened, mediumReopened, highReopened, criticalReopened], 
-                        colors: ['#FFEE99', '#FF9F00', '#FF4500', '#E12901'] }} />
+                        labels: ['Total tickets', 'Open and not solved', 'Open more than 2 weeks'], 
+                        values: [total, openNotSolved, count2weeks], 
+                        colors: ['#0096FF', '#009E60', '#FAFA33'] }} />
 
                     )}
-                    <br />
 
                       <Typography variant="subtitle1" color="text.secondary">
                           {hoverReopened? 
@@ -904,7 +942,7 @@ export default function Home(props:any) {
 
             {/*Backlog tickets*/}
             <Grid item xs={3}>
-            <Card sx={{ maxWidth: 300, minHeight: 300 }}>
+            <Card sx={{ maxWidth: 300, minHeight: 380 }}>
             
                 <CardActionArea href="/">
                 <CardContent 
@@ -973,7 +1011,7 @@ export default function Home(props:any) {
 
             {/*Graphics*/}
             <Grid item xs={3}>
-            <Card sx={{ maxWidth: 300, minHeight: 300 }}>
+            <Card sx={{ maxWidth: 300, minHeight: 380 }}>
             
                 <CardActionArea >
                 <Link href={{ pathname: '/graficas', query: { data: JSON.stringify(allData) } }}>

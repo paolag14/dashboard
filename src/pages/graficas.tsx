@@ -261,9 +261,6 @@ export default function Graficas() {
         return obj;
       }, {});
 
-    console.log("nombres sorteads", sortedNamesAll);
-
-
     const transformData = (counts: any) => {
       const labels = ['Assigned', 'Closed', 'In Progress', 'Pending', 'Resolved'];
       const priorities = ['High', 'Medium', 'Low'];
@@ -519,8 +516,6 @@ export default function Graficas() {
                                         <Typography> </Typography>
                                     </Typography>
                                 ))}
-
-                                
                                 
                         </Box>
                     </Modal>
