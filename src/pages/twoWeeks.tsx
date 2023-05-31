@@ -39,8 +39,9 @@ const useStyles = makeStyles({
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-    backgroundColor: "#737A80",
+    backgroundColor: "#EB1C24",
     color: theme.palette.common.white,
+    //color: "#4D4D52"
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
@@ -58,7 +59,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 
-export default function Tickets() {
+export default function TwoWeeks() {
   const router = useRouter();
   const { data } = router.query;
   const allData = JSON.parse(data);
@@ -84,6 +85,8 @@ export default function Tickets() {
 
   // state to keep track of the filtered data
    const [filteredData, setFilteredData] = useState(allData.slice(1));
+
+   console.log("data filtrada", filteredData);
    //const [filteredData, setFilteredData] = useState(allData);
 
    // state to clear filters
@@ -94,10 +97,13 @@ export default function Tickets() {
 
    const indexOfLastRow = (page + 1) * rowsPerPage;
    const indexOfFirstRow = indexOfLastRow - rowsPerPage;
-   const paginatedData = filteredData.slice(indexOfFirstRow, indexOfLastRow);
+   let paginatedData = filteredData.slice(indexOfFirstRow, indexOfLastRow);
 
 
-   console.log("data recibida", allData);
+/*    console.log("data slice", paginatedData[0].slice(0, 3).
+    concat(paginatedData[0].slice(4,5)).
+    concat(paginatedData[0].slice(6,11)));
+ */
 
 
   const handleRowClick = (index:any) => {
@@ -120,25 +126,25 @@ export default function Tickets() {
     if (service === "" && priority === "" && status === "" ) {
       setFilteredData(allData.slice(1));
     } else if (service === "" && priority === "" && status !== "" ) {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[5] === status);
+      const newFilteredData = allData.filter((row:any) => row[5] === status);
       setFilteredData(newFilteredData);
     } else if (service === "" && priority !== "" && status === "" ) {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[6] === priority);
+      const newFilteredData = allData.filter((row:any) => row[6] === priority);
       setFilteredData(newFilteredData);
     } else if (service === "" && priority !== "" && status !== "" ) {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[5] === status && row[6] === priority);
+      const newFilteredData = allData.filter((row:any) => row[5] === status && row[6] === priority);
       setFilteredData(newFilteredData);
     } else if (service !== "" && priority === "" && status === "") {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[2] === service );
+      const newFilteredData = allData.filter((row:any) => row[2] === service );
       setFilteredData(newFilteredData);
     } else if (service !== "" && priority === "" && status !== "" ) {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[2] === service && row[5] === status );
+      const newFilteredData = allData.filter((row:any) => row[2] === service && row[5] === status );
       setFilteredData(newFilteredData);
     } else if (service !== "" && priority !== "" && status === "" ) {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[2] === service && row[6] === priority);
+      const newFilteredData = allData.filter((row:any) => row[2] === service && row[6] === priority);
       setFilteredData(newFilteredData);
     } else {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[2] === service && row[5] === status && row[6] === priority );
+      const newFilteredData = allData.filter((row:any) => row[2] === service && row[5] === status && row[6] === priority );
       setFilteredData(newFilteredData);
     }
 
@@ -155,27 +161,27 @@ export default function Tickets() {
     const status = selectedStatus;  
   
     if (service === "" && priority === "" && status === "") {
-      setFilteredData(allData.slice(1));
+        setFilteredData(allData.slice(1));
     } else if (service === "" && priority !== "" && status === "") {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[6] === priority);
+      const newFilteredData = allData.filter((row:any) => row[6] === priority);
       setFilteredData(newFilteredData);
     } else if (service === "" && priority === "" && status !== "") {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[5] === status);
+      const newFilteredData = allData.filter((row:any) => row[5] === status);
       setFilteredData(newFilteredData);
     } else if (service !== "" && priority === "" && status === "") {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[2] === service);
+      const newFilteredData = allData.filter((row:any) => row[2] === service);
       setFilteredData(newFilteredData);
     } else if (service !== "" && priority !== "" && status === "") {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[2] === service && row[6] === priority);
+      const newFilteredData = allData.filter((row:any) => row[2] === service && row[6] === priority);
       setFilteredData(newFilteredData);
     } else if (service !== "" && priority === "" && status !== "") {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[2] === service && row[5] === status);
+      const newFilteredData = allData.filter((row:any) => row[2] === service && row[5] === status);
       setFilteredData(newFilteredData);
     } else if (service === "" && priority !== "" && status !== "") {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[5] === status && row[6] === priority);
+      const newFilteredData = allData.filter((row:any) => row[5] === status && row[6] === priority);
       setFilteredData(newFilteredData);
     } else {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[2] === service && row[6] === priority && row[5] === status);
+      const newFilteredData = allData.filter((row:any) => row[2] === service && row[6] === priority && row[5] === status);
       setFilteredData(newFilteredData);
     }
 
@@ -193,46 +199,33 @@ export default function Tickets() {
     if (service === "" && priority === "" && status === "" ) {
       setFilteredData(allData.slice(1));
     } else if (service === "" && priority === "" && status !== "") {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[7] === status);
+      const newFilteredData = allData.filter((row:any) => row[7] === status);
       setFilteredData(newFilteredData);
     } else if (service === "" && priority !== "" && status === "") {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[6] === priority);
+      const newFilteredData = allData.filter((row:any) => row[6] === priority);
       setFilteredData(newFilteredData);
     } else if (service === "" && priority !== "" && status !== "") {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[6] === priority && row[7] === status);
+      const newFilteredData = allData.filter((row:any) => row[6] === priority && row[7] === status);
       setFilteredData(newFilteredData);
     } else if (service !== "" && priority === "" && status === "") {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[2] === service);
+      const newFilteredData = allData.filter((row:any) => row[2] === service);
       setFilteredData(newFilteredData);
     } else if (service !== "" && priority === "" && status !== "") {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[2] === service && row[7] === status);
+      const newFilteredData = allData.filter((row:any) => row[2] === service && row[7] === status);
       setFilteredData(newFilteredData);
     } else if (service !== "" && priority !== "" && status === "") {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[2] === service && row[6] === priority);
+      const newFilteredData = allData.filter((row:any) => row[2] === service && row[6] === priority);
       setFilteredData(newFilteredData);
     } else {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[2] === service && row[6] === priority && row[7] === status);
+      const newFilteredData = allData.filter((row:any) => row[2] === service && row[6] === priority && row[7] === status);
       setFilteredData(newFilteredData);
     }
 
     /* const newFiltered = filterData(service, priority, status);
     setFilteredData(newFiltered); */
 /*     setSelectedStatus(status);
-  }; */
-
-
-  // handle text field value change
-/*   const handleSearchChange = (event) => {
-    const value = event.target.value;
-    setSearchValue(value);
-
-    const filtered = allData.slice(1).filter((row) =>
-      Object.values(row).some((value) =>
-        String(value).toLowerCase().includes(searchValue.toLowerCase())
-      )
-    );
-    setFilteredData(filtered);
   }; */ 
+
 
   const handleFilterChange = (service:any, priority:any, status:any) => {
     const filteredData = allData.slice(1).filter((row:any) => {
@@ -261,31 +254,58 @@ export default function Tickets() {
     handleFilterChange(selectedService, selectedPriority, status);
     setSelectedStatus(status);
   };
+  
 
-const handleResetFilters = () => {
-  setResetFilters(true);
-};
+    // handle text field value change
+/*     const handleSearchChange = (event:any) => {
+    const value = event.target.value;
+    setSearchValue(value);
 
-if (resetFilters) {
-  setFilteredData(allData.slice(1));
-  setSelectedService('');
-  setSelectedPriority('');
-  setSelectedStatus('');
-  setSearchValue('');
-  setResetFilters(false);
-}
+    const filtered = allData.slice(1).filter((row) =>
+        Object.values(row).some((value) =>
+        String(value).toLowerCase().includes(searchValue.toLowerCase())
+        )
+    );
+    setFilteredData(filtered);
+    }; */
+
+    const handleSearchChange = (event) => {
+        const value = event.target.value;
+        setSearchValue(value);
+      
+        const filtered = allData.slice(1).filter((row) =>
+          Object.values(row).some((value) =>
+            String(value).toLowerCase().includes(searchValue.toLowerCase())
+          )
+        );
+        setFilteredData(filtered);
+      };
+      
+      
+    const handleResetFilters = () => {
+    setResetFilters(true);
+    };
+
+    if (resetFilters) {
+    setFilteredData(allData.slice(1));
+    setSelectedService('');
+    setSelectedPriority('');
+    setSelectedStatus('');
+    setSearchValue('');
+    setResetFilters(false);
+    }
 
 
 // filter data based on search value
-/* useEffect(() => {
-  const filtered = allData.slice(1).filter((row) =>
-    Object.values(row).some((value) =>
-      String(value).toLowerCase().includes(searchValue.toLowerCase())
-    )
-  );
-  setFilteredData(filtered);
-}, [searchValue, allData]);
- */
+/*     useEffect(() => {
+    const filtered = allData.slice(1).filter((row) =>
+        Object.values(row).some((value) =>
+        String(value).toLowerCase().includes(searchValue.toLowerCase())
+        )
+    );
+    setFilteredData(filtered);
+    }, [searchValue, allData]); */
+
   
    // create a set of services from the third column of allData
   const services = Array.from(new Set(allData.slice(1).map((row:any) => row[2] ? row[2] : null)))
@@ -296,7 +316,7 @@ if (resetFilters) {
   return(
     <>
     <br />
-    <Typography variant='h3' align='center'>Tickets</Typography>
+    <Typography variant='h3' align='center'>Tickets Two Weeks</Typography>
     <br />
     <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
 
@@ -311,9 +331,7 @@ if (resetFilters) {
               <SearchIcon />
             </InputAdornment>
           }
-          
         />
-        
       </Box>
     
     <br />
@@ -389,7 +407,6 @@ if (resetFilters) {
       </Select>
     </FormControl>
 
-    
     <Box marginLeft="auto">
       <Button variant="outlined" onClick={handleResetFilters} startIcon={<ClearIcon />}>
         Clear
@@ -398,23 +415,25 @@ if (resetFilters) {
 
     </Stack>
 
-    
-  
     <br /><br />
-
 
     <TableContainer component={Paper}>
     <Table  sx={{minWidth: 700}} aria-label="collapsible table">
         <TableHead>
           <StyledTableRow>
             <StyledTableCell></StyledTableCell> 
-            {allData[0].slice(0, -16).map((header:any) => (
+
+            {allData[0].slice(0, 3).
+                concat(allData[0].slice(4,5)).
+                concat(allData[0].slice(6,11)).map((header:any) => (
             <StyledTableCell><Typography variant="h6">{header}</Typography></StyledTableCell>
           ))}
           </StyledTableRow>
         </TableHead>
         <TableBody>
-          {paginatedData.map((row:any, index:any) => (
+          {paginatedData.slice(0,3).
+            concat(paginatedData.slice(4,5)).
+            concat(paginatedData.slice(6,11)).map((row:any, index:any) => (
             <>
               <StyledTableRow key={index} onClick={() => handleRowClick(index)}>
                 <StyledTableCell>
@@ -422,7 +441,9 @@ if (resetFilters) {
                     {expandedRow === index ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
                   </IconButton>
                 </StyledTableCell>
-                {row.slice(0, -16).map((cell:any) => (
+                {row.slice(0,3).
+                    concat(row.slice(4,5)).
+                    concat(row.slice(6,11)).map((cell:any) => (
                   <TableCell>{cell}</TableCell>
                 ))}
               </StyledTableRow>
@@ -433,22 +454,36 @@ if (resetFilters) {
                     <TableHead>
                       <br />
                     <Typography> <strong>Details</strong> </Typography>
-              
 
-                    {allData[0].slice(-16).map((header:any, headerIndex:any) => (
-                        <TableRow key={headerIndex}>
-                        <TableCell > 
-{/*                           <Typography sx={{ fontWeight: 'bold'  }}> {header}: </Typography>  {row[row.length - 16 + headerIndex]}  
- */}                          <Typography  display="inline" sx={{ fontSize: "13px", fontWeight: "bold" }}>
-                                        {header}: {" "}
-                                        <Typography display="inline" sx={{ fontSize: "13px" }} >
-                                          {row[row.length - 16 + headerIndex]}
-                                        </Typography>
-                                        <Typography> </Typography>
-                                    </Typography>
-                          </TableCell>
-                        </TableRow>
-                    ))}
+                    {allData[0].slice(13, 20)
+                        .concat(allData[0].slice(33, 34))
+                        .concat(allData[0].slice(35, 38))
+                        .map((header: any, headerIndex: any) => {
+                            const dataIndex =
+                            headerIndex < 7
+                                ? headerIndex + 13
+                                : headerIndex === 7
+                                ? 33
+                                : headerIndex === 8
+                                ? 35
+                                : headerIndex === 9
+                                ? 36
+                                : 37;
+                            return (
+                            <TableRow key={headerIndex}>
+                                <TableCell>
+                                <Typography display="inline" sx={{ fontSize: "13px", fontWeight: "bold" }}>
+                                    {header}:{" "}
+                                </Typography>
+                                <Typography display="inline" sx={{ fontSize: "13px" }}>
+                                    {row[dataIndex]}
+                                </Typography>
+                                <Typography> </Typography>
+                                </TableCell>
+                            </TableRow>
+                            );
+                    })}
+
                     </TableHead>
 
                     </Table>
@@ -461,6 +496,7 @@ if (resetFilters) {
         
       </Table>
     </TableContainer>
+
     <TablePagination
           component="div"
           count={filteredData.length}

@@ -332,7 +332,7 @@ export default function Graficas() {
   return(
     <>
 
-    <Container id="all-data">
+    <Container id="all-data" sx={{height: '100%'}}>
         <br />
         <Box display="flex" justifyContent="center" alignItems="center">
           <Typography variant='h3' align='center'>Graphics</Typography> 
@@ -399,7 +399,7 @@ export default function Graficas() {
         </Box>
         
         {/* Tickets by status and priority and tickets handled by team */}
-        <Box display="flex" width={"100%"} justifyContent="center" alignItems="stretch">
+        <Box display="flex" width={"100%"} justifyContent="center" alignItems="stretch" sx={{flexGrow: 1, height: '100%'}}>
 
           <Box width="50%"  m={2} alignItems="center" sx={{ backgroundColor: "white", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
               <br />
@@ -407,7 +407,7 @@ export default function Graficas() {
               <StackedBarChart data={transformedData} />
           </Box>
 
-          <Box width="50%"  m={2} alignItems="center" sx={{ backgroundColor: "white", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
+          <Box width="50%"  m={2} alignItems="center" sx={{ backgroundColor: "white", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", flexGrow: 1, height: '100%'}}>
             <br />
             <Typography align='center' variant='h6'  sx={{ fontWeight: 'bold'  }}> Tickets category</Typography> 
               <BarChart
@@ -421,20 +421,19 @@ export default function Graficas() {
                     return `rgb(${r}, ${g}, ${b})`;
                   })
                 }}
-                
-
               />
           </Box>
  
         </Box>
 
         {/* Forwared y de categoria */}
-        <Box display="flex" width={"100%"} justifyContent="center" alignItems="stretch">
+        <Box display="flex" width={"100%"} justifyContent="center" alignItems="stretch" sx={{height: '100%'}}>
 
-          <Box width="50%"  m={2} alignItems="center" sx={{ backgroundColor: "white", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
+          <Box width="50%"  m={2} alignItems="center" sx={{ backgroundColor: "white", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" , height: '100%'}}>
               <br />
               <Typography align='center' variant='h6'  sx={{ fontWeight: 'bold'  }}> Tickets handled by Support Group </Typography> 
               <br />
+              <br /> 
               <DonutChart data={{ 
                         labels: ['Order Management Customizing and Services', 'Others'], 
                         values: [totalCount, (allData.length - totalCount - 1)], 

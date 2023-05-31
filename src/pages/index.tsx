@@ -883,10 +883,10 @@ export default function Home(props:any) {
             <Card sx={{ maxWidth: 300, minHeight: 380 }}>
             
                 <CardActionArea >
-                <Link href={{ pathname: '/tickets', query: { data: JSON.stringify(open2weeksData) } }}>
+                <Link href={{ pathname: '/twoWeeks', query: { data: JSON.stringify(open2weeksData) } }}>
                   <CardContent 
-                          onMouseOver={() => setHoverReopened(true)}
-                          onMouseOut={() => setHoverReopened(false)} >
+                          /* onMouseOver={() => setHoverReopened(true)}
+                          onMouseOut={() => setHoverReopened(false)} */ >
                     <Typography gutterBottom variant="h5" component="div">
                         Open tickets more than 2 weeks
                     </Typography>
@@ -902,7 +902,7 @@ export default function Home(props:any) {
 
                     )}
 
-                      <Typography variant="subtitle1" color="text.secondary">
+                      {/* <Typography variant="subtitle1" color="text.secondary">
                           {hoverReopened? 
                               <Box sx={{ fontWeight: 'bold' }}> Priority </Box>
                           : null} 
@@ -930,7 +930,7 @@ export default function Home(props:any) {
                           {hoverReopened? 
                               "Critical: " + criticalReopened.toString() 
                           : null} 
-                      </Typography>
+                      </Typography> */}
 
 
                     </CardContent>
@@ -1019,6 +1019,22 @@ export default function Home(props:any) {
                     <Typography gutterBottom variant="h5" component="div">
                         Graphics
                     </Typography>
+
+                    {fileName && (
+                      <div style={{ whiteSpace: 'pre-line' }}>
+                        <Typography variant="subtitle1" color="text.secondary"> 
+                          - Tickets by Service{"\n"}
+                          - Tickets by Status and Priority{"\n"}
+                          - Tickets by category{"\n"}
+                          - Tickets handled by Support Group{"\n"}
+                          - Tickets handled by Order Management Customizing and Services{"\n"}
+                          - Forwarded Tickets{"\n"}
+                        </Typography> 
+                      </div>
+
+                    )}
+
+
                     
   
                     </CardContent>
