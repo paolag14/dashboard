@@ -188,21 +188,6 @@ export default function Graficas() {
 
     const categoryCounts = countCategories(categories, allData);
 
-    //priority and status stacked bar chart 
-    const countByStatusAndPriority = (data:any) => {
-        const counts = {};
-        data.forEach((row: any[]) => {
-          const status = row[7];
-          const priority = row[6];
-          if (status && priority) {
-            const key = `${status}-${priority}`;
-            counts[key] = (counts[key] || 0) + 1;
-          }
-        });
-        return counts;
-    };
-
-
     //count forwarded tickets
     const forwardedToGroup = Array.from(
       new Set(
@@ -239,7 +224,6 @@ export default function Graficas() {
     };
 
     const countAllForwardedToGropus = countForwardedToGroups(forwardedToGroups, allData);
-    console.log("forwardeados", countAllForwardedToGropus);
 
     // Remove first 7 characters of each name
     const modifiedCounts = {};
@@ -261,6 +245,22 @@ export default function Graficas() {
         return obj;
       }, {});
 
+
+     //priority and status stacked bar chart 
+     const countByStatusAndPriority = (data:any) => {
+      const counts = {};
+      data.forEach((row: any[]) => {
+        const status = row[7];
+        const priority = row[6];
+        
+        if (status && priority) {
+          const key = `${status}-${priority}`;
+          counts[key] = (counts[key] || 0) + 1;
+        }
+      });
+      return counts;
+    };
+
     const transformData = (counts: any) => {
       const labels = ['Assigned', 'Closed', 'In Progress', 'Pending', 'Resolved'];
       const priorities = ['High', 'Medium', 'Low'];
@@ -278,6 +278,24 @@ export default function Graficas() {
 
     const statusPriorityCounts = countByStatusAndPriority(allData);
     const transformedData = transformData(statusPriorityCounts);
+
+    //bar chart assigned, resolved and forwarded
+    const countRows = (allData) => {
+      const assignedCount = allData.filter(row => row[7] === "Assigned").length;
+      const resolvedCount = allData.filter(row => row[7] === "Resolved").length;
+      const row16Count = allData.filter(row => row[16] === "1").length;
+    
+      return {
+        Assigned: assignedCount,
+        Resolved: resolvedCount,
+        Forwarded: row16Count
+      };
+    };
+    
+    const rowCounts = countRows(allData);
+    console.log("aver", rowCounts);
+    
+
 
     const handleDownloadImage = (elementId:any) => {
       const chartContainer = document.getElementById(elementId); // Get the chart container element
@@ -398,23 +416,44 @@ export default function Graficas() {
           
         </Box>
         
-        {/* Tickets by status and priority and tickets handled by team */}
-        <Box display="flex" width={"100%"} justifyContent="center" alignItems="stretch" sx={{flexGrow: 1, height: '100%'}}>
+        {/* Tickets by status and priority, tickets category and assigned, resolved*/}
+        <Box display="flex" width={"100%"} justifyContent="center" alignItems="stretch" sx={{ flexGrow: 1, height: '100%' }}>
 
-          <Box width="50%"  m={2} alignItems="center" sx={{ backgroundColor: "white", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
-              <br />
-              <Typography align='center' variant='h6'  sx={{ fontWeight: 'bold'  }}> Tickets by Status and Priority </Typography> 
-              <StackedBarChart data={transformedData} />
+          <Box width="50%" m={2} alignItems="center" sx={{ backgroundColor: "white", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
+            <br />
+            <Typography align='center' variant='h6' sx={{ fontWeight: 'bold' }}> Tickets by Status and Priority </Typography>
+            <StackedBarChart data={transformedData} />
           </Box>
 
-          <Box width="50%"  m={2} alignItems="center" sx={{ backgroundColor: "white", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", flexGrow: 1, height: '100%'}}>
+          <Box width="50%" m={2} sx={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+            <Box>
+              <Box width="100%" alignItems="center" sx={{ backgroundColor: "white", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
+                <br />
+                <Typography align='center' variant='h6' sx={{ fontWeight: 'bold' }}> Tickets category</Typography>
+                <BarChart
+                  data={{
+                    labels: Object.keys(categoryCounts).filter(type => categoryCounts[type] !== 0),
+                    values: Object.values(categoryCounts).filter(count => count !== 0),
+                    colors: Object.keys(categoryCounts).map(() => {
+                      const r = Math.floor(Math.random() * 255);
+                      const g = Math.floor(Math.random() * 255);
+                      const b = Math.floor(Math.random() * 255);
+                      return `rgb(${r}, ${g}, ${b})`;
+                    })
+                  }}
+                />
+              </Box>
+            </Box>
             <br />
-            <Typography align='center' variant='h6'  sx={{ fontWeight: 'bold'  }}> Tickets category</Typography> 
+
+            <Box width="100%" alignItems="center" sx={{ backgroundColor: "white", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
+              <br />
+              <Typography align='center' variant='h6' sx={{ fontWeight: 'bold' }}> Tickets Assigned, Resolved, and Forwarded</Typography>
               <BarChart
                 data={{
-                  labels: Object.keys(categoryCounts).filter(type => categoryCounts[type] !== 0),
-                  values: Object.values(categoryCounts).filter(count => count !== 0),
-                  colors: Object.keys(categoryCounts).map(() => {
+                  labels: Object.keys(rowCounts).filter(type => rowCounts[type] !== 0),
+                  values: Object.values(rowCounts).filter(count => count !== 0),
+                  colors: Object.keys(rowCounts).map(() => {
                     const r = Math.floor(Math.random() * 255);
                     const g = Math.floor(Math.random() * 255);
                     const b = Math.floor(Math.random() * 255);
@@ -422,29 +461,32 @@ export default function Graficas() {
                   })
                 }}
               />
+            </Box>
           </Box>
- 
+
         </Box>
 
-        {/* Forwared y de categoria */}
+
+        {/* Tickets support group and team */}
         <Box display="flex" width={"100%"} justifyContent="center" alignItems="stretch" sx={{height: '100%'}}>
 
           <Box width="50%"  m={2} alignItems="center" sx={{ backgroundColor: "white", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" , height: '100%'}}>
               <br />
-              <Typography align='center' variant='h6'  sx={{ fontWeight: 'bold'  }}> Tickets handled by Support Group </Typography> 
-              <br />
+              <Typography align='center' variant='h6'  sx={{ fontWeight: 'bold'  }}> Tickets handled </Typography> 
+              <Typography align='center' variant='h6'  sx={{ fontWeight: 'bold'  }}> by Support Group </Typography> 
+
               <br /> 
               <DonutChart data={{ 
                         labels: ['Order Management Customizing and Services', 'Others'], 
                         values: [totalCount, (allData.length - totalCount - 1)], 
                         colors: generateRandomColors(2) }} />
+              <br />
           </Box>
 
           <Box width="50%"  m={2} alignItems="center" sx={{ backgroundColor: "white", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"  }}>
             <br />
             <Typography align='center' variant='h6'  sx={{ fontWeight: 'bold'  }}> Tickets handled by Order Management Customizing and Services </Typography> 
             <Box display="flex" flexDirection="column" width="100%"  alignItems="center">
-              <br />
               <Button variant="text" onClick={handleOpenAssignee}>See Details</Button>
                 <Modal
                   open={openAssignee}
@@ -483,7 +525,7 @@ export default function Graficas() {
  
         </Box>
 
-        {/*  forwarded */}
+        {/* Tickets forwarded */}
         <Box id= "chart-container4" display="flex" width={"100%"} justifyContent="center" alignItems="center">
             <Box display="flex" m={2} flexDirection="row" width="100%"  alignItems="center" sx={{ backgroundColor: "white" }} >
                 <Box display="flex" flexDirection="column" width="100%"  alignItems="center">

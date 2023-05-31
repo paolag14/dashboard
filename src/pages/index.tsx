@@ -192,8 +192,6 @@ export default function Home(props:any) {
         contOpenNotSolved++;
         return true;
       }
-
-      
       
       return false;
     });
@@ -312,14 +310,14 @@ export default function Home(props:any) {
         contadorPending++;
       }
 
-      //Resolved
-      if (jsonData[i][7] === "Resolved"){
-        contadorResolved++;
+      //solved
+      if (jsonData[i][14] === "1"){ //solved
+        contadorSolved++;
       }
 
-        //solved
-      if (jsonData[i][7] === "Resolved" && jsonData[i][14] === "1" ){ //columna status y solved=1
-        contadorSolved++;
+        //Resolved
+      if (jsonData[i][7] === "Resolved" ){ 
+        contadorResolved++;
         arrayResolved.push(jsonData[i]);
 
         if (jsonData[i][6] == "Low"){
@@ -640,7 +638,7 @@ export default function Home(props:any) {
                         Resolved tickets
                     </Typography>
                     <Typography variant="h6" color="text.secondary">
-                        {solved}
+                        {resolved}
                     </Typography>
 
                     {fileName && (
