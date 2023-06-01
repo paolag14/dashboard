@@ -18,6 +18,7 @@
     "chart.js": "^4.3.0",
     "chartjs-chart-wordcloud": "^4.2.0",
     "dom-to-image": "^2.6.0",
+    "html-to-image": "^1.11.11",
     "html2canvas": "^1.4.1",
     "html2pdf.js": "^0.10.1",
     "jspdf": "^2.5.1",

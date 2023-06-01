@@ -14,6 +14,8 @@ import Tooltip from '@mui/material/Tooltip';
 import jsPDF from 'jspdf';
 import DonutChart from '@/components/donutChart';
 import domtoimage from 'dom-to-image';
+import htmlToImage from 'html-to-image';
+
 
 interface Service {
     type: string;
@@ -292,10 +294,7 @@ export default function Graficas() {
       };
     };
     
-    const rowCounts = countRows(allData);
-    console.log("aver", rowCounts);
-    
-
+    const rowCounts = countRows(allData);    
 
     const handleDownloadImage = (elementId:any) => {
       const chartContainer = document.getElementById(elementId); // Get the chart container element
@@ -308,7 +307,8 @@ export default function Graficas() {
       });
     };
 
-    const handleDownloadPdf = async (elementId: any) => {
+    //anterior de github
+    /* const handleDownloadPdf = async (elementId: any) => {
       const chartContainer = document.getElementById(elementId);
     
       const options = {
@@ -331,7 +331,107 @@ export default function Graficas() {
       } catch (error) {
         console.error('Error generating PDF:', error);
       }
+    }; */
+
+    const handleDownloadPdf = async (elementIds: string[]) => {
+      try {
+        const pdf = new jsPDF('p', 'mm', 'a4');
+    
+        for (let i = 0; i < elementIds.length; i++) {
+          const elementId = elementIds[i];
+          const chartContainer = document.getElementById(elementId);
+    
+          const options = {
+            style: {
+              'transform-origin': 'center',
+            },
+            quality: 1,
+            //height: chartContainer.offsetHeight * 2, // Increase the height to improve image quality
+            //width: chartContainer.offsetWidth * 2, // Increase the width to improve image quality
+          };
+    
+          try {
+            const dataUrl = await domtoimage.toPng(chartContainer, options);
+            const imgProps = pdf.getImageProperties(dataUrl);
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+    
+            if (i > 0) {
+              pdf.addPage();
+            }
+    
+            pdf.addImage(dataUrl, 'PNG', 0, 0, pdfWidth, pdfHeight);
+          } catch (error) {
+            console.error('Error generating image:', error);
+          }
+        }
+    
+        pdf.save('graphs_pdf.pdf');
+      } catch (error) {
+        console.error('Error generating PDF:', error);
+      }
     };
+    
+
+    /* const handleDownloadPdf = async () => {
+      const elementIds = ["title", "chart-container1", "chart-container2", "chart-container3"];
+      const graphicsPerPage = 2;
+      const totalPages = Math.ceil(elementIds.length / graphicsPerPage);
+    
+      try {
+        const pdf = new jsPDF('p', 'mm', 'a4');
+    
+        for (let page = 0; page < totalPages; page++) {
+          const startX = 20;
+          const startY = 20;
+          const pageWidth = pdf.internal.pageSize.getWidth();
+          const pageHeight = pdf.internal.pageSize.getHeight();
+          const elementsOnPage = elementIds.slice(
+            page * graphicsPerPage,
+            (page + 1) * graphicsPerPage
+          );
+    
+          for (let i = 0; i < elementsOnPage.length; i++) {
+            const elementId = elementsOnPage[i];
+            const chartContainer = document.getElementById(elementId);
+    
+            const options = {
+              style: {
+                'transform-origin': 'center',
+              },
+              quality: 1,
+              height: chartContainer.offsetHeight * 2, // Increase the height to improve image quality
+              width: chartContainer.offsetWidth * 2, // Increase the width to improve image quality
+            };
+    
+            try {
+              const dataUrl = await domtoimage.toPng(chartContainer, options);
+              const imgProps = pdf.getImageProperties(dataUrl);
+              const imgWidth = pageWidth - 2 * startX;
+              const imgHeight = (imgWidth * imgProps.height) / imgProps.width;
+    
+              const x = startX;
+              const y = startY + i * (imgHeight + startY);
+    
+              pdf.addImage(dataUrl, 'PNG', x, y, imgWidth, imgHeight);
+            } catch (error) {
+              console.error('Error generating image:', error);
+            }
+          }
+    
+          if (page !== totalPages - 1) {
+            pdf.addPage();
+          }
+        }
+    
+        pdf.save('graphs_pdf.pdf');
+      } catch (error) {
+        console.error('Error generating PDF:', error);
+      }
+    }; */
+    
+    
+    
 
     // Generate random colors
     const generateRandomColors = (count: number) => {
@@ -349,13 +449,13 @@ export default function Graficas() {
 
   return(
     <>
-
     <Container id="all-data" sx={{height: '100%'}}>
+      <Container id="title-and-chart">
         <br />
-        <Box display="flex" justifyContent="center" alignItems="center">
+        <Box id="title" display="flex" justifyContent="center" alignItems="center">
           <Typography variant='h3' align='center'>Graphics</Typography> 
           <Tooltip title="Download all graphics as PDF">
-            <Button size="large" endIcon={<DownloadIcon />} sx={{ color: 'grey' }} onClick={() => handleDownloadPdf('all-data')}></Button>
+            <Button size="large" endIcon={<DownloadIcon />} sx={{ color: 'grey' }} onClick={() => handleDownloadPdf(["title-and-chart", "charts2", "chart-container4"])}></Button>
           </Tooltip>
         </Box>
       
@@ -415,9 +515,12 @@ export default function Graficas() {
             </Box>
           
         </Box>
+      </Container>
+
+      <Container id="charts2">
         
         {/* Tickets by status and priority, tickets category and assigned, resolved*/}
-        <Box display="flex" width={"100%"} justifyContent="center" alignItems="stretch" sx={{ flexGrow: 1, height: '100%' }}>
+        <Box id= "chart-container2" display="flex" width={"100%"} justifyContent="center" alignItems="stretch" sx={{ flexGrow: 1, height: '100%' }}>
 
           <Box width="50%" m={2} alignItems="center" sx={{ backgroundColor: "white", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
             <br />
@@ -468,7 +571,7 @@ export default function Graficas() {
 
 
         {/* Tickets support group and team */}
-        <Box display="flex" width={"100%"} justifyContent="center" alignItems="stretch" sx={{height: '100%'}}>
+        <Box id= "chart-container3" display="flex" width={"100%"} justifyContent="center" alignItems="stretch" sx={{height: '100%'}}>
 
           <Box width="50%"  m={2} alignItems="center" sx={{ backgroundColor: "white", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" , height: '100%'}}>
               <br />
@@ -524,6 +627,7 @@ export default function Graficas() {
           
  
         </Box>
+      </Container>
 
         {/* Tickets forwarded */}
         <Box id= "chart-container4" display="flex" width={"100%"} justifyContent="center" alignItems="center">
