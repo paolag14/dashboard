@@ -983,7 +983,7 @@ export default function Home(props:any) {
 
                         <Typography variant="subtitle1" color="text.secondary">
                           {hoverBacklog? 
-                              "Asigned tickets: " + assigned.toString() 
+                              "Assigned tickets: " + assigned.toString() 
                           : null} 
                         </Typography>
 
@@ -1005,8 +1005,6 @@ export default function Home(props:any) {
                 </Card>
             </Grid>
 
-
-
             {/*Graphics*/}
             <Grid item xs={3}>
             <Card sx={{ maxWidth: 300, minHeight: 380 }}>
@@ -1021,20 +1019,11 @@ export default function Home(props:any) {
                     {fileName && (
                       <div style={{ whiteSpace: 'pre-line' }}>
                         <Typography variant="subtitle1" color="text.secondary"> 
-                          - Tickets by Service{"\n"}
-                          - Tickets by Status and Priority{"\n"}
-                          - Tickets by category{"\n"}
-                          - Tickets handled by Support Group{"\n"}
-                          - Tickets handled by Order Management Customizing and Services{"\n"}
-                          - Forwarded Tickets{"\n"}
+                          View all graphics
                         </Typography> 
                       </div>
 
                     )}
-
-
-                    
-  
                     </CardContent>
                 </Link>
                 </CardActionArea>

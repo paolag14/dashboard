@@ -282,7 +282,7 @@ export default function Graficas() {
     const transformedData = transformData(statusPriorityCounts);
 
     //bar chart assigned, resolved and forwarded
-    const countRows = (allData) => {
+    const countRows = (allData:any) => {
       const assignedCount = allData.filter(row => row[7] === "Assigned").length;
       const resolvedCount = allData.filter(row => row[7] === "Resolved").length;
       const row16Count = allData.filter(row => row[16] === "1").length;
@@ -295,6 +295,23 @@ export default function Graficas() {
     };
     
     const rowCounts = countRows(allData);    
+
+    //bar chart request, failure, reopened,complaints
+    const countFailures = (allData:any) => {
+      const requestCount = allData.filter(row => row[19] === "Request").length;
+      const failureCount = allData.filter(row => row[19] === "Failure").length; //cambiar todo esto
+      const reopenedCount = allData.filter(row => row[15] === "1").length;
+      const complaintsCount = allData.filter(row => row[5] === "Complaint").length;
+
+      return {
+        Request: requestCount,
+        Failure: failureCount,
+        Reopened: reopenedCount,
+        Complaints: complaintsCount,
+      };
+    };
+    
+    const failuresCount = countFailures(allData);    
 
     const handleDownloadImage = (elementId:any) => {
       const chartContainer = document.getElementById(elementId); // Get the chart container element
@@ -373,66 +390,6 @@ export default function Graficas() {
     };
     
 
-    /* const handleDownloadPdf = async () => {
-      const elementIds = ["title", "chart-container1", "chart-container2", "chart-container3"];
-      const graphicsPerPage = 2;
-      const totalPages = Math.ceil(elementIds.length / graphicsPerPage);
-    
-      try {
-        const pdf = new jsPDF('p', 'mm', 'a4');
-    
-        for (let page = 0; page < totalPages; page++) {
-          const startX = 20;
-          const startY = 20;
-          const pageWidth = pdf.internal.pageSize.getWidth();
-          const pageHeight = pdf.internal.pageSize.getHeight();
-          const elementsOnPage = elementIds.slice(
-            page * graphicsPerPage,
-            (page + 1) * graphicsPerPage
-          );
-    
-          for (let i = 0; i < elementsOnPage.length; i++) {
-            const elementId = elementsOnPage[i];
-            const chartContainer = document.getElementById(elementId);
-    
-            const options = {
-              style: {
-                'transform-origin': 'center',
-              },
-              quality: 1,
-              height: chartContainer.offsetHeight * 2, // Increase the height to improve image quality
-              width: chartContainer.offsetWidth * 2, // Increase the width to improve image quality
-            };
-    
-            try {
-              const dataUrl = await domtoimage.toPng(chartContainer, options);
-              const imgProps = pdf.getImageProperties(dataUrl);
-              const imgWidth = pageWidth - 2 * startX;
-              const imgHeight = (imgWidth * imgProps.height) / imgProps.width;
-    
-              const x = startX;
-              const y = startY + i * (imgHeight + startY);
-    
-              pdf.addImage(dataUrl, 'PNG', x, y, imgWidth, imgHeight);
-            } catch (error) {
-              console.error('Error generating image:', error);
-            }
-          }
-    
-          if (page !== totalPages - 1) {
-            pdf.addPage();
-          }
-        }
-    
-        pdf.save('graphs_pdf.pdf');
-      } catch (error) {
-        console.error('Error generating PDF:', error);
-      }
-    }; */
-    
-    
-    
-
     // Generate random colors
     const generateRandomColors = (count: number) => {
       const colors = [];
@@ -455,7 +412,7 @@ export default function Graficas() {
         <Box id="title" display="flex" justifyContent="center" alignItems="center">
           <Typography variant='h3' align='center'>Graphics</Typography> 
           <Tooltip title="Download all graphics as PDF" arrow>
-            <Button size="large" endIcon={<DownloadIcon />} sx={{ color: 'grey' }} onClick={() => handleDownloadPdf(["title-and-chart", "charts2", "charts3"])}></Button>
+            <Button size="large" endIcon={<DownloadIcon />} sx={{ color: 'grey' }} onClick={() => handleDownloadPdf(["title-and-chart", "charts2", "charts3", "charts4"])}></Button>
           </Tooltip>
         </Box>
       
@@ -718,6 +675,88 @@ export default function Graficas() {
           
         </Box>
       </Container>
+
+      <Container id="charts4">
+      
+        {/* Tickets request, failure, reopened, complaints*/}
+        <Box  display="flex" width={"100%"} justifyContent="center" alignItems="stretch" sx={{height: '100%'}}>
+
+          <Box id= "chart-container8" width="100%" m={2} alignItems="center" sx={{ backgroundColor: "white", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" , height: '100%'}}>
+              <br />
+              <Box display="flex" justifyContent="flex-end" sx={{ marginTop: "-10px", marginBottom: "-20px", marginRight: "-85%", cursor: "pointer" }}>
+                  <Tooltip title= "Click to download graph image" arrow>
+                    <Button size="large" endIcon={<DownloadIcon />} onClick={() => handleDownloadImage('chart-container8')}></Button>
+                  </Tooltip>
+              </Box>
+              <br />
+              <Typography align='center' variant='h6'  sx={{ fontWeight: 'bold'  }}> Request, Failure, Reopened, and Complaints </Typography> 
+
+              <br /> 
+              <BarChart
+                data={{
+                  labels: Object.keys(failuresCount).filter(type => failuresCount[type] !== 0),
+                  values: Object.values(failuresCount).filter(count => count !== 0),
+                  colors: Object.keys(failuresCount).map(() => {
+                    const r = Math.floor(Math.random() * 255);
+                    const g = Math.floor(Math.random() * 255);
+                    const b = Math.floor(Math.random() * 255);
+                    return `rgb(${r}, ${g}, ${b})`;
+                  })
+                }}
+              />
+              <br />
+              <br />
+          </Box>
+
+          {/* <Box id="chart-container6" width="50%"  m={2} alignItems="center" sx={{ backgroundColor: "white", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"  }}>
+            <br />
+            <Box display="flex" justifyContent="flex-end" sx={{ marginTop: "-10px", marginBottom: "1px", marginRight: "-85%", cursor: "pointer" }}>
+                  <Tooltip title= "Click to download graph image" arrow>
+                    <Button size="large" endIcon={<DownloadIcon />} onClick={() => handleDownloadImage('chart-container6')}></Button>
+                  </Tooltip>
+            </Box>
+            <Typography align='center' variant='h6'  sx={{ fontWeight: 'bold'  }}> Tickets handled by Order Management Customizing and Services </Typography> 
+            <Box display="flex" flexDirection="column" width="100%"  alignItems="center">
+              <Button variant="text" onClick={handleOpenAssignee}>See Details</Button>
+                <Modal
+                  open={openAssignee}
+                  onClose={handleCloseAssignee}
+                  aria-labelledby="modal-modal-title"
+                  aria-describedby="modal-modal-description"
+                >
+                  <Box sx={style}>
+                    <Typography id="modal-modal-title2" align='center' variant='h6' sx={{ fontWeight: 'bold' }}> Tickets handled by Team </Typography>
+                    <br />
+                        <Typography variant="body2" align='justify' display="inline" sx={{ fontSize: "14px", fontWeight: "bold" }}>
+                          Total tickets handled by Team: {" "}
+                        <Typography variant="body2" align='justify' display="inline" sx={{ fontSize: "14px" }}>
+                          {totalCount}
+                        </Typography>
+                        <Typography> </Typography>
+                      </Typography>
+                      <br />
+                        
+                      {Object.entries(asigneeNameCountsAll).map(([name, count]) => (
+                      <Typography variant="body2" align='justify' display="inline" sx={{ fontSize: "12px", fontWeight: "bold" }}>
+                          {name}: {" "}
+                        <Typography variant="body2" align='justify' display="inline" sx={{ fontSize: "12px" }}>
+                            {count}
+                        </Typography>
+                        <Typography> </Typography>
+                      </Typography>
+                      ))}
+                   </Box>
+                  </Modal>
+             </Box>
+             <br />
+              <PieChart data={dataPie} ></PieChart>
+          </Box> */}
+          
+        </Box>
+
+      </Container>
+
+     
 
     </Container>
     
