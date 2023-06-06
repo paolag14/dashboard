@@ -48,15 +48,16 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
 }));
 
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  '&:nth-of-type(odd)': {
-    backgroundColor: theme.palette.action.hover,
-  },
-  // hide last border
+const StyledTableRow = styled(TableRow)(({ theme, index }) => ({
+  backgroundColor: index % 2 === 0 ? "#D2D8D9" : theme.palette.action.hover,
+  color: index % 2 === 0 ? theme.palette.common.white : '',
+
   '&:last-child td, &:last-child th': {
     border: 0,
   },
 }));
+
+
 
 
 export default function TwoWeeks() {
@@ -116,116 +117,6 @@ export default function TwoWeeks() {
     setSelectedPriority(selectedPriority);
     setSelectedStatus(selectedStatus);
   }
-  
-
-/*   const handleServiceChange = (event:any) => {
-    const service = event.target.value;
-    const priority = selectedPriority;
-    const status = selectedStatus;
-    
-    if (service === "" && priority === "" && status === "" ) {
-      setFilteredData(allData.slice(1));
-    } else if (service === "" && priority === "" && status !== "" ) {
-      const newFilteredData = allData.filter((row:any) => row[5] === status);
-      setFilteredData(newFilteredData);
-    } else if (service === "" && priority !== "" && status === "" ) {
-      const newFilteredData = allData.filter((row:any) => row[6] === priority);
-      setFilteredData(newFilteredData);
-    } else if (service === "" && priority !== "" && status !== "" ) {
-      const newFilteredData = allData.filter((row:any) => row[5] === status && row[6] === priority);
-      setFilteredData(newFilteredData);
-    } else if (service !== "" && priority === "" && status === "") {
-      const newFilteredData = allData.filter((row:any) => row[2] === service );
-      setFilteredData(newFilteredData);
-    } else if (service !== "" && priority === "" && status !== "" ) {
-      const newFilteredData = allData.filter((row:any) => row[2] === service && row[5] === status );
-      setFilteredData(newFilteredData);
-    } else if (service !== "" && priority !== "" && status === "" ) {
-      const newFilteredData = allData.filter((row:any) => row[2] === service && row[6] === priority);
-      setFilteredData(newFilteredData);
-    } else {
-      const newFilteredData = allData.filter((row:any) => row[2] === service && row[5] === status && row[6] === priority );
-      setFilteredData(newFilteredData);
-    }
-
-    //const filtered = filterData(service, priority, status);
-    //setFilteredData(filtered);
-
-    setSelectedService(service);
-
-  };
-
-  const handlePriorityChange = (event:any) => {
-    const priority = event.target.value;
-    const service = selectedService;
-    const status = selectedStatus;  
-  
-    if (service === "" && priority === "" && status === "") {
-        setFilteredData(allData.slice(1));
-    } else if (service === "" && priority !== "" && status === "") {
-      const newFilteredData = allData.filter((row:any) => row[6] === priority);
-      setFilteredData(newFilteredData);
-    } else if (service === "" && priority === "" && status !== "") {
-      const newFilteredData = allData.filter((row:any) => row[5] === status);
-      setFilteredData(newFilteredData);
-    } else if (service !== "" && priority === "" && status === "") {
-      const newFilteredData = allData.filter((row:any) => row[2] === service);
-      setFilteredData(newFilteredData);
-    } else if (service !== "" && priority !== "" && status === "") {
-      const newFilteredData = allData.filter((row:any) => row[2] === service && row[6] === priority);
-      setFilteredData(newFilteredData);
-    } else if (service !== "" && priority === "" && status !== "") {
-      const newFilteredData = allData.filter((row:any) => row[2] === service && row[5] === status);
-      setFilteredData(newFilteredData);
-    } else if (service === "" && priority !== "" && status !== "") {
-      const newFilteredData = allData.filter((row:any) => row[5] === status && row[6] === priority);
-      setFilteredData(newFilteredData);
-    } else {
-      const newFilteredData = allData.filter((row:any) => row[2] === service && row[6] === priority && row[5] === status);
-      setFilteredData(newFilteredData);
-    }
-
-    //const filtered = filterData(service, priority, status);
-    //setFilteredData(filtered);
-    setSelectedPriority(priority);
-    
-  };
-
-  const handleStatusChange = (event:any) => {
-    const status = event.target.value;
-    const service = selectedService;
-    const priority = selectedPriority;
-      
-    if (service === "" && priority === "" && status === "" ) {
-      setFilteredData(allData.slice(1));
-    } else if (service === "" && priority === "" && status !== "") {
-      const newFilteredData = allData.filter((row:any) => row[7] === status);
-      setFilteredData(newFilteredData);
-    } else if (service === "" && priority !== "" && status === "") {
-      const newFilteredData = allData.filter((row:any) => row[6] === priority);
-      setFilteredData(newFilteredData);
-    } else if (service === "" && priority !== "" && status !== "") {
-      const newFilteredData = allData.filter((row:any) => row[6] === priority && row[7] === status);
-      setFilteredData(newFilteredData);
-    } else if (service !== "" && priority === "" && status === "") {
-      const newFilteredData = allData.filter((row:any) => row[2] === service);
-      setFilteredData(newFilteredData);
-    } else if (service !== "" && priority === "" && status !== "") {
-      const newFilteredData = allData.filter((row:any) => row[2] === service && row[7] === status);
-      setFilteredData(newFilteredData);
-    } else if (service !== "" && priority !== "" && status === "") {
-      const newFilteredData = allData.filter((row:any) => row[2] === service && row[6] === priority);
-      setFilteredData(newFilteredData);
-    } else {
-      const newFilteredData = allData.filter((row:any) => row[2] === service && row[6] === priority && row[7] === status);
-      setFilteredData(newFilteredData);
-    }
-
-    /* const newFiltered = filterData(service, priority, status);
-    setFilteredData(newFiltered); */
-/*     setSelectedStatus(status);
-  }; */ 
-
 
   const handleFilterChange = (service:any, priority:any, status:any) => {
     const filteredData = allData.slice(1).filter((row:any) => {
@@ -256,20 +147,7 @@ export default function TwoWeeks() {
   };
   
 
-    // handle text field value change
-/*     const handleSearchChange = (event:any) => {
-    const value = event.target.value;
-    setSearchValue(value);
-
-    const filtered = allData.slice(1).filter((row) =>
-        Object.values(row).some((value) =>
-        String(value).toLowerCase().includes(searchValue.toLowerCase())
-        )
-    );
-    setFilteredData(filtered);
-    }; */
-
-    const handleSearchChange = (event) => {
+  const handleSearchChange = (event) => {
         const value = event.target.value;
         setSearchValue(value);
       
@@ -279,10 +157,10 @@ export default function TwoWeeks() {
           )
         );
         setFilteredData(filtered);
-      };
+  };
       
       
-    const handleResetFilters = () => {
+  const handleResetFilters = () => {
     setResetFilters(true);
     };
 
@@ -293,129 +171,148 @@ export default function TwoWeeks() {
     setSelectedStatus('');
     setSearchValue('');
     setResetFilters(false);
-    }
-
-
-// filter data based on search value
-/*     useEffect(() => {
-    const filtered = allData.slice(1).filter((row) =>
-        Object.values(row).some((value) =>
-        String(value).toLowerCase().includes(searchValue.toLowerCase())
-        )
-    );
-    setFilteredData(filtered);
-    }, [searchValue, allData]); */
-
+  }
   
    // create a set of services from the third column of allData
   const services = Array.from(new Set(allData.slice(1).map((row:any) => row[2] ? row[2] : null)))
   .filter(service => service !== null)
   .sort((a:any, b:any) => a.localeCompare(b));
 
+  const headers = ["Incident Number", "Summary", "Service", "Support Group", "Priority", "Status", "Creation Date", "Reopened Date",
+    "Solved Date"];
+  /* headers
+  allData[0].slice(0, 3).
+                concat(allData[0].slice(4,5)).
+                concat(allData[0].slice(6,11))
+                 */
+  console.log("headers", headers);
+
+  /* headers details 
+  paginatedData.slice(0,3).
+            concat(paginatedData.slice(4,5)).
+            concat(paginatedData.slice(6,11)) */
+
+  const headersDetails = ["Open", "Solved", "Reopened", "Forwarded", "Assignee ID", "Assignee Name", "Category", "Forwarded to Group", "Reopened Reason", 
+    "Last Assigned On", "Duration in Days"];
 
   return(
     <>
     <br />
-    <Typography variant='h3' align='center'>Tickets Two Weeks</Typography>
+    
+    <Typography variant='h3' align='center' mt={2} sx={{fontWeight:400}}>Tickets Two Weeks</Typography>
+
+    <Box width="95%" sx={{ backgroundColor: "#4D4D52", height: 10, mt:3, marginLeft: "auto", marginRight: "auto" }}></Box>
+   
+    
     <br />
     <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
 
-      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-        <OutlinedInput
-          value={searchValue}
-          onChange={handleSearchChange}
-          placeholder="Search"
-          sx={{ ml: 1, width: '100%' }}
-          startAdornment={
-            <InputAdornment position="start">
-              <SearchIcon />
-            </InputAdornment>
-          }
-        />
-      </Box>
+      <Paper elevation={3} sx={{ margin: 0 , width: '100%'}}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <OutlinedInput
+            value={searchValue}
+            onChange={handleSearchChange}
+            placeholder="Search"
+            sx={{  width: '100%' }}
+            startAdornment={
+              <InputAdornment position="start">
+                <SearchIcon />
+              </InputAdornment>
+            }
+          />
+        </Box>
+      </Paper>
     
     <br />
     <br />
 
-
     <Stack direction="row" spacing={2} alignItems="center">
 
-    {/* Service filter */}
-    <FormControl variant="outlined" className={classes.formControl}> 
-      <InputLabel id="service-select-label">Select a service</InputLabel>
-      <Select
-        labelId="service-select-label"
-        id="service-select"
-        value={selectedService}
-        onChange={handleServiceChange}
-        label="Select a service"
-        sx={{
-          bgcolor: 'background.paper',
-          boxShadow: 1,
-          borderRadius: 2,
-          p: 2,
-          minWidth: 300,
-        }}
-      >
-        <MenuItem value="">
-          <em>None</em>
-        </MenuItem>
-        {Array.from(services).map((service:any) => (
-          <MenuItem key={service.toString()} value={service.toString()}>{service}</MenuItem>
+      {/* Service filter */}
+      <Paper elevation={3}>
+        <FormControl variant="outlined" className={classes.formControl}> 
+          <InputLabel id="service-select-label">Select a service</InputLabel>
+          <Select
+            labelId="service-select-label"
+            id="service-select"
+            value={selectedService}
+            onChange={handleServiceChange}
+            label="Select a service"
+            sx={{
+              bgcolor: 'background.paper',
+              boxShadow: 1,
+              borderRadius: 2,
+              p: 2,
+              minWidth: 300,
+            }}
+          >
+            <MenuItem value="">
+              <em>None</em>
+            </MenuItem>
+            {Array.from(services).map((service:any) => (
+              <MenuItem key={service.toString()} value={service.toString()}>{service}</MenuItem>
 
-        ))}
-      </Select>
-    </FormControl>
+            ))}
+          </Select>
+        </FormControl>
+      </Paper>
 
 
-    {/* Priority filter */}
-    <FormControl variant="outlined" className={classes.formControl}>
-        <InputLabel id="priority-select-label">Select a priority</InputLabel>
-        <Select
-          labelId="priority-select-label"
-          id="priority-select"
-          value={selectedPriority}
-          onChange={handlePriorityChange}
-          label="Select a priority"
-        >
-          <MenuItem value="">
-            <em>None</em>
-          </MenuItem>
-          <MenuItem value="Low">Low</MenuItem>
-          <MenuItem value="Medium">Medium</MenuItem>
-          <MenuItem value="High">High</MenuItem>
-        </Select>
-    </FormControl>
+      {/* Priority filter */}
+      <Paper elevation={3}>
+        <FormControl variant="outlined" className={classes.formControl}>
+            <InputLabel id="priority-select-label">Select a priority</InputLabel>
+            <Select
+              labelId="priority-select-label"
+              id="priority-select"
+              value={selectedPriority}
+              onChange={handlePriorityChange}
+              label="Select a priority"
+            >
+              <MenuItem value="">
+                <em>None</em>
+              </MenuItem>
+              <MenuItem value="Low">Low</MenuItem>
+              <MenuItem value="Medium">Medium</MenuItem>
+              <MenuItem value="High">High</MenuItem>
+            </Select>
+        </FormControl>
+      </Paper>
 
-    {/* Status filter */}
-    <FormControl variant="outlined" className={classes.formControl}>
-      <InputLabel id="status-select-label">Select a status</InputLabel>
-      <Select
-        labelId="status-select-label"
-        id="status-select"
-        value={selectedStatus}
-        onChange={handleStatusChange}
-        label="Select a status"
-      >
-        <MenuItem value="">
-          <em>None</em>
-        </MenuItem>
-        {/* Add menu items for each unique status in the "status" column of allData */}
-        {Array.from(new Set(allData.slice(1).map((row: any[]) => row[7]))).map(status => (
-          <MenuItem key={status} value={status}>{status}</MenuItem>
-        ))}
-      </Select>
-    </FormControl>
+      {/* Status filter */}
+      <Paper elevation={3}>
+        <FormControl variant="outlined" className={classes.formControl}>
+          <InputLabel id="status-select-label">Select a status</InputLabel>
+          <Select
+            labelId="status-select-label"
+            id="status-select"
+            value={selectedStatus}
+            onChange={handleStatusChange}
+            label="Select a status"
+          >
+            <MenuItem value="">
+              <em>None</em>
+            </MenuItem>
+            {/* Add menu items for each unique status in the "status" column of allData */}
+            {Array.from(new Set(allData.slice(1).map((row: any[]) => row[7]))).map(status => (
+              <MenuItem key={status} value={status}>{status}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Paper>
 
-    <Box marginLeft="auto">
-      <Button variant="outlined" onClick={handleResetFilters} startIcon={<ClearIcon />}>
-        Clear
-      </Button>
-    </Box>
+
+      <Box marginLeft="auto">
+        <Button variant="outlined" onClick={handleResetFilters} startIcon={<ClearIcon />}>
+          Clear
+        </Button>
+      </Box>
 
     </Stack>
 
     <br /><br />
+
+    <Paper elevation={3}>
 
     <TableContainer component={Paper}>
     <Table  sx={{minWidth: 700}} aria-label="collapsible table">
@@ -423,9 +320,7 @@ export default function TwoWeeks() {
           <StyledTableRow>
             <StyledTableCell></StyledTableCell> 
 
-            {allData[0].slice(0, 3).
-                concat(allData[0].slice(4,5)).
-                concat(allData[0].slice(6,11)).map((header:any) => (
+            {headers.map((header:any) => (
             <StyledTableCell><Typography variant="h6">{header}</Typography></StyledTableCell>
           ))}
           </StyledTableRow>
@@ -435,7 +330,7 @@ export default function TwoWeeks() {
             concat(paginatedData.slice(4,5)).
             concat(paginatedData.slice(6,11)).map((row:any, index:any) => (
             <>
-              <StyledTableRow key={index} onClick={() => handleRowClick(index)}>
+              <StyledTableRow key={index} index={index} onClick={() => handleRowClick(index)}>
                 <StyledTableCell>
                   <IconButton aria-label="expand row" size="small" onClick={() => handleRowClick(index)}>
                     {expandedRow === index ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
@@ -447,7 +342,7 @@ export default function TwoWeeks() {
                   <TableCell>{cell}</TableCell>
                 ))}
               </StyledTableRow>
-              <StyledTableRow>
+              <StyledTableRow key={index} index={index}>
                 <StyledTableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={allData[0].length}>
                   <Collapse in={expandedRow === index} timeout="auto" unmountOnExit>
                     <Table size="small" aria-label="details">
@@ -458,7 +353,7 @@ export default function TwoWeeks() {
                     {allData[0].slice(13, 20)
                         .concat(allData[0].slice(33, 34))
                         .concat(allData[0].slice(35, 38))
-                        .map((header: any, headerIndex: any) => {
+                        .map((header: any, headerIndex: any, index:any) => {
                             const dataIndex =
                             headerIndex < 7
                                 ? headerIndex + 13
@@ -469,11 +364,12 @@ export default function TwoWeeks() {
                                 : headerIndex === 9
                                 ? 36
                                 : 37;
+                                
                             return (
                             <TableRow key={headerIndex}>
                                 <TableCell>
                                 <Typography display="inline" sx={{ fontSize: "13px", fontWeight: "bold" }}>
-                                    {header}:{" "}
+                                  {headersDetails[headerIndex]} :{" "} 
                                 </Typography>
                                 <Typography display="inline" sx={{ fontSize: "13px" }}>
                                     {row[dataIndex]}
@@ -507,7 +403,10 @@ export default function TwoWeeks() {
             setRowsPerPage(parseInt(event.target.value, 10));
             setPage(0);
           }}
+          
         />
+
+    </Paper>
 
     </Box>
    

@@ -388,7 +388,6 @@ export default function Graficas() {
         console.error('Error generating PDF:', error);
       }
     };
-    
 
     // Generate random colors
     const generateRandomColors = (count: number) => {
