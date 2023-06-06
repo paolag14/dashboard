@@ -19,6 +19,9 @@ import DownloadIcon from '@mui/icons-material/Download';
 import jsPDF from 'jspdf';
 import domtoimage from 'dom-to-image';
 import htmlToImage from 'html-to-image';
+import FileOpenIcon from '@mui/icons-material/FileOpen';
+import Paper from '@material-ui/core/Paper';
+
 
 const useStyles = makeStyles(theme => ({
   iconHover: {
@@ -480,6 +483,10 @@ export default function Home(props:any) {
 
   }
 
+  const newColors = ['#ffed1a', '#fa9b00', '#009be1', '#FF0000']; // Example new colors
+  
+
+
   const handleDownloadPdf = async (elementIds: string[]) => {
     /* setHover(true);
     setHoverR(true);
@@ -531,27 +538,41 @@ export default function Home(props:any) {
         <>
         <Container id= "all-data">
           <br />
+
           <Box id="title" display="flex" justifyContent="center" alignItems="center">
-            <Typography variant="h3" align="center">Tickets</Typography>
-            <br></br>
+            <Typography variant='h3' align='center' mt={2} sx={{fontWeight:400}}>Tickets</Typography>
             {/* <Tooltip title="Download all graphics as PDF" arrow>
               <Button size="large" endIcon={<DownloadIcon />} sx={{ color: 'grey' }} onClick={() => handleDownloadPdf(["title", "cards", "este"])}></Button>
             </Tooltip> */}
           </Box>
-          <br />
 
-          <div className='center'>
-          <Input type="file"  inputProps={{accept: '.xlsx,.xls'}} onChange={e => handleFile(e)}></Input>
-          </div>
+          <Box width="95%" sx={{ backgroundColor: "#EB1C24", height: 10, mt:3, marginLeft: "auto", marginRight: "auto" }}></Box>
+
+          <br /> 
+
+          <Box width={"100%"} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', margin: 'auto', mt:1}}>
+            <input id="select-button" type="file"  accept=".xlsx, .xls" style={{ display: 'none' }} onChange={handleFile}></input>
+              <label htmlFor="select-button">
+                  <Button variant="contained" component="span"
+                    style={{
+                      backgroundColor: "#4D4D52",
+                      padding: "18px 36px"
+                    }}
+
+                    //onClick={handleFile(e)}
+                    endIcon={<FileOpenIcon />}>
+                    Select a file
+                  </Button>
+              </label>
+          </Box>
 
           <br></br>
 
           <Container id="este">
           <div className='center'>
           {fileName && (
-            <React.Fragment> 
-          <Typography variant="h4" align="center">File Name: <span>{fileName}</span></Typography>
-            </React.Fragment>
+            
+            <Typography variant="h4" align="center" mt={3} mb={3} >File Name: <span>{fileName}</span></Typography>
           ) }
           
           </div>
@@ -569,7 +590,7 @@ export default function Home(props:any) {
                   <Typography gutterBottom variant="subtitle2" component="div">
                   See all tickets </Typography>} arrow>
 
-                  <Card sx={{ maxWidth: 300, minHeight: 300 }}>
+                  <Card sx={{ maxWidth: 300, minHeight: 300 }} elevation={3}>
                 
                     <CardActionArea >
                       
@@ -593,7 +614,7 @@ export default function Home(props:any) {
                             <DonutChart data={{ 
                               labels: ['Resolved', 'Closed', 'Forwarded', 'Reopened'], 
                               values: [solved, closed, forwarded, reopened], 
-                              colors: ['#74b72e', '#FF7518', '#FFBF00', '#FF0000'] }} />
+                              colors: newColors }} />
 
                           )}
 
@@ -677,7 +698,7 @@ export default function Home(props:any) {
 
               {/*Resolved tickets*/}
               <Grid item xs={3}>
-              <Card sx={{ maxWidth: 300, minHeight: 300 }}>
+              <Card sx={{ maxWidth: 300, minHeight: 300 }} elevation={3}>
               
                   <CardActionArea >
                   <Link href={{ pathname: '/tickets', query: { data: JSON.stringify(resolvedData) } }}> 
@@ -695,7 +716,7 @@ export default function Home(props:any) {
                         <DonutChart data={{ 
                           labels: ['Low', 'Medium', 'High', 'Critical'], 
                           values: [lowR, mediumR, highR, criticalR], 
-                          colors: ['#FFEE99', '#FF9F00', '#FF4500', '#E12901'] }} />
+                          colors: newColors }} />
 
                       )}
                       <br />
@@ -740,7 +761,7 @@ export default function Home(props:any) {
 
               {/*Closed tickets*/}
               <Grid item xs={3}>
-                <Card sx={{ maxWidth: 300, minHeight: 300 }}>
+                <Card sx={{ maxWidth: 300, minHeight: 300 }} elevation={3}>
                 
                     <CardActionArea >
                     <Link href={{ pathname: '/tickets', query: { data: JSON.stringify(closedData) } }}>
@@ -758,7 +779,7 @@ export default function Home(props:any) {
                           <DonutChart data={{ 
                             labels: ['Low', 'Medium', 'High', 'Critical'], 
                             values: [lowC, mediumC, highC, criticalC], 
-                            colors: ['#FFEE99', '#FF9F00', '#FF4500', '#E12901'] }} />
+                            colors: newColors }} />
 
                         )}
                         <br />
@@ -803,7 +824,7 @@ export default function Home(props:any) {
 
               {/*Forwarded tickets*/}
               <Grid item xs={3}>
-              <Card sx={{ maxWidth: 300, minHeight: 300 }}>
+              <Card sx={{ maxWidth: 300, minHeight: 300 }} elevation={3}>
               
                   <CardActionArea >
                   <Link href={{ pathname: '/tickets', query: { data: JSON.stringify(forwardedData) } }}>
@@ -822,7 +843,7 @@ export default function Home(props:any) {
                         <DonutChart data={{ 
                           labels: ['Low', 'Medium', 'High', 'Critical'], 
                           values: [lowF, mediumF, highF, criticalF], 
-                          colors: ['#FFEE99', '#FF9F00', '#FF4500', '#E12901'] }} />
+                          colors: newColors }} />
 
                       )}
                       <br />
@@ -866,7 +887,7 @@ export default function Home(props:any) {
 
               {/*Reopened tickets*/}
               <Grid item xs={3}>
-              <Card sx={{ maxWidth: 300, minHeight: 380 }}>
+              <Card sx={{ maxWidth: 300, minHeight: 380 }} elevation={3}>
               
                   <CardActionArea >
                   <Link href={{ pathname: '/tickets', query: { data: JSON.stringify(reopenedData) } }}>
@@ -884,7 +905,7 @@ export default function Home(props:any) {
                         <DonutChart data={{ 
                           labels: ['Low', 'Medium', 'High', 'Critical'], 
                           values: [lowReopened, mediumReopened, highReopened, criticalReopened], 
-                          colors: ['#FFEE99', '#FF9F00', '#FF4500', '#E12901'] }} />
+                          colors: newColors }} />
 
                       )}
                       <br />
@@ -928,7 +949,7 @@ export default function Home(props:any) {
 
               {/*Más de dos semanas tickets*/}
               <Grid item xs={3}>
-              <Card sx={{ maxWidth: 300, minHeight: 380 }}>
+              <Card sx={{ maxWidth: 300, minHeight: 380 }} elevation={3}>
               
                   <CardActionArea >
                   <Link href={{ pathname: '/twoWeeks', query: { data: JSON.stringify(open2weeksData) } }}>
@@ -946,7 +967,7 @@ export default function Home(props:any) {
                         <DonutChart data={{ 
                           labels: ['Total tickets', 'Open and not solved', 'Open more than 2 weeks'], 
                           values: [total, openNotSolved, count2weeks], 
-                          colors: ['#0096FF', '#009E60', '#FAFA33'] }} />
+                          colors: newColors }} />
 
                       )}
 
@@ -990,7 +1011,7 @@ export default function Home(props:any) {
 
               {/*Backlog tickets*/}
               <Grid item xs={3}>
-              <Card sx={{ maxWidth: 300, minHeight: 380 }}>
+              <Card sx={{ maxWidth: 300, minHeight: 380 }} elevation={3}>
               
                   <CardActionArea href="/">
                   <CardContent 
@@ -1007,7 +1028,7 @@ export default function Home(props:any) {
                                 <DonutChart data={{ 
                                   labels: ['Over limit'], 
                                   values: [lowReopened], 
-                                  colors: ['#FF2400	'] }} /> 
+                                  colors: ['#e10a14	'] }} /> 
                             : null
                             } 
 
@@ -1015,7 +1036,7 @@ export default function Home(props:any) {
                             <DonutChart data={{ 
                               labels: ['Below limit'], 
                               values: [lowReopened], 
-                              colors: ['#32CD32	'] }} />
+                              colors: ['#d7e100	'] }} />
                             : null }
 
                           {/* si no hay, si es false */}
@@ -1057,7 +1078,7 @@ export default function Home(props:any) {
 
               {/*Graphics*/}
               <Grid item xs={3}>
-              <Card sx={{ maxWidth: 300, minHeight: 380 }}>
+              <Card sx={{ maxWidth: 300, minHeight: 380 }} elevation={3}>
               
                   <CardActionArea >
                   <Link href={{ pathname: '/graficas', query: { data: JSON.stringify(allData) } }}>
