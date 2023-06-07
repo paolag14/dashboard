@@ -8,13 +8,14 @@ import Modal from '@mui/material/Modal';
 import Button from '@mui/material/Button';
 import StackedBarChart from '@/components/stackedBarChart';
 import PieChart from '@/components/pieChart';
-import DownloadIcon from '@mui/icons-material/Download';
 import html2canvas from 'html2canvas'; 
 import Tooltip from '@mui/material/Tooltip';
 import jsPDF from 'jspdf';
 import DonutChart from '@/components/donutChart';
 import domtoimage from 'dom-to-image';
 import htmlToImage from 'html-to-image';
+import {  Menu, MenuItem } from '@mui/material';
+import { MoreVert as MoreVertIcon, GetApp as DownloadIcon } from '@mui/icons-material';
 
 
 interface Service {
@@ -70,6 +71,17 @@ export default function Graficas() {
     const handleOpenGroups = () => setOpenGroups(true);
     const handleCloseGroups = () => setOpenGroups(false);
 
+    //dropdown
+    const [anchorEl, setAnchorEl] = useState(null);
+
+    const handleOpenMenu = (event) => {
+      setAnchorEl(event.currentTarget);
+    };
+  
+    const handleCloseMenu = () => {
+      setAnchorEl(null);
+    };
+
     //bar chart services
     const services2 = Array.from(new Set(allData.slice(1).map((row:any) => row[2] ? row[2] : null)))
 
@@ -85,7 +97,7 @@ export default function Graficas() {
 
     const serviceCounts = countServices(services, allData);
 
-    // Sort services in descending order based on counts
+    // Sort services in descending order 
     const sortedServices = Object.entries(serviceCounts)
     .sort(([, countA], [, countB]) => countB - countA)
     .reduce((sortedObj, [type, count]) => {
@@ -155,7 +167,7 @@ export default function Graficas() {
 
     // Create an array of the top 10 names with highest counts
     const topNames = Object.entries(asigneeNameCounts)
-    .sort(([, countA], [, countB]) => countB - countA) // sort by count in descending order
+    .sort(([, countA], [, countB]) => countB - countA) //sort by count in descending order
     .slice(0, 10) // take only the top 10 names
     .map(([name]) => name); // extract the names only
 
@@ -314,8 +326,10 @@ export default function Graficas() {
     const failuresCount = countFailures(allData);    
 
     const handleDownloadImage = (elementId:any) => {
-      const chartContainer = document.getElementById(elementId); // Get the chart container element
-      html2canvas(chartContainer).then(canvas => {
+      //const chartContainer = document.getElementById(elementId); // Get the chart container element
+      //const containerStyle = chartContainer.style.boxShadow; // Store the original box shadow
+    chartContainer.style.boxShadow = 'none'; // Remove the box shadow temporarily
+      html2canvas(chartContainer, { useCORS: true }).then((canvas) => {
         const image = canvas.toDataURL('image/png'); // Convert canvas to image data URL
         const downloadLink = document.createElement('a'); // Create a download link element
         downloadLink.href = image; // Set the image data URL as the link's href
@@ -407,33 +421,45 @@ export default function Graficas() {
     <>
     <Container id="all-data" sx={{height: '100%'}}>
       <Container id="title-and-chart">
-        <br />
-        <Box id="title" display="flex" justifyContent="center" alignItems="center">
-          <Typography variant='h3' align='center'>Graphics</Typography> 
+
+      <Typography variant='h3' align='center' mt={2} sx={{fontWeight:400}}>Graphics</Typography>
+
+      <Box width="95%" sx={{ backgroundColor: "#EB1C24", height: 10, mt:3, marginLeft: "auto", marginRight: "auto" }}></Box>        
+      
+      <Box id="title" display="flex" justifyContent="center" alignItems="center" sx={{mt:3}}>
           <Tooltip title="Download all graphics as PDF" arrow>
-            <Button size="large" endIcon={<DownloadIcon />} sx={{ color: 'grey' }} onClick={() => handleDownloadPdf(["title-and-chart", "charts2", "charts3", "charts4"])}></Button>
+            <Button variant="contained" component="span"
+                    style={{
+                      backgroundColor: "#4D4D52",
+                      padding: "18px 36px"
+                    }}
+                    onClick={() => handleDownloadPdf(["title-and-chart", "charts2", "charts3", "charts4"])}
+                    endIcon={<DownloadIcon />}>
+                    Download
+                  </Button>
           </Tooltip>
         </Box>
       
         <br />
 
        {/*  Number of tickets by Service */}
-        <Box id= "chart-container1" display="flex" width={"100%"} justifyContent="center" alignItems="center">
-            <Box display="flex" m={2} flexDirection="row" width="100%"  alignItems="center" sx={{ backgroundColor: "white" }} >
-                <Box display="flex" flexDirection="column" width="100%"  alignItems="center">
-                    <br />
-                    {/* Download as png */}
-                    <Box display="flex" justifyContent="flex-end" sx={{ marginTop: "-10px", marginBottom: "-20px", marginRight: "-93%", cursor: "pointer" }}>
-                      <Tooltip title= "Click to download graph image" arrow>
-                        <Button size="large" endIcon={<DownloadIcon />} onClick={() => handleDownloadImage('chart-container1')}></Button>
-                      </Tooltip>
-                    </Box>
-                    <Typography align='center' variant='h6'  sx={{ fontWeight: 'bold'  }}> Number of tickets by Service </Typography>
-                    
+        <Box id="chart-container1" display="flex" width={"100%"} justifyContent="center" alignItems="center" sx={{ boxShadow: 3, borderRadius: '6px', backgroundColor: "white" }}>
+          <Box display="flex" m={2} flexDirection="row" width="100%" alignItems="center" sx={{  backgroundColor: "white" }}>
+            <Box display="flex" flexDirection="column" width="100%" alignItems="center">
+              <br />
+              {/* Download as png */}
+              <Box display="flex" justifyContent="flex-end" sx={{ marginTop: "-10px", marginBottom: "-20px", marginRight: "-93%", cursor: "pointer" }}>
+                <Tooltip title="Click to download graph image" arrow>
+                  <Button size="large" endIcon={<MoreVertIcon />} onClick={() => handleDownloadImage('chart-container1')}></Button>
+                </Tooltip>
+              </Box>
+              <Typography align='center' variant='h6' sx={{ fontWeight: 'bold' }}>Number of tickets by Service</Typography>
 
-                    <br />
-                    <Button variant="text" onClick={handleOpen}>See Details</Button>
-                    <Modal
+              <br />
+              <Button variant="text" onClick={handleOpen}>
+                See Details
+              </Button>
+              <Modal
                         open={open}
                         onClose={handleClose}
                         aria-labelledby="modal-modal-title"
@@ -452,35 +478,36 @@ export default function Graficas() {
                                     </Typography>
                                 ))}
                         </Box>
-                    </Modal>
+              </Modal>
+              
+              <Box display="flex" width="100%" alignItems="center" justifyContent="center" sx={{ borderRadius: '6px', backgroundColor: "white" }}>
 
-                    <Box display="flex" width="100%" alignItems="center" justifyContent="center">
-
-                        <BarChart data={{ 
-                            labels: topServices.map(service => service.type),
-                            values: topServices.map(service => service.count),
-                            colors: topServices.map(() => {
+              <BarChart data={{ 
+                   labels: topServices.map(service => service.type),
+                   values: topServices.map(service => service.count),
+                   colors: topServices.map(() => {
                             const r = Math.floor(Math.random() * 255);
                             const g = Math.floor(Math.random() * 255);
                             const b = Math.floor(Math.random() * 255);
                             return `rgb(${r}, ${g}, ${b})`;
                             })
-                        }} />
+               }} />
                       
-                    </Box>
-                </Box>
+              </Box>
+
 
             </Box>
-          
+          </Box>
         </Box>
       </Container>
 
       <Container id="charts2">
+       
         
         {/* Tickets by status and priority, tickets category and assigned, resolved*/}
         <Box  display="flex" width={"100%"} justifyContent="center" alignItems="stretch" sx={{ flexGrow: 1, height: '100%' }}>
-
-          <Box id= "chart-container2" width="50%" m={2} alignItems="center" sx={{ backgroundColor: "white", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
+          
+          <Box id= "chart-container2" width="50%" m={2} alignItems="center" sx={{ boxShadow: 3, borderRadius: '6px', backgroundColor: "white", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
             <Box display="flex" justifyContent="flex-end" sx={{ marginTop: "-50px", marginBottom: "-5px", marginRight: "-85%", cursor: "pointer" }}>
                 <Tooltip title= "Click to download graph image" arrow>
                   <Button size="large" endIcon={<DownloadIcon />} onClick={() => handleDownloadImage('chart-container2')}></Button>
@@ -490,10 +517,11 @@ export default function Graficas() {
             <br />
             <StackedBarChart data={transformedData} />
           </Box>
+         
 
           <Box  width="50%" m={2} sx={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
             <Box>
-              <Box id="chart-container3" width="100%" alignItems="center" sx={{ backgroundColor: "white", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
+              <Box id="chart-container3" width="100%" alignItems="center" sx={{ boxShadow: 3, borderRadius: '6px', backgroundColor: "white", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
                 <br />
                 <Box display="flex" justifyContent="flex-end" sx={{ marginTop: "-10px", marginBottom: "-20px", marginRight: "-85%", cursor: "pointer" }}>
                   <Tooltip title= "Click to download graph image" arrow>
@@ -518,8 +546,8 @@ export default function Graficas() {
               </Box>
             </Box>
             <br />
-
-            <Box id="chart-container4" width="100%" alignItems="center" sx={{ backgroundColor: "white", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
+            
+            <Box id="chart-container4" width="100%" alignItems="center" sx={{ boxShadow: 3, borderRadius: '6px', backgroundColor: "white", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
               <br />
               <Box display="flex" justifyContent="flex-end" sx={{ marginTop: "-10px", marginBottom: "-5px", marginRight: "-85%", cursor: "pointer" }}>
                   <Tooltip title= "Click to download graph image" arrow>
@@ -539,7 +567,9 @@ export default function Graficas() {
                   })
                 }}
               />
+              
             </Box>
+            
           </Box>
 
         </Box>
@@ -548,7 +578,7 @@ export default function Graficas() {
         {/* Tickets support group and team */}
         <Box  display="flex" width={"100%"} justifyContent="center" alignItems="stretch" sx={{height: '100%'}}>
 
-          <Box id= "chart-container5" width="50%"  m={2} alignItems="center" sx={{ backgroundColor: "white", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" , height: '100%'}}>
+          <Box id= "chart-container5" width="50%"  m={2} alignItems="center" sx={{ boxShadow: 3, borderRadius: '6px', backgroundColor: "white", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" , height: '100%'}}>
               <br />
               <Box display="flex" justifyContent="flex-end" sx={{ marginTop: "-10px", marginBottom: "-20px", marginRight: "-85%", cursor: "pointer" }}>
                   <Tooltip title= "Click to download graph image" arrow>
@@ -568,7 +598,7 @@ export default function Graficas() {
               <br />
           </Box>
 
-          <Box id="chart-container6" width="50%"  m={2} alignItems="center" sx={{ backgroundColor: "white", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"  }}>
+          <Box id="chart-container6" width="50%"  m={2} alignItems="center" sx={{ boxShadow: 3, borderRadius: '6px', backgroundColor: "white", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"  }}>
             <br />
             <Box display="flex" justifyContent="flex-end" sx={{ marginTop: "-10px", marginBottom: "1px", marginRight: "-85%", cursor: "pointer" }}>
                   <Tooltip title= "Click to download graph image" arrow>
@@ -620,7 +650,7 @@ export default function Graficas() {
       <Container id="charts3">
         {/* Tickets forwarded */}
         <Box display="flex" width={"100%"} justifyContent="center" alignItems="center">
-            <Box id= "chart-container7" display="flex" m={2} flexDirection="row" width="100%"  alignItems="center" sx={{ backgroundColor: "white" }} >
+            <Box id= "chart-container7" display="flex" m={2} flexDirection="row" width="100%"  alignItems="center" sx={{ boxShadow: 3, borderRadius: '6px', backgroundColor: "white" }} >
                 <Box display="flex" flexDirection="column" width="100%"  alignItems="center">
                     <br />
                     <Box display="flex" justifyContent="flex-end" sx={{ marginTop: "-10px", marginBottom: "-20px", marginRight: "-93%", cursor: "pointer" }}>
@@ -680,7 +710,7 @@ export default function Graficas() {
         {/* Tickets request, failure, reopened, complaints*/}
         <Box  display="flex" width={"100%"} justifyContent="center" alignItems="stretch" sx={{height: '100%'}}>
 
-          <Box id= "chart-container8" width="100%" m={2} alignItems="center" sx={{ backgroundColor: "white", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" , height: '100%'}}>
+          <Box id= "chart-container8" width="100%" m={2} alignItems="center" sx={{ boxShadow: 3, borderRadius: '6px', backgroundColor: "white", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" , height: '100%'}}>
               <br />
               <Box display="flex" justifyContent="flex-end" sx={{ marginTop: "-10px", marginBottom: "-20px", marginRight: "-85%", cursor: "pointer" }}>
                   <Tooltip title= "Click to download graph image" arrow>

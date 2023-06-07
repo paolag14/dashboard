@@ -112,128 +112,6 @@ export default function Tickets() {
   }
   
 
-/*   const handleServiceChange = (event:any) => {
-    const service = event.target.value;
-    const priority = selectedPriority;
-    const status = selectedStatus;
-    
-    if (service === "" && priority === "" && status === "" ) {
-      setFilteredData(allData.slice(1));
-    } else if (service === "" && priority === "" && status !== "" ) {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[5] === status);
-      setFilteredData(newFilteredData);
-    } else if (service === "" && priority !== "" && status === "" ) {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[6] === priority);
-      setFilteredData(newFilteredData);
-    } else if (service === "" && priority !== "" && status !== "" ) {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[5] === status && row[6] === priority);
-      setFilteredData(newFilteredData);
-    } else if (service !== "" && priority === "" && status === "") {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[2] === service );
-      setFilteredData(newFilteredData);
-    } else if (service !== "" && priority === "" && status !== "" ) {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[2] === service && row[5] === status );
-      setFilteredData(newFilteredData);
-    } else if (service !== "" && priority !== "" && status === "" ) {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[2] === service && row[6] === priority);
-      setFilteredData(newFilteredData);
-    } else {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[2] === service && row[5] === status && row[6] === priority );
-      setFilteredData(newFilteredData);
-    }
-
-    //const filtered = filterData(service, priority, status);
-    //setFilteredData(filtered);
-
-    setSelectedService(service);
-
-  };
-
-  const handlePriorityChange = (event:any) => {
-    const priority = event.target.value;
-    const service = selectedService;
-    const status = selectedStatus;  
-  
-    if (service === "" && priority === "" && status === "") {
-      setFilteredData(allData.slice(1));
-    } else if (service === "" && priority !== "" && status === "") {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[6] === priority);
-      setFilteredData(newFilteredData);
-    } else if (service === "" && priority === "" && status !== "") {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[5] === status);
-      setFilteredData(newFilteredData);
-    } else if (service !== "" && priority === "" && status === "") {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[2] === service);
-      setFilteredData(newFilteredData);
-    } else if (service !== "" && priority !== "" && status === "") {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[2] === service && row[6] === priority);
-      setFilteredData(newFilteredData);
-    } else if (service !== "" && priority === "" && status !== "") {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[2] === service && row[5] === status);
-      setFilteredData(newFilteredData);
-    } else if (service === "" && priority !== "" && status !== "") {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[5] === status && row[6] === priority);
-      setFilteredData(newFilteredData);
-    } else {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[2] === service && row[6] === priority && row[5] === status);
-      setFilteredData(newFilteredData);
-    }
-
-    //const filtered = filterData(service, priority, status);
-    //setFilteredData(filtered);
-    setSelectedPriority(priority);
-    
-  };
-
-  const handleStatusChange = (event:any) => {
-    const status = event.target.value;
-    const service = selectedService;
-    const priority = selectedPriority;
-      
-    if (service === "" && priority === "" && status === "" ) {
-      setFilteredData(allData.slice(1));
-    } else if (service === "" && priority === "" && status !== "") {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[7] === status);
-      setFilteredData(newFilteredData);
-    } else if (service === "" && priority !== "" && status === "") {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[6] === priority);
-      setFilteredData(newFilteredData);
-    } else if (service === "" && priority !== "" && status !== "") {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[6] === priority && row[7] === status);
-      setFilteredData(newFilteredData);
-    } else if (service !== "" && priority === "" && status === "") {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[2] === service);
-      setFilteredData(newFilteredData);
-    } else if (service !== "" && priority === "" && status !== "") {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[2] === service && row[7] === status);
-      setFilteredData(newFilteredData);
-    } else if (service !== "" && priority !== "" && status === "") {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[2] === service && row[6] === priority);
-      setFilteredData(newFilteredData);
-    } else {
-      const newFilteredData = allData.slice(1).filter((row:any) => row[2] === service && row[6] === priority && row[7] === status);
-      setFilteredData(newFilteredData);
-    }
-
-    /* const newFiltered = filterData(service, priority, status);
-    setFilteredData(newFiltered); */
-/*     setSelectedStatus(status);
-  }; */
-
-
-  // handle text field value change
-/*   const handleSearchChange = (event) => {
-    const value = event.target.value;
-    setSearchValue(value);
-
-    const filtered = allData.slice(1).filter((row) =>
-      Object.values(row).some((value) =>
-        String(value).toLowerCase().includes(searchValue.toLowerCase())
-      )
-    );
-    setFilteredData(filtered);
-  }; */ 
-
   const handleFilterChange = (service:any, priority:any, status:any) => {
     const filteredData = allData.slice(1).filter((row:any) => {
       const serviceMatch = service === "" || row[2] === service;
@@ -261,19 +139,42 @@ export default function Tickets() {
     handleFilterChange(selectedService, selectedPriority, status);
     setSelectedStatus(status);
   };
+  
 
-const handleResetFilters = () => {
-  setResetFilters(true);
-};
+  const handleSearchChange = (event:any) => {
+        const value = event.target.value;
+        setSearchValue(value);
+      
+        const filtered = allData.slice(1).filter((row) =>
+          Object.values(row).some((value) =>
+            String(value).toLowerCase().includes(searchValue.toLowerCase())
+          )
+        );
+        setFilteredData(filtered);
+  };
+      
+      
+  const handleResetFilters = () => {
+    setResetFilters(true);
+    };
 
-if (resetFilters) {
-  setFilteredData(allData.slice(1));
-  setSelectedService('');
-  setSelectedPriority('');
-  setSelectedStatus('');
-  setSearchValue('');
-  setResetFilters(false);
-}
+    if (resetFilters) {
+    setFilteredData(allData.slice(1));
+    setSelectedService('');
+    setSelectedPriority('');
+    setSelectedStatus('');
+    setSearchValue('');
+    setResetFilters(false);
+  }
+
+  if (resetFilters) {
+    setFilteredData(allData.slice(1));
+    setSelectedService('');
+    setSelectedPriority('');
+    setSelectedStatus('');
+    setSearchValue('');
+    setResetFilters(false);
+  }
 
 
 // filter data based on search value

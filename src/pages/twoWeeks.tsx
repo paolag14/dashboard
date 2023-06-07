@@ -147,7 +147,7 @@ export default function TwoWeeks() {
   };
   
 
-  const handleSearchChange = (event) => {
+  const handleSearchChange = (event:any) => {
         const value = event.target.value;
         setSearchValue(value);
       
