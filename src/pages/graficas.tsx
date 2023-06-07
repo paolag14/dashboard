@@ -328,7 +328,7 @@ export default function Graficas() {
     const handleDownloadImage = (elementId:any) => {
       //const chartContainer = document.getElementById(elementId); // Get the chart container element
       //const containerStyle = chartContainer.style.boxShadow; // Store the original box shadow
-    chartContainer.style.boxShadow = 'none'; // Remove the box shadow temporarily
+      chartContainer.style.boxShadow = 'none'; // Remove the box shadow temporarily
       html2canvas(chartContainer, { useCORS: true }).then((canvas) => {
         const image = canvas.toDataURL('image/png'); // Convert canvas to image data URL
         const downloadLink = document.createElement('a'); // Create a download link element

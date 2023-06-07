@@ -7,7 +7,7 @@ import Container from '@mui/material/Container';
 import { CardActionArea } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import * as XLSX from "xlsx";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Box from '@mui/material/Box';
@@ -21,24 +21,14 @@ import domtoimage from 'dom-to-image';
 import htmlToImage from 'html-to-image';
 import FileOpenIcon from '@mui/icons-material/FileOpen';
 import Paper from '@material-ui/core/Paper';
-
-
-const useStyles = makeStyles(theme => ({
-  iconHover: {
-    '&:hover': {
-      border: '2px solid green',
-      //TODO display the text CREATE ITEM instead of AddIcon
-    }
-  },
-
-  floatBtn: {
-    marginRight: theme.spacing(1),
-  },
-}));
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 
 export default function Home(props:any) {
   const [fileName, setFileName] = useState(null);
+
+  const [isLoading, setLoading] = useState(true);
+
 
   //cards
   const [total, setTotal] = useState(0);
@@ -118,8 +108,16 @@ export default function Home(props:any) {
   const [hoverBacklog, setHoverBacklog] = useState(false);
 
   const router = useRouter();
+
+  useEffect(() => {
+    // Simulating data fetching delay
+    setTimeout(() => {
+      setLoading(false);
+    }, 1500); // Replace this with your actual data fetching logic
+  }, []);
+
   
-  const handleFile = async (e: any) =>{
+  const handleFile = async (e:any) =>{
     
     const file = e.target.files[0];
     setFileName(file.name);
@@ -479,9 +477,28 @@ export default function Home(props:any) {
 
     setRestrictionTotal(restriction);
 
-    setBacklogTotal(((contadorOpenedTickets/contadorAssigned)*100))    
+    setBacklogTotal(((contadorOpenedTickets/contadorAssigned)*100));
+    
 
   }
+
+
+  if (isLoading) {
+    return <div 
+    style={{
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      height: '100vh',
+      fontWeight: 600,
+      fontSize: '2rem',
+      fontFamily: 'Arial, Helvetica, sans-serif',
+    }}> 
+      Loading...
+    </div>;
+  }
+  
+
 
   const newColors = ['#ffed1a', '#fa9b00', '#009be1', '#FF0000']; // Example new colors
   
@@ -550,7 +567,7 @@ export default function Home(props:any) {
 
           <br /> 
 
-          <Box width={"100%"} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', margin: 'auto', mt:1}}>
+          <Box width={"100%"} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', margin: 'auto', mt:1}}>   
             <input id="select-button" type="file"  accept=".xlsx, .xls" style={{ display: 'none' }} onChange={handleFile}></input>
               <label htmlFor="select-button">
                   <Button variant="contained" component="span"
