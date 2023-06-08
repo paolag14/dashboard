@@ -549,7 +549,7 @@ export default function Home(props:any) {
 
     return( 
         <>
-        <Container id= "all-data">
+        <Container id= "all-data" maxWidth="xl">
           <br />
 
           <Box id="title" display="flex" justifyContent="center" alignItems="center">
@@ -581,7 +581,7 @@ export default function Home(props:any) {
 
           <br></br>
 
-          <Container id="este">
+          <Container id="este" maxWidth="lg">
             <div className='center'>
             {fileName && (
               
@@ -592,12 +592,12 @@ export default function Home(props:any) {
 
             <br></br>
 
-            <Container id="cards" disableGutters maxWidth="xl" component="main" sx={{ pt: 1, pb: 1 }} >
+            <Container id="cards" disableGutters maxWidth="xl" component="main" sx={{ pt: 1, pb: 1 }}>
                 
               <Grid container spacing={4} alignItems="center" justifyContent="center">
                   
                   {/* Total de tickets*/}
-                  <Grid item xs={3}>
+                  <Grid item xs={3} >
                     <Tooltip title= { <Typography gutterBottom variant="subtitle2" component="div"> See all tickets </Typography>}  placement="top" arrow>
 
                       <Card sx={{ maxWidth: 300, minHeight: 300 }} elevation={3}>

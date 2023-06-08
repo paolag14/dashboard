@@ -450,7 +450,7 @@ export default function Graficas() {
               {/* Download as png */}
               <Box display="flex" justifyContent="flex-end" sx={{ marginTop: "-10px", marginBottom: "-20px", marginRight: "-93%", cursor: "pointer" }}>
                 <Tooltip title="Click to download graph image" arrow>
-                  <Button size="large" endIcon={<MoreVertIcon />} onClick={() => handleDownloadImage('chart-container1')}></Button>
+                  <Button size="large" endIcon={<MoreVertIcon style={{ color: '#4D4D52' }} />} onClick={() => handleDownloadImage('chart-container1')}></Button>
                 </Tooltip>
               </Box>
               <Typography align='center' variant='h6' sx={{ fontWeight: 'bold' }}>Number of tickets by Service</Typography>
@@ -510,7 +510,7 @@ export default function Graficas() {
           <Box id= "chart-container2" width="50%" m={2} alignItems="center" sx={{ boxShadow: 3, borderRadius: '6px', backgroundColor: "white", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
             <Box display="flex" justifyContent="flex-end" sx={{ marginTop: "-50px", marginBottom: "-5px", marginRight: "-85%", cursor: "pointer" }}>
                 <Tooltip title= "Click to download graph image" arrow>
-                  <Button size="large" endIcon={<DownloadIcon />} onClick={() => handleDownloadImage('chart-container2')}></Button>
+                  <Button size="large" endIcon={<MoreVertIcon style={{ color: '#4D4D52' }} />} onClick={() => handleDownloadImage('chart-container2')}></Button>
                 </Tooltip>
             </Box>
             <Typography align='center' variant='h6' sx={{ fontWeight: 'bold' }}> Tickets by Status and Priority </Typography>
@@ -525,7 +525,7 @@ export default function Graficas() {
                 <br />
                 <Box display="flex" justifyContent="flex-end" sx={{ marginTop: "-10px", marginBottom: "-20px", marginRight: "-85%", cursor: "pointer" }}>
                   <Tooltip title= "Click to download graph image" arrow>
-                    <Button size="large" endIcon={<DownloadIcon />} onClick={() => handleDownloadImage('chart-container3')}></Button>
+                    <Button size="large" endIcon={<MoreVertIcon style={{ color: '#4D4D52' }} />} onClick={() => handleDownloadImage('chart-container3')}></Button>
                   </Tooltip>
                 </Box>
                 
@@ -551,7 +551,7 @@ export default function Graficas() {
               <br />
               <Box display="flex" justifyContent="flex-end" sx={{ marginTop: "-10px", marginBottom: "-5px", marginRight: "-85%", cursor: "pointer" }}>
                   <Tooltip title= "Click to download graph image" arrow>
-                    <Button size="large" endIcon={<DownloadIcon />} onClick={() => handleDownloadImage('chart-container4')}></Button>
+                    <Button size="large" endIcon={<MoreVertIcon style={{ color: '#4D4D52' }} />} onClick={() => handleDownloadImage('chart-container4')}></Button>
                   </Tooltip>
               </Box>
               <Typography align='center' variant='h6' sx={{ fontWeight: 'bold' }}> Tickets Assigned, Resolved, and Forwarded</Typography>
@@ -582,7 +582,7 @@ export default function Graficas() {
               <br />
               <Box display="flex" justifyContent="flex-end" sx={{ marginTop: "-10px", marginBottom: "-20px", marginRight: "-85%", cursor: "pointer" }}>
                   <Tooltip title= "Click to download graph image" arrow>
-                    <Button size="large" endIcon={<DownloadIcon />} onClick={() => handleDownloadImage('chart-container5')}></Button>
+                    <Button size="large" endIcon={<MoreVertIcon style={{ color: '#4D4D52' }} />} onClick={() => handleDownloadImage('chart-container5')}></Button>
                   </Tooltip>
               </Box>
               <br />
@@ -602,7 +602,7 @@ export default function Graficas() {
             <br />
             <Box display="flex" justifyContent="flex-end" sx={{ marginTop: "-10px", marginBottom: "1px", marginRight: "-85%", cursor: "pointer" }}>
                   <Tooltip title= "Click to download graph image" arrow>
-                    <Button size="large" endIcon={<DownloadIcon />} onClick={() => handleDownloadImage('chart-container6')}></Button>
+                    <Button size="large" endIcon={<MoreVertIcon style={{ color: '#4D4D52' }} />} onClick={() => handleDownloadImage('chart-container6')}></Button>
                   </Tooltip>
             </Box>
             <Typography align='center' variant='h6'  sx={{ fontWeight: 'bold'  }}> Tickets handled by Order Management Customizing and Services </Typography> 
@@ -655,7 +655,7 @@ export default function Graficas() {
                     <br />
                     <Box display="flex" justifyContent="flex-end" sx={{ marginTop: "-10px", marginBottom: "-20px", marginRight: "-93%", cursor: "pointer" }}>
                       <Tooltip title= "Click to download graph image" arrow>
-                        <Button size="large" endIcon={<DownloadIcon />} onClick={() => handleDownloadImage('chart-container7')}></Button>
+                        <Button size="large" endIcon={<MoreVertIcon style={{ color: '#4D4D52' }} />} onClick={() => handleDownloadImage('chart-container7')}></Button>
                       </Tooltip>
                     </Box>
                     <Typography align='center' variant='h6'  sx={{ fontWeight: 'bold'  }}> Forwarded Tickets </Typography>
@@ -712,9 +712,9 @@ export default function Graficas() {
 
           <Box id= "chart-container8" width="100%" m={2} alignItems="center" sx={{ boxShadow: 3, borderRadius: '6px', backgroundColor: "white", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" , height: '100%'}}>
               <br />
-              <Box display="flex" justifyContent="flex-end" sx={{ marginTop: "-10px", marginBottom: "-20px", marginRight: "-85%", cursor: "pointer" }}>
+              <Box display="flex" justifyContent="flex-end" sx={{ marginTop: "-10px", marginBottom: "-20px", marginRight: "-93%", cursor: "pointer" }}>
                   <Tooltip title= "Click to download graph image" arrow>
-                    <Button size="large" endIcon={<DownloadIcon />} onClick={() => handleDownloadImage('chart-container8')}></Button>
+                    <Button size="large" endIcon={<MoreVertIcon style={{ color: '#4D4D52' }} />} onClick={() => handleDownloadImage('chart-container8')}></Button>
                   </Tooltip>
               </Box>
               <br />
