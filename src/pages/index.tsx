@@ -20,15 +20,11 @@ import jsPDF from 'jspdf';
 import domtoimage from 'dom-to-image';
 import htmlToImage from 'html-to-image';
 import FileOpenIcon from '@mui/icons-material/FileOpen';
-import Paper from '@material-ui/core/Paper';
-import CircularProgress from '@material-ui/core/CircularProgress';
-
 
 export default function Home(props:any) {
   const [fileName, setFileName] = useState(null);
 
   const [isLoading, setLoading] = useState(true);
-
 
   //cards
   const [total, setTotal] = useState(0);
@@ -586,543 +582,568 @@ export default function Home(props:any) {
           <br></br>
 
           <Container id="este">
-          <div className='center'>
-          {fileName && (
+            <div className='center'>
+            {fileName && (
+              
+              <Typography variant="h4" align="center" mt={3} mb={3} >File Name: <span>{fileName}</span></Typography>
+            ) }
             
-            <Typography variant="h4" align="center" mt={3} mb={3} >File Name: <span>{fileName}</span></Typography>
-          ) }
-          
-          </div>
+            </div>
 
-          <br></br>
+            <br></br>
 
-          <Container id="cards" disableGutters maxWidth="xl" component="main" sx={{ pt: 1, pb: 1 }} >
-              
-          <Grid container spacing={4} alignItems="center" justifyContent="center">
-              
-
-              {/* Total de tickets*/}
-              <Grid item xs={3}>
-                <Tooltip title= {
-                  <Typography gutterBottom variant="subtitle2" component="div">
-                  See all tickets </Typography>} arrow>
-
-                  <Card sx={{ maxWidth: 300, minHeight: 300 }} elevation={3}>
+            <Container id="cards" disableGutters maxWidth="xl" component="main" sx={{ pt: 1, pb: 1 }} >
                 
-                    <CardActionArea >
-                      
-                    <Link href={{ pathname: '/tickets', query: { data: JSON.stringify(allData) } }}>
-
-                        <CardContent 
-                            onMouseOver={() => setHover(true)}
-                            onMouseOut={() => setHover(false)} >
-                      
-                          <Typography gutterBottom variant="h5" component="div">
-                              Total tickets
-                            
-                          </Typography>
-
-                          <Typography variant="h6" color="text.secondary">
-                              <Box sx={{ fontWeight: 'bold' }}> {total} </Box>
-                          </Typography>
-
-
-                          {fileName && (
-                            <DonutChart data={{ 
-                              labels: ['Resolved', 'Closed', 'Forwarded', 'Reopened'], 
-                              values: [solved, closed, forwarded, reopened], 
-                              colors: newColors }} />
-
-                          )}
-
-                          <Typography variant="subtitle1" color="text.secondary">
-                              {hover? 
-                                  <Box sx={{ fontWeight: 'bold' }}> Priority </Box>
-                              : null} 
-                          </Typography>
-
-                          <Typography variant="subtitle1" color="text.secondary">
-                              {hover? 
-                                  "Low: " + low.toString()
-                              : null} 
-                          </Typography>
-
-                          <Typography variant="subtitle1" color="text.secondary">
-                              {hover? 
-                                  "Medium: " + medium.toString()
-                              : null} 
-                          </Typography>
-
-                          <Typography variant="subtitle1" color="text.secondary">
-                              {hover? 
-                                  "High: " + high.toString() 
-                              : null} 
-                          </Typography>
-
-                          <Typography variant="subtitle1" color="text.secondary">
-                              {hover? 
-                                  "Critical: " + critical.toString() 
-                              : null} 
-                          </Typography>
-
-                          <br />
-
-                          <Typography variant="subtitle1" color="text.secondary">
-                              {hover? 
-                                  <Box sx={{ fontWeight: 'bold' }}> Status </Box>
-                              : null} 
-                          </Typography> 
-
-                          <Typography variant="subtitle1" color="text.secondary">
-                              {hover? 
-                                  "Assigned: " + assigned.toString() 
-                              : null} 
-                          </Typography>
-
-                          <Typography variant="subtitle1" color="text.secondary">
-                              {hover? 
-                                  "Closed: " + closed.toString() 
-                              : null} 
-                          </Typography>
-
-                          <Typography variant="subtitle1" color="text.secondary">
-                              {hover? 
-                                  "In Progress: " + inProgress.toString() 
-                              : null} 
-                          </Typography>
-
-                          <Typography variant="subtitle1" color="text.secondary">
-                              {hover? 
-                                  "Pending: " + pending.toString() 
-                              : null} 
-                          </Typography>
-
-                          <Typography variant="subtitle1" color="text.secondary">
-                              {hover? 
-                                  "Resolved: " + resolved.toString() 
-                              : null} 
-                          </Typography>
-                      
-                        </CardContent>
-
-                    </Link>
-                    </CardActionArea>
-                    
-                  </Card>
-                </Tooltip>
-              </Grid>
-
-
-              {/*Resolved tickets*/}
-              <Grid item xs={3}>
-              <Card sx={{ maxWidth: 300, minHeight: 300 }} elevation={3}>
-              
-                  <CardActionArea >
-                  <Link href={{ pathname: '/tickets', query: { data: JSON.stringify(resolvedData) } }}> 
-                    <CardContent 
-                          onMouseOver={() => setHoverR(true)}
-                          onMouseOut={() => setHoverR(false)} >
-                      <Typography gutterBottom variant="h5" component="div">
-                          Resolved tickets
-                      </Typography>
-                      <Typography variant="h6" color="text.secondary">
-                          {resolved}
-                      </Typography>
-
-                      {fileName && (
-                        <DonutChart data={{ 
-                          labels: ['Low', 'Medium', 'High', 'Critical'], 
-                          values: [lowR, mediumR, highR, criticalR], 
-                          colors: newColors }} />
-
-                      )}
-                      <br />
-
-                      <Typography variant="subtitle1" color="text.secondary">
-                          {hoverR? 
-                              <Box sx={{ fontWeight: 'bold' }}> Priority </Box>
-                          : null} 
-                      </Typography>
-
-                      <Typography variant="subtitle1" color="text.secondary">
-                          {hoverR? 
-                              "Low: " + lowR.toString()
-                          : null} 
-                      </Typography>
-
-                      <Typography variant="subtitle1" color="text.secondary">
-                          {hoverR? 
-                              "Medium: " + mediumR.toString()
-                          : null} 
-                      </Typography>
-
-                      <Typography variant="subtitle1" color="text.secondary">
-                          {hoverR? 
-                              "High: " + highR.toString() 
-                          : null} 
-                      </Typography>
-
-                      <Typography variant="subtitle1" color="text.secondary">
-                          {hoverR? 
-                              "Critical: " + criticalR.toString() 
-                          : null} 
-                      </Typography>
-
-                      </CardContent>
-                  </Link>
-                  </CardActionArea>
+              <Grid container spacing={4} alignItems="center" justifyContent="center">
                   
-                  </Card>
-              </Grid>
+                  {/* Total de tickets*/}
+                  <Grid item xs={3}>
+                    <Tooltip title= { <Typography gutterBottom variant="subtitle2" component="div"> See all tickets </Typography>}  placement="top" arrow>
 
-
-              {/*Closed tickets*/}
-              <Grid item xs={3}>
-                <Card sx={{ maxWidth: 300, minHeight: 300 }} elevation={3}>
-                
-                    <CardActionArea >
-                    <Link href={{ pathname: '/tickets', query: { data: JSON.stringify(closedData) } }}>
-                      <CardContent 
-                              onMouseOver={() => setHoverC(true)}
-                              onMouseOut={() => setHoverC(false)} >
-                        <Typography gutterBottom variant="h5" component="div">
-                            Closed tickets
-                        </Typography>
-                        <Typography variant="h6" color="text.secondary">
-                            {closed}
-                        </Typography>
-
-                        {fileName && (
-                          <DonutChart data={{ 
-                            labels: ['Low', 'Medium', 'High', 'Critical'], 
-                            values: [lowC, mediumC, highC, criticalC], 
-                            colors: newColors }} />
-
-                        )}
-                        <br />
-
-                        <Typography variant="subtitle1" color="text.secondary">
-                            {hoverC? 
-                                <Box sx={{ fontWeight: 'bold' }}> Priority </Box>
-                            : null} 
-                        </Typography>
-
-                        <Typography variant="subtitle1" color="text.secondary">
-                            {hoverC? 
-                                "Low: " + lowC.toString()
-                            : null} 
-                        </Typography>
-
-                        <Typography variant="subtitle1" color="text.secondary">
-                            {hoverC? 
-                                "Medium: " + mediumC.toString()
-                            : null} 
-                        </Typography>
-
-                        <Typography variant="subtitle1" color="text.secondary">
-                            {hoverC? 
-                                "High: " + highC.toString() 
-                            : null} 
-                        </Typography>
-
-                        <Typography variant="subtitle1" color="text.secondary">
-                            {hoverC? 
-                                "Critical: " + criticalC.toString() 
-                            : null} 
-                        </Typography>
-
-                        </CardContent>
-                        </Link>
-                    </CardActionArea>
+                      <Card sx={{ maxWidth: 300, minHeight: 300 }} elevation={3}>
                     
-                    </Card>
-              </Grid>
+                        <CardActionArea >
+                          
+                            <CardContent 
+                                onMouseOver={() => setHover(true)}
+                                onMouseOut={() => setHover(false)} >
+
+                              <Link href={{ pathname: '/tickets', query: { data: JSON.stringify(allData) } }}>
+                          
+                              <Typography gutterBottom variant="h5" component="div">
+                                  Total tickets    
+                              </Typography>
+                              </Link>
+
+                              <Typography variant="h6" color="text.secondary">
+                                  <Box sx={{ fontWeight: 'bold' }}> {total} </Box>
+                              </Typography>
 
 
-              {/*Forwarded tickets*/}
-              <Grid item xs={3}>
-              <Card sx={{ maxWidth: 300, minHeight: 300 }} elevation={3}>
-              
-                  <CardActionArea >
-                  <Link href={{ pathname: '/tickets', query: { data: JSON.stringify(forwardedData) } }}>
-                    
-                      <CardContent 
-                            onMouseOver={() => setHoverF(true)}
-                            onMouseOut={() => setHoverF(false)} >
-                      <Typography gutterBottom variant="h5" component="div">
-                          Forwarded tickets
-                      </Typography>
-                      <Typography variant="h6" color="text.secondary">
-                          {forwarded}
-                      </Typography>
-
-                      {fileName && (
-                        <DonutChart data={{ 
-                          labels: ['Low', 'Medium', 'High', 'Critical'], 
-                          values: [lowF, mediumF, highF, criticalF], 
-                          colors: newColors }} />
-
-                      )}
-                      <br />
-
-                        <Typography variant="subtitle1" color="text.secondary">
-                            {hoverF? 
-                                <Box sx={{ fontWeight: 'bold' }}> Priority </Box>
-                            : null} 
-                        </Typography>
-
-                        <Typography variant="subtitle1" color="text.secondary">
-                            {hoverF? 
-                                "Low: " + lowF.toString()
-                            : null} 
-                        </Typography>
-
-                        <Typography variant="subtitle1" color="text.secondary">
-                            {hoverF? 
-                                "Medium: " + mediumF.toString()
-                            : null} 
-                        </Typography>
-
-                        <Typography variant="subtitle1" color="text.secondary">
-                            {hoverF? 
-                                "High: " + highF.toString() 
-                            : null} 
-                        </Typography>
-
-                        <Typography variant="subtitle1" color="text.secondary">
-                            {hoverF? 
-                                "Critical: " + criticalF.toString() 
-                            : null} 
-                        </Typography>
-
-                      </CardContent>
-                      </Link>
-                  </CardActionArea>
-                  </Card>
-              </Grid>
-
-
-              {/*Reopened tickets*/}
-              <Grid item xs={3}>
-              <Card sx={{ maxWidth: 300, minHeight: 380 }} elevation={3}>
-              
-                  <CardActionArea >
-                  <Link href={{ pathname: '/tickets', query: { data: JSON.stringify(reopenedData) } }}>
-                    <CardContent 
-                            onMouseOver={() => setHoverReopened(true)}
-                            onMouseOut={() => setHoverReopened(false)} >
-                      <Typography gutterBottom variant="h5" component="div">
-                          Reopened tickets
-                      </Typography>
-                      <Typography variant="h6" color="text.secondary">
-                          {reopened}
-                      </Typography>
-
-                      {fileName && (
-                        <DonutChart data={{ 
-                          labels: ['Low', 'Medium', 'High', 'Critical'], 
-                          values: [lowReopened, mediumReopened, highReopened, criticalReopened], 
-                          colors: newColors }} />
-
-                      )}
-                      <br />
-
-                        <Typography variant="subtitle1" color="text.secondary">
-                            {hoverReopened? 
-                                <Box sx={{ fontWeight: 'bold' }}> Priority </Box>
-                            : null} 
-                        </Typography>
-
-                        <Typography variant="subtitle1" color="text.secondary">
-                            {hoverReopened? 
-                                "Low: " + lowReopened.toString()
-                            : null} 
-                        </Typography>
-
-                        <Typography variant="subtitle1" color="text.secondary">
-                            {hoverReopened? 
-                                "Medium: " + mediumReopened.toString()
-                            : null} 
-                        </Typography>
-
-                        <Typography variant="subtitle1" color="text.secondary">
-                            {hoverReopened? 
-                                "High: " + highReopened.toString() 
-                            : null} 
-                        </Typography>
-
-                        <Typography variant="subtitle1" color="text.secondary">
-                            {hoverReopened? 
-                                "Critical: " + criticalReopened.toString() 
-                            : null} 
-                        </Typography>
-
-
-                      </CardContent>
-                      </Link>
-                  </CardActionArea>
-                  </Card>
-              </Grid>
-
-              {/*Más de dos semanas tickets*/}
-              <Grid item xs={3}>
-              <Card sx={{ maxWidth: 300, minHeight: 380 }} elevation={3}>
-              
-                  <CardActionArea >
-                  <Link href={{ pathname: '/twoWeeks', query: { data: JSON.stringify(open2weeksData) } }}>
-                    <CardContent 
-                            /* onMouseOver={() => setHoverReopened(true)}
-                            onMouseOut={() => setHoverReopened(false)} */ >
-                      <Typography gutterBottom variant="h5" component="div">
-                          Open tickets more than 2 weeks
-                      </Typography>
-                      <Typography variant="h6" color="text.secondary">
-                          {count2weeks}
-                      </Typography>
-
-                      {fileName && (
-                        <DonutChart data={{ 
-                          labels: ['Total tickets', 'Open and not solved', 'Open more than 2 weeks'], 
-                          values: [total, openNotSolved, count2weeks], 
-                          colors: newColors }} />
-
-                      )}
-
-                        {/* <Typography variant="subtitle1" color="text.secondary">
-                            {hoverReopened? 
-                                <Box sx={{ fontWeight: 'bold' }}> Priority </Box>
-                            : null} 
-                        </Typography>
-
-                        <Typography variant="subtitle1" color="text.secondary">
-                            {hoverReopened? 
-                                "Low: " + lowReopened.toString()
-                            : null} 
-                        </Typography>
-
-                        <Typography variant="subtitle1" color="text.secondary">
-                            {hoverReopened? 
-                                "Medium: " + mediumReopened.toString()
-                            : null} 
-                        </Typography>
-
-                        <Typography variant="subtitle1" color="text.secondary">
-                            {hoverReopened? 
-                                "High: " + highReopened.toString() 
-                            : null} 
-                        </Typography>
-
-                        <Typography variant="subtitle1" color="text.secondary">
-                            {hoverReopened? 
-                                "Critical: " + criticalReopened.toString() 
-                            : null} 
-                        </Typography> */}
-
-
-                      </CardContent>
-                      </Link>
-                  </CardActionArea>
-                  </Card>
-              </Grid>
-
-
-              {/*Backlog tickets*/}
-              <Grid item xs={3}>
-              <Card sx={{ maxWidth: 300, minHeight: 380 }} elevation={3}>
-              
-                  <CardActionArea href="/">
-                  <CardContent 
-                            onMouseOver={() => setHoverBacklog(true)}
-                            onMouseOut={() => setHoverBacklog(false)} >
-                      <Typography gutterBottom variant="h5" component="div">
-                          Backlog
-                      </Typography>
-                      <br />
-                      
-                          {/* si hay backlog, o sea es true */}
-
-                          {backlog && fileName? 
+                              {fileName && (
                                 <DonutChart data={{ 
-                                  labels: ['Over limit'], 
-                                  values: [lowReopened], 
-                                  colors: ['#e10a14	'] }} /> 
-                            : null
-                            } 
+                                  labels: ['Resolved', 'Closed', 'Forwarded', 'Reopened'], 
+                                  values: [solved, closed, forwarded, reopened], 
+                                  colors: newColors }} />
 
-                          {!backlog && fileName? 
-                            <DonutChart data={{ 
-                              labels: ['Below limit'], 
-                              values: [lowReopened], 
-                              colors: ['#d7e100	'] }} />
-                            : null }
+                              )}
 
-                          {/* si no hay, si es false */}
+                              <Typography variant="subtitle1" color="text.secondary">
+                                  {hover? 
+                                      <Box sx={{ fontWeight: 'bold' }}> Priority </Box>
+                                  : null} 
+                              </Typography>
 
-                        {/*  agregar un hover que enseñe tickets abiertos, assigned,
-                          el limite de 5% y cuánto queda el backlog */}
-                          <br />
-                          <br />
+                              <Typography variant="subtitle1" color="text.secondary">
+                                  {hover? 
+                                      "Low: " + low.toString()
+                                  : null} 
+                              </Typography>
 
-                          <Typography variant="subtitle1" color="text.secondary">
-                            {hoverBacklog? 
-                                "Open tickets: " + openTickets.toString() 
-                            : null} 
-                          </Typography>
+                              <Typography variant="subtitle1" color="text.secondary">
+                                  {hover? 
+                                      "Medium: " + medium.toString()
+                                  : null} 
+                              </Typography>
 
-                          <Typography variant="subtitle1" color="text.secondary">
-                            {hoverBacklog? 
-                                "Assigned tickets: " + assigned.toString() 
-                            : null} 
-                          </Typography>
+                              <Typography variant="subtitle1" color="text.secondary">
+                                  {hover? 
+                                      "High: " + high.toString() 
+                                  : null} 
+                              </Typography>
 
-                          <Typography variant="subtitle1" color="text.secondary">
-                            {hoverBacklog? 
-                                "5% limit: " + restrictionTotal.toString() 
-                            : null} 
-                          </Typography>
+                              <Typography variant="subtitle1" color="text.secondary">
+                                  {hover? 
+                                      "Critical: " + critical.toString() 
+                                  : null} 
+                              </Typography>
 
-                          <Typography variant="subtitle1" color="text.secondary">
-                            {hoverBacklog? 
-                                "Backlog total: " + (Math.floor(backlogTotal)).toString() 
-                            : null} 
-                          </Typography>
-    
-                      </CardContent>
+                              <br />
+
+                              <Typography variant="subtitle1" color="text.secondary">
+                                  {hover? 
+                                      <Box sx={{ fontWeight: 'bold' }}> Status </Box>
+                                  : null} 
+                              </Typography> 
+
+                              <Typography variant="subtitle1" color="text.secondary">
+                                  {hover? 
+                                      "Assigned: " + assigned.toString() 
+                                  : null} 
+                              </Typography>
+
+                              <Typography variant="subtitle1" color="text.secondary">
+                                  {hover? 
+                                      "Closed: " + closed.toString() 
+                                  : null} 
+                              </Typography>
+
+                              <Typography variant="subtitle1" color="text.secondary">
+                                  {hover? 
+                                      "In Progress: " + inProgress.toString() 
+                                  : null} 
+                              </Typography>
+
+                              <Typography variant="subtitle1" color="text.secondary">
+                                  {hover? 
+                                      "Pending: " + pending.toString() 
+                                  : null} 
+                              </Typography>
+
+                              <Typography variant="subtitle1" color="text.secondary">
+                                  {hover? 
+                                      "Resolved: " + resolved.toString() 
+                                  : null} 
+                              </Typography>
+                          
+                            </CardContent>                    
+                        </CardActionArea>
+                        
+                      </Card>
+                    </Tooltip>
+                  </Grid>
+
+
+                  {/*Resolved tickets*/}
+                  <Grid item xs={3}>
+                    <Tooltip title= { <Typography gutterBottom variant="subtitle2" component="div"> See Resolved Tickets</Typography>}  placement="top" arrow>
+
+                        <Card sx={{ maxWidth: 300, minHeight: 300 }} elevation={3}>
+
+                        <CardActionArea >
+                        
+                          <CardContent 
+                                onMouseOver={() => setHoverR(true)}
+                                onMouseOut={() => setHoverR(false)} >
+                            
+                            <Link href={{ pathname: '/tickets', query: { data: JSON.stringify(resolvedData) } }}> 
+                              <Typography gutterBottom variant="h5" component="div">
+                                  Resolved tickets
+                              </Typography>
+                              <Typography variant="h6" color="text.secondary">
+                                  {resolved}
+                              </Typography>
+                            </Link>
+
+
+                            {fileName && (
+                              <DonutChart data={{ 
+                                labels: ['Low', 'Medium', 'High', 'Critical'], 
+                                values: [lowR, mediumR, highR, criticalR], 
+                                colors: newColors }} />
+
+                            )}
+                            <br />
+
+                            <Typography variant="subtitle1" color="text.secondary">
+                                {hoverR? 
+                                    <Box sx={{ fontWeight: 'bold' }}> Priority </Box>
+                                : null} 
+                            </Typography>
+
+                            <Typography variant="subtitle1" color="text.secondary">
+                                {hoverR? 
+                                    "Low: " + lowR.toString()
+                                : null} 
+                            </Typography>
+
+                            <Typography variant="subtitle1" color="text.secondary">
+                                {hoverR? 
+                                    "Medium: " + mediumR.toString()
+                                : null} 
+                            </Typography>
+
+                            <Typography variant="subtitle1" color="text.secondary">
+                                {hoverR? 
+                                    "High: " + highR.toString() 
+                                : null} 
+                            </Typography>
+
+                            <Typography variant="subtitle1" color="text.secondary">
+                                {hoverR? 
+                                    "Critical: " + criticalR.toString() 
+                                : null} 
+                            </Typography>
+
+                            </CardContent>
+                        </CardActionArea>
+                        
+                        </Card>
+                    </Tooltip>
+
+                  </Grid>
+
+
+                  {/*Closed tickets*/}
+                  <Grid item xs={3}>
+                    <Tooltip title= { <Typography gutterBottom variant="subtitle2" component="div"> See Closed Tickets</Typography>}  placement="top" arrow>
+
+                      <Card sx={{ maxWidth: 300, minHeight: 300 }} elevation={3}>
                       
-                  </CardActionArea>
-                  </Card>
-              </Grid>
+                          <CardActionArea >
+                            <CardContent 
+                                    onMouseOver={() => setHoverC(true)}
+                                    onMouseOut={() => setHoverC(false)} >
+                              
+                              <Link href={{ pathname: '/tickets', query: { data: JSON.stringify(closedData) } }}>
+                                <Typography gutterBottom variant="h5" component="div">
+                                    Closed tickets
+                                </Typography>
+                                <Typography variant="h6" color="text.secondary">
+                                    {closed}
+                                </Typography>
+                              </Link>
 
-              {/*Graphics*/}
-              <Grid item xs={3}>
-              <Card sx={{ maxWidth: 300, minHeight: 380 }} elevation={3}>
-              
-                  <CardActionArea >
-                  <Link href={{ pathname: '/graficas', query: { data: JSON.stringify(allData) } }}>
-                  <CardContent >
-                      <Typography gutterBottom variant="h5" component="div">
-                          Graphics
-                      </Typography>
 
-                      {fileName && (
-                        <div style={{ whiteSpace: 'pre-line' }}>
-                          <Typography variant="subtitle1" color="text.secondary"> 
-                            View all graphics
-                          </Typography> 
-                        </div>
+                              {fileName && (
+                                <DonutChart data={{ 
+                                  labels: ['Low', 'Medium', 'High', 'Critical'], 
+                                  values: [lowC, mediumC, highC, criticalC], 
+                                  colors: newColors }} />
 
-                      )}
-                      </CardContent>
-                  </Link>
-                  </CardActionArea>
+                              )}
+                              <br />
+
+                              <Typography variant="subtitle1" color="text.secondary">
+                                  {hoverC? 
+                                      <Box sx={{ fontWeight: 'bold' }}> Priority </Box>
+                                  : null} 
+                              </Typography>
+
+                              <Typography variant="subtitle1" color="text.secondary">
+                                  {hoverC? 
+                                      "Low: " + lowC.toString()
+                                  : null} 
+                              </Typography>
+
+                              <Typography variant="subtitle1" color="text.secondary">
+                                  {hoverC? 
+                                      "Medium: " + mediumC.toString()
+                                  : null} 
+                              </Typography>
+
+                              <Typography variant="subtitle1" color="text.secondary">
+                                  {hoverC? 
+                                      "High: " + highC.toString() 
+                                  : null} 
+                              </Typography>
+
+                              <Typography variant="subtitle1" color="text.secondary">
+                                  {hoverC? 
+                                      "Critical: " + criticalC.toString() 
+                                  : null} 
+                              </Typography>
+
+                              </CardContent>
+                          </CardActionArea>
+                          
+                      </Card>
+                    </Tooltip>
+
+                  </Grid>
+
+
+                  {/*Forwarded tickets*/}
+                  <Grid item xs={3}>
+                    <Tooltip title= { <Typography gutterBottom variant="subtitle2" component="div"> See Forwarded Tickets</Typography>}  placement="top" arrow>
+                      <Card sx={{ maxWidth: 300, minHeight: 300 }} elevation={3}>
+                          <CardActionArea >
+                              <CardContent 
+                                    onMouseOver={() => setHoverF(true)}
+                                    onMouseOut={() => setHoverF(false)} >
+                              
+                              <Link href={{ pathname: '/tickets', query: { data: JSON.stringify(forwardedData) } }}>
+                                <Typography gutterBottom variant="h5" component="div">
+                                    Forwarded tickets
+                                </Typography>
+                                <Typography variant="h6" color="text.secondary">
+                                    {forwarded}
+                                </Typography>
+                              </Link>
+
+                              {fileName && (
+                                <DonutChart data={{ 
+                                  labels: ['Low', 'Medium', 'High', 'Critical'], 
+                                  values: [lowF, mediumF, highF, criticalF], 
+                                  colors: newColors }} />
+
+                              )}
+                              <br />
+
+                                <Typography variant="subtitle1" color="text.secondary">
+                                    {hoverF? 
+                                        <Box sx={{ fontWeight: 'bold' }}> Priority </Box>
+                                    : null} 
+                                </Typography>
+
+                                <Typography variant="subtitle1" color="text.secondary">
+                                    {hoverF? 
+                                        "Low: " + lowF.toString()
+                                    : null} 
+                                </Typography>
+
+                                <Typography variant="subtitle1" color="text.secondary">
+                                    {hoverF? 
+                                        "Medium: " + mediumF.toString()
+                                    : null} 
+                                </Typography>
+
+                                <Typography variant="subtitle1" color="text.secondary">
+                                    {hoverF? 
+                                        "High: " + highF.toString() 
+                                    : null} 
+                                </Typography>
+
+                                <Typography variant="subtitle1" color="text.secondary">
+                                    {hoverF? 
+                                        "Critical: " + criticalF.toString() 
+                                    : null} 
+                                </Typography>
+
+                              </CardContent>
+                          </CardActionArea>
+                      </Card>
+                    </Tooltip>
+
+                  </Grid>
+
+
+                  {/*Reopened tickets*/}
+                  <Grid item xs={3}>
+                    <Tooltip title= { <Typography gutterBottom variant="subtitle2" component="div"> See Reopened Tickets</Typography>}  placement="top" arrow>
+
+                      <Card sx={{ maxWidth: 300, minHeight: 380 }} elevation={3}>
+                    
+                        <CardActionArea >
+                          <CardContent 
+                                  onMouseOver={() => setHoverReopened(true)}
+                                  onMouseOut={() => setHoverReopened(false)} >
+                            
+                            <Link href={{ pathname: '/tickets', query: { data: JSON.stringify(reopenedData) } }}>
+
+                              <Typography gutterBottom variant="h5" component="div">
+                                  Reopened tickets
+                              </Typography>
+                              <Typography variant="h6" color="text.secondary">
+                                  {reopened}
+                              </Typography>
+                            </Link>
+
+                            {fileName && (
+                              <DonutChart data={{ 
+                                labels: ['Low', 'Medium', 'High', 'Critical'], 
+                                values: [lowReopened, mediumReopened, highReopened, criticalReopened], 
+                                colors: newColors }} />
+
+                            )}
+                            <br />
+
+                              <Typography variant="subtitle1" color="text.secondary">
+                                  {hoverReopened? 
+                                      <Box sx={{ fontWeight: 'bold' }}> Priority </Box>
+                                  : null} 
+                              </Typography>
+
+                              <Typography variant="subtitle1" color="text.secondary">
+                                  {hoverReopened? 
+                                      "Low: " + lowReopened.toString()
+                                  : null} 
+                              </Typography>
+
+                              <Typography variant="subtitle1" color="text.secondary">
+                                  {hoverReopened? 
+                                      "Medium: " + mediumReopened.toString()
+                                  : null} 
+                              </Typography>
+
+                              <Typography variant="subtitle1" color="text.secondary">
+                                  {hoverReopened? 
+                                      "High: " + highReopened.toString() 
+                                  : null} 
+                              </Typography>
+
+                              <Typography variant="subtitle1" color="text.secondary">
+                                  {hoverReopened? 
+                                      "Critical: " + criticalReopened.toString() 
+                                  : null} 
+                              </Typography>
+
+
+                            </CardContent>
+                        </CardActionArea>
+                      </Card>
+                    </Tooltip>
+
+                  </Grid>
+
+                  {/*Más de dos semanas tickets*/}
+                  <Grid item xs={3}>
+                    <Tooltip title= { <Typography gutterBottom variant="subtitle2" component="div"> See Tickets Open More Than Two Weeks</Typography>}  placement="top" arrow>
+                      <Card sx={{ maxWidth: 300, minHeight: 380 }} elevation={3}>
+                      
+                          <CardActionArea >
+                            <CardContent 
+                                    /* onMouseOver={() => setHoverReopened(true)}
+                                    onMouseOut={() => setHoverReopened(false)} */ >
+                             <Link href={{ pathname: '/twoWeeks', query: { data: JSON.stringify(open2weeksData) } }}>
+
+                                <Typography gutterBottom variant="h5" component="div">
+                                    Open tickets more than 2 weeks
+                                </Typography>
+                                <Typography variant="h6" color="text.secondary">
+                                    {count2weeks}
+                                </Typography>
+                              </Link>
+
+
+                              {fileName && (
+                                <DonutChart data={{ 
+                                  labels: ['Total tickets', 'Open and not solved', 'Open more than 2 weeks'], 
+                                  values: [total, openNotSolved, count2weeks], 
+                                  colors: newColors }} />
+
+                              )}
+
+                                {/* <Typography variant="subtitle1" color="text.secondary">
+                                    {hoverReopened? 
+                                        <Box sx={{ fontWeight: 'bold' }}> Priority </Box>
+                                    : null} 
+                                </Typography>
+
+                                <Typography variant="subtitle1" color="text.secondary">
+                                    {hoverReopened? 
+                                        "Low: " + lowReopened.toString()
+                                    : null} 
+                                </Typography>
+
+                                <Typography variant="subtitle1" color="text.secondary">
+                                    {hoverReopened? 
+                                        "Medium: " + mediumReopened.toString()
+                                    : null} 
+                                </Typography>
+
+                                <Typography variant="subtitle1" color="text.secondary">
+                                    {hoverReopened? 
+                                        "High: " + highReopened.toString() 
+                                    : null} 
+                                </Typography>
+
+                                <Typography variant="subtitle1" color="text.secondary">
+                                    {hoverReopened? 
+                                        "Critical: " + criticalReopened.toString() 
+                                    : null} 
+                                </Typography> */}
+
+
+                              </CardContent>
+                          </CardActionArea>
+                      </Card>
+                    </Tooltip>
+                  </Grid>
+
+
+                  {/*Backlog tickets*/}
+                  <Grid item xs={3}>
+                    
+                    <Card sx={{ maxWidth: 300, minHeight: 380 }} elevation={3}>
                   
-                  </Card>
-              </Grid>
+                      <CardActionArea href="/">
+                      <CardContent 
+                                onMouseOver={() => setHoverBacklog(true)}
+                                onMouseOut={() => setHoverBacklog(false)} >
+                          <Typography gutterBottom variant="h5" component="div">
+                              Backlog
+                          </Typography>
+                          <br />
+                          
+                              {/* si hay backlog, o sea es true */}
 
-            
-          </Grid>
+                              {backlog && fileName? 
+                                    <DonutChart data={{ 
+                                      labels: ['Over limit'], 
+                                      values: [lowReopened], 
+                                      colors: ['#e10a14	'] }} /> 
+                                : null
+                                } 
+
+                              {!backlog && fileName? 
+                                <DonutChart data={{ 
+                                  labels: ['Below limit'], 
+                                  values: [lowReopened], 
+                                  colors: ['#d7e100	'] }} />
+                                : null }
+
+                              {/* si no hay, si es false */}
+
+                            {/*  agregar un hover que enseñe tickets abiertos, assigned,
+                              el limite de 5% y cuánto queda el backlog */}
+                              <br />
+                              <br />
+
+                              <Typography variant="subtitle1" color="text.secondary">
+                                {hoverBacklog? 
+                                    "Open tickets: " + openTickets.toString() 
+                                : null} 
+                              </Typography>
+
+                              <Typography variant="subtitle1" color="text.secondary">
+                                {hoverBacklog? 
+                                    "Assigned tickets: " + assigned.toString() 
+                                : null} 
+                              </Typography>
+
+                              <Typography variant="subtitle1" color="text.secondary">
+                                {hoverBacklog? 
+                                    "5% limit: " + restrictionTotal.toString() 
+                                : null} 
+                              </Typography>
+
+                              <Typography variant="subtitle1" color="text.secondary">
+                                {hoverBacklog? 
+                                    "Backlog total: " + (Math.floor(backlogTotal)).toString() 
+                                : null} 
+                              </Typography>
+        
+                          </CardContent>
+                          
+                      </CardActionArea>
+                    </Card>
+                  </Grid>
+
+                  {/*Graphics*/}
+                  <Grid item xs={3}>
+                    <Tooltip title= { <Typography gutterBottom variant="subtitle2" component="div"> See Graphics</Typography>}  placement="top" arrow>
+
+                      <Card sx={{ maxWidth: 300, minHeight: 380 }} elevation={3}>
+                    
+                        <CardActionArea >
+                        <Link href={{ pathname: '/graficas', query: { data: JSON.stringify(allData) } }}>
+                        <CardContent >
+                            <Typography gutterBottom variant="h5" component="div">
+                                Graphics
+                            </Typography>
+
+                            {fileName && (
+                              <div style={{ whiteSpace: 'pre-line' }}>
+                                <Typography variant="subtitle1" color="text.secondary"> 
+                                  View all graphics
+                                </Typography> 
+
+                              </div>
+
+                            )}
+                            </CardContent>
+                        </Link>
+                        </CardActionArea>
+                        
+                      </Card>
+                    </Tooltip>
+
+                  </Grid>
+                
+              </Grid>
           
-          </Container>
+            </Container>
 
           </Container>
 
