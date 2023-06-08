@@ -20,6 +20,10 @@ import jsPDF from 'jspdf';
 import domtoimage from 'dom-to-image';
 import htmlToImage from 'html-to-image';
 import FileOpenIcon from '@mui/icons-material/FileOpen';
+import ReactPDF, { Document, Page, Text, View } from 'react-pdf';
+import html2canvas from 'html2canvas';
+
+
 
 export default function Home(props:any) {
   const [fileName, setFileName] = useState(null);
@@ -478,7 +482,6 @@ export default function Home(props:any) {
 
   }
 
-
   if (isLoading) {
     return <div 
     style={{
@@ -493,27 +496,20 @@ export default function Home(props:any) {
       Loading...
     </div>;
   }
-  
-
 
   const newColors = ['#ffed1a', '#fa9b00', '#009be1', '#FF0000']; // Example new colors
-  
 
-
-  const handleDownloadPdf = async (elementIds: string[]) => {
-    /* setHover(true);
-    setHoverR(true);
-    setHoverC(true);
-    setHoverF(true);
-    setHoverReopened(true);
-    setHoverBacklog(true); */
-
+  /* const handleDownloadPdf = async (elementIds: string[]) => {
     try {
       const pdf = new jsPDF('p', 'mm', 'a4');
   
       for (let i = 0; i < elementIds.length; i++) {
         const elementId = elementIds[i];
-        const chartContainer = document.getElementById(elementId);
+        console.log("elementid", elementId);
+        //const chartContainer = document.getElementById(elementId);
+        //console.log("chart", chartContainer);
+        const cardElement = document.getElementById(elementId);
+
   
         const options = {
           style: {
@@ -525,7 +521,7 @@ export default function Home(props:any) {
         };
   
         try {
-          const dataUrl = await domtoimage.toPng(chartContainer, options);
+          const dataUrl = await domtoimage.toPng(cardElement, options);
           const imgProps = pdf.getImageProperties(dataUrl);
           const pdfWidth = pdf.internal.pageSize.getWidth();
           const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
@@ -540,11 +536,43 @@ export default function Home(props:any) {
         }
       }
   
-      pdf.save('graphs_pdf.pdf');
+      pdf.save('menu.pdf');
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+    }
+  }; */
+
+  const handleDownloadPdf = async (elementIds: string[]) => {
+    try {
+      const pdf = new jsPDF('p', 'mm', 'a4');
+  
+      for (let i = 0; i < elementIds.length; i++) {
+        const elementId = elementIds[i];
+        console.log("elementid", elementId);
+        const cardElement = document.getElementById(elementId);
+  
+        try {
+          const canvas = await html2canvas(cardElement);
+          const imgData = canvas.toDataURL('image/png');
+          const pdfWidth = pdf.internal.pageSize.getWidth();
+          const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+  
+          if (i > 0) {
+            pdf.addPage();
+          }
+  
+          pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        } catch (error) {
+          console.error('Error generating image:', error);
+        }
+      }
+  
+      pdf.save('menu.pdf');
     } catch (error) {
       console.error('Error generating PDF:', error);
     }
   };
+  
 
 
     return( 
@@ -552,58 +580,73 @@ export default function Home(props:any) {
         <Container id= "all-data" maxWidth="xl">
           <br />
 
-          <Box id="title" display="flex" justifyContent="center" alignItems="center">
-            <Typography variant='h3' align='center' mt={2} sx={{fontWeight:400}}>Tickets</Typography>
-            {/* <Tooltip title="Download all graphics as PDF" arrow>
-              <Button size="large" endIcon={<DownloadIcon />} sx={{ color: 'grey' }} onClick={() => handleDownloadPdf(["title", "cards", "este"])}></Button>
-            </Tooltip> */}
-          </Box>
 
-          <Box width="95%" sx={{ backgroundColor: "#EB1C24", height: 10, mt:3, marginLeft: "auto", marginRight: "auto" }}></Box>
+          <Container id="title-and-bar">
+            <Box id="title" display="flex" justifyContent="center" alignItems="center">
+              <Typography variant='h3' align='center' mt={2} sx={{fontWeight:400}}>Tickets</Typography>
+            </Box>
 
-          <br /> 
+            <Box id="bar" width="95%" sx={{ backgroundColor: "#EB1C24", height: 10, mt:3, marginLeft: "auto", marginRight: "auto" }}></Box>
 
-          <Box width={"100%"} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', margin: 'auto', mt:1}}>   
-            <input id="select-button" type="file"  accept=".xlsx, .xls" style={{ display: 'none' }} onChange={handleFile}></input>
-              <label htmlFor="select-button">
-                  <Button variant="contained" component="span"
-                    style={{
-                      backgroundColor: "#4D4D52",
-                      padding: "18px 36px"
-                    }}
+            <br /> 
 
-                    //onClick={handleFile(e)}
-                    endIcon={<FileOpenIcon />}>
-                    Select a file
-                  </Button>
-              </label>
-          </Box>
+            <Box width={"100%"} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', margin: 'auto', mt:1}}>   
+              <input id="select-button" type="file"  accept=".xlsx, .xls" style={{ display: 'none' }} onChange={handleFile}></input>
+                <label htmlFor="select-button">
+                    <Button variant="contained" component="span"
+                      style={{
+                        backgroundColor: "#4D4D52",
+                        padding: "18px 36px"
+                      }}
 
-          <br></br>
+                      //onClick={handleFile(e)}
+                      endIcon={<FileOpenIcon />}>
+                      Select a file
+                    </Button>
+                </label>
+            </Box>
 
-          <Container id="este" maxWidth="lg">
-            <div className='center'>
-            {fileName && (
-              
-              <Typography variant="h4" align="center" mt={3} mb={3} >File Name: <span>{fileName}</span></Typography>
-            ) }
-            
-            </div>
+            <Box display="flex" justifyContent="center" alignItems="center" sx={{mt:3}}>
+              <Tooltip title="Download all graphics as PDF" arrow>
+                <Button variant="contained" component="span"
+                        style={{
+                          backgroundColor: "#4D4D52",
+                          padding: "18px 36px"
+                        }}
+                        onClick={() => handleDownloadPdf(["title-and-bar", "cards1",])}
+                        endIcon={<DownloadIcon />}>
+                        Download
+                      </Button>
+              </Tooltip>
+            </Box>
 
             <br></br>
 
-            <Container id="cards" disableGutters maxWidth="xl" component="main" sx={{ pt: 1, pb: 1 }}>
+            <div className='center'>
+                {fileName && (
+                  
+                  <Typography variant="h4" align="center" mt={3} mb={3} >File Name: <span>{fileName}</span></Typography>
+                ) }
+                
+            </div>
+
+            <br></br>
+          </Container>
+
+          <Container  maxWidth="lg">
+
+            <Container disableGutters maxWidth="xl" component="main" sx={{ pt: 1, pb: 1 }}>
                 
               <Grid container spacing={4} alignItems="center" justifyContent="center">
                   
+                  <Grid id="cards1" container spacing={4} alignItems="center" justifyContent="center">
                   {/* Total de tickets*/}
                   <Grid item xs={3} >
                     <Tooltip title= { <Typography gutterBottom variant="subtitle2" component="div"> See all tickets </Typography>}  placement="top" arrow>
 
-                      <Card sx={{ maxWidth: 300, minHeight: 300 }} elevation={3}>
+                      <Card  sx={{ maxWidth: 300, minHeight: 300, backgroundColor:'white' }}  >
                     
                         <CardActionArea >
-                          
                             <CardContent 
                                 onMouseOver={() => setHover(true)}
                                 onMouseOut={() => setHover(false)} >
@@ -696,19 +739,19 @@ export default function Home(props:any) {
                                   : null} 
                               </Typography>
                           
-                            </CardContent>                    
+                            </CardContent>  
+                  
                         </CardActionArea>
                         
                       </Card>
                     </Tooltip>
                   </Grid>
 
-
                   {/*Resolved tickets*/}
                   <Grid item xs={3}>
                     <Tooltip title= { <Typography gutterBottom variant="subtitle2" component="div"> See Resolved Tickets</Typography>}  placement="top" arrow>
 
-                        <Card sx={{ maxWidth: 300, minHeight: 300 }} elevation={3}>
+                        <Card id="card2" sx={{ maxWidth: 300, minHeight: 300 }}  >
 
                         <CardActionArea >
                         
@@ -773,12 +816,11 @@ export default function Home(props:any) {
 
                   </Grid>
 
-
                   {/*Closed tickets*/}
                   <Grid item xs={3}>
                     <Tooltip title= { <Typography gutterBottom variant="subtitle2" component="div"> See Closed Tickets</Typography>}  placement="top" arrow>
 
-                      <Card sx={{ maxWidth: 300, minHeight: 300 }} elevation={3}>
+                      <Card sx={{ maxWidth: 300, minHeight: 300 }}  >
                       
                           <CardActionArea >
                             <CardContent 
@@ -842,11 +884,10 @@ export default function Home(props:any) {
 
                   </Grid>
 
-
                   {/*Forwarded tickets*/}
                   <Grid item xs={3}>
                     <Tooltip title= { <Typography gutterBottom variant="subtitle2" component="div"> See Forwarded Tickets</Typography>}  placement="top" arrow>
-                      <Card sx={{ maxWidth: 300, minHeight: 300 }} elevation={3}>
+                      <Card sx={{ maxWidth: 300, minHeight: 300 }}  >
                           <CardActionArea >
                               <CardContent 
                                     onMouseOver={() => setHoverF(true)}
@@ -906,13 +947,14 @@ export default function Home(props:any) {
                     </Tooltip>
 
                   </Grid>
+                  </Grid>
 
 
                   {/*Reopened tickets*/}
                   <Grid item xs={3}>
                     <Tooltip title= { <Typography gutterBottom variant="subtitle2" component="div"> See Reopened Tickets</Typography>}  placement="top" arrow>
 
-                      <Card sx={{ maxWidth: 300, minHeight: 380 }} elevation={3}>
+                      <Card sx={{ maxWidth: 300, minHeight: 380 }}  >
                     
                         <CardActionArea >
                           <CardContent 
@@ -979,7 +1021,7 @@ export default function Home(props:any) {
                   {/*Más de dos semanas tickets*/}
                   <Grid item xs={3}>
                     <Tooltip title= { <Typography gutterBottom variant="subtitle2" component="div"> See Tickets Open More Than Two Weeks</Typography>}  placement="top" arrow>
-                      <Card sx={{ maxWidth: 300, minHeight: 380 }} elevation={3}>
+                      <Card sx={{ maxWidth: 300, minHeight: 380 }}  >
                       
                           <CardActionArea >
                             <CardContent 
@@ -1045,7 +1087,7 @@ export default function Home(props:any) {
                   {/*Backlog tickets*/}
                   <Grid item xs={3}>
                     
-                    <Card sx={{ maxWidth: 300, minHeight: 380 }} elevation={3}>
+                    <Card sx={{ maxWidth: 300, minHeight: 380 }}  >
                   
                       <CardActionArea href="/">
                       <CardContent 
@@ -1114,7 +1156,7 @@ export default function Home(props:any) {
                   <Grid item xs={3}>
                     <Tooltip title= { <Typography gutterBottom variant="subtitle2" component="div"> See Graphics</Typography>}  placement="top" arrow>
 
-                      <Card sx={{ maxWidth: 300, minHeight: 380 }} elevation={3}>
+                      <Card sx={{ maxWidth: 300, minHeight: 380, backgroundColor:'white' }}  >
                     
                         <CardActionArea >
                         <Link href={{ pathname: '/graficas', query: { data: JSON.stringify(allData) } }}>
