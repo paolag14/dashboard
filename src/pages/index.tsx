@@ -543,6 +543,7 @@ export default function Home(props:any) {
   }; */
 
   const handleDownloadPdf = async (elementIds: string[]) => {
+
     try {
       const pdf = new jsPDF('p', 'mm', 'a4');
   
@@ -552,7 +553,16 @@ export default function Home(props:any) {
         const cardElement = document.getElementById(elementId);
   
         try {
-          const canvas = await html2canvas(cardElement);
+
+          setHover(true);
+          setHoverR(true);
+          setHoverC(true);
+          setHoverF(true);
+
+
+          await new Promise((resolve) => setTimeout(resolve, 2000));
+
+          const canvas = await html2canvas(cardElement, { scrollX: -window.scrollX -100, scrollY: -window.scrollY -100 });
           const imgData = canvas.toDataURL('image/png');
           const pdfWidth = pdf.internal.pageSize.getWidth();
           const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
@@ -568,6 +578,10 @@ export default function Home(props:any) {
       }
   
       pdf.save('menu.pdf');
+      setHover(false);
+          setHoverR(false);
+          setHoverC(false);
+          setHoverF(false);
     } catch (error) {
       console.error('Error generating PDF:', error);
     }
