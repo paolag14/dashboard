@@ -2,7 +2,6 @@ import * as React from 'react';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
-import Input from '@mui/material/Input';
 import Container from '@mui/material/Container';
 import { CardActionArea } from '@mui/material';
 import Grid from '@mui/material/Grid';
@@ -11,19 +10,14 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Box from '@mui/material/Box';
-import { makeStyles } from '@material-ui/core/styles';
 import Tooltip from '@mui/material/Tooltip';
 import DonutChart from '@/components/donutChart';
 import Button from '@mui/material/Button';
 import DownloadIcon from '@mui/icons-material/Download';
 import jsPDF from 'jspdf';
-import domtoimage from 'dom-to-image';
-import htmlToImage from 'html-to-image';
 import FileOpenIcon from '@mui/icons-material/FileOpen';
-import ReactPDF, { Document, Page, Text, View } from 'react-pdf';
 import html2canvas from 'html2canvas';
-
-
+import Stack from '@mui/material/Stack';
 
 export default function Home(props:any) {
   const [fileName, setFileName] = useState(null);
@@ -201,7 +195,6 @@ export default function Home(props:any) {
     setCount2weeks(cont2weeks);
     setOpenNotSolved(contOpenNotSolved);
 
-  
     //jsonData[0] son el nombre de todas las columnas cuando es array
 
     //set data
@@ -456,14 +449,12 @@ export default function Home(props:any) {
 
     setOpenTickets(contadorOpenedTickets);
 
-
     //data arrays
     setResolvedData(arrayResolved);
     setClosedData(arrayClosed);
     setForwardedData(arrayForwarded);
     setReopenedData(arrayReopened);
     setOpen2weeksData(arrayOpen2Weeks);
-
 
     let restriction = (counter-1) * 0.5;
 
@@ -478,8 +469,7 @@ export default function Home(props:any) {
     setRestrictionTotal(restriction);
 
     setBacklogTotal(((contadorOpenedTickets/contadorAssigned)*100));
-    
-
+  
   }
 
   if (isLoading) {
@@ -519,14 +509,14 @@ export default function Home(props:any) {
           setHoverReopened(true);
           setHoverBacklog(true);
 
-          await new Promise((resolve) => setTimeout(resolve, 500));
+          await new Promise((resolve) => setTimeout(resolve, 1500));
 
           const canvas = await html2canvas(cardElement, { scrollX: -window.scrollX -100 , scrollY: -window.scrollY-100000 });
           const imgData = canvas.toDataURL('image/png');
           const pdfWidth = pdf.internal.pageSize.getWidth();
           const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-  
-          if (i === 0) {
+          
+          /* if (i === 0) {
             pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
           } else {
             if (currentPage === 1) {
@@ -537,13 +527,19 @@ export default function Home(props:any) {
               pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
               currentPage++;
             }
+          } */
+
+          if (i > 0) {
+            pdf.addPage();
           }
+  
+          pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
         } catch (error) {
           console.error('Error generating image:', error);
         }
       }
   
-      pdf.save('menu.pdf');
+      pdf.save('MainPage.pdf');
       setHover(false);
       setHoverR(false);
       setHoverC(false);
@@ -571,7 +567,37 @@ export default function Home(props:any) {
 
             <br /> 
 
-            <Box width={"100%"} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', margin: 'auto', mt:1}}>   
+            <Stack direction="row" spacing={2} width={"100%"} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', margin: 'auto', mt:1, mb:2}}>
+              <input id="select-button" type="file"  accept=".xlsx, .xls" style={{ display: 'none' }} onChange={handleFile}></input>
+                  <label htmlFor="select-button">
+                      <Button variant="contained" component="span"
+                        style={{
+                          backgroundColor: "#4D4D52",
+                          padding: "18px 36px"
+                        }}
+
+                        //onClick={handleFile(e)}
+                        endIcon={<FileOpenIcon />}>
+                        Select a file
+                      </Button>
+                    </label>
+
+              {fileName && (
+                <Tooltip title="Download all graphics as PDF" arrow>
+                  <Button variant="contained" component="span"
+                          style={{
+                            backgroundColor: "#4D4D52",
+                            padding: "18px 36px"
+                          }}
+                          onClick={() => handleDownloadPdf(["all-data"])}
+                          endIcon={<DownloadIcon />}>
+                          Download
+                        </Button>
+                </Tooltip>
+              ) }
+
+            </Stack>
+            {/* <Box width={"100%"} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', margin: 'auto', mt:1}}>   
               <input id="select-button" type="file"  accept=".xlsx, .xls" style={{ display: 'none' }} onChange={handleFile}></input>
                 <label htmlFor="select-button">
                     <Button variant="contained" component="span"
@@ -594,18 +620,16 @@ export default function Home(props:any) {
                           backgroundColor: "#4D4D52",
                           padding: "18px 36px"
                         }}
-                        onClick={() => handleDownloadPdf(["title-and-bar", "cards1", "cards2"])}
+                        onClick={() => handleDownloadPdf(["all-data"])}
                         endIcon={<DownloadIcon />}>
                         Download
                       </Button>
               </Tooltip>
-            </Box>
+            </Box> */}
 
-            <br></br>
-
+     
             <div className='center'>
                 {fileName && (
-                  
                   <Typography variant="h4" align="center" mt={3} mb={3} >File Name: <span>{fileName}</span></Typography>
                 ) }
                 
@@ -614,13 +638,14 @@ export default function Home(props:any) {
             <br></br>
           </Container>
 
-          <Container  maxWidth="lg">
+          <Container maxWidth="lg" sx={{mt:1}}>
 
             <Container disableGutters maxWidth="xl" component="main" sx={{ pt: 1, pb: 1 }}>
                 
               <Grid container spacing={4} alignItems="center" justifyContent="center">
                   
                   <Grid id="cards1" container spacing={4} alignItems="center" justifyContent="center">
+                 
                     {/* Total de tickets*/}
                     <Grid item xs={3} >
                       <Tooltip title= { <Typography gutterBottom variant="subtitle2" component="div"> See all tickets </Typography>}  placement="top" arrow>
@@ -928,10 +953,10 @@ export default function Home(props:any) {
                       </Tooltip>
 
                     </Grid>
-                  </Grid>
+                  
 
-                  <Grid id="cards2" container spacing={4} alignItems="center" justifyContent="center" sx={{mt:1}}>
-                    {/*Reopened tickets*/}
+{/*                   <Grid id="cards2" container spacing={4} alignItems="center" justifyContent="center" sx={{mt:1}}>
+ */}                    {/*Reopened tickets*/}
                     <Grid item xs={3}>
                       <Tooltip title= { <Typography gutterBottom variant="subtitle2" component="div"> See Reopened Tickets</Typography>}  placement="top" arrow>
 
