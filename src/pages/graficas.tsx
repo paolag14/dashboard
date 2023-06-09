@@ -13,10 +13,9 @@ import Tooltip from '@mui/material/Tooltip';
 import jsPDF from 'jspdf';
 import DonutChart from '@/components/donutChart';
 import domtoimage from 'dom-to-image';
-import htmlToImage from 'html-to-image';
-import {  Menu, MenuItem } from '@mui/material';
 import { MoreVert as MoreVertIcon, GetApp as DownloadIcon } from '@mui/icons-material';
-
+import Alert from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
 
 interface Service {
     type: string;
@@ -55,6 +54,8 @@ export default function Graficas() {
     const router = useRouter();
     const { data } = router.query;
     const allData = JSON.parse(data);
+
+    const [showSuccessAlert, setShowSuccessAlert] = useState(false); 
 
     //asignee names modal
     const [openAssignee, setOpenAssignee] = useState(false);
@@ -326,8 +327,8 @@ export default function Graficas() {
     const failuresCount = countFailures(allData);    
 
     const handleDownloadImage = (elementId:any) => {
-      //const chartContainer = document.getElementById(elementId); // Get the chart container element
-      //const containerStyle = chartContainer.style.boxShadow; // Store the original box shadow
+      const chartContainer = document.getElementById(elementId); // Get the chart container element
+      const containerStyle = chartContainer.style.boxShadow; // Store the original box shadow
       chartContainer.style.boxShadow = 'none'; // Remove the box shadow temporarily
       html2canvas(chartContainer, { useCORS: true }).then((canvas) => {
         const image = canvas.toDataURL('image/png'); // Convert canvas to image data URL
@@ -382,6 +383,7 @@ export default function Graficas() {
           };
     
           try {
+            await new Promise((resolve) => setTimeout(resolve, 1000));
             const dataUrl = await domtoimage.toPng(chartContainer, options);
             const imgProps = pdf.getImageProperties(dataUrl);
             const pdfWidth = pdf.internal.pageSize.getWidth();
@@ -392,15 +394,19 @@ export default function Graficas() {
             }
     
             pdf.addImage(dataUrl, 'PNG', 0, 0, pdfWidth, pdfHeight);
+            setShowSuccessAlert(true);
           } catch (error) {
             console.error('Error generating image:', error);
           }
         }
     
-        pdf.save('graphs_pdf.pdf');
+        pdf.save('graphs.pdf');
       } catch (error) {
         console.error('Error generating PDF:', error);
       }
+      setTimeout(() => {
+      setShowSuccessAlert(false);
+      }, 3000);
     };
 
     // Generate random colors
@@ -420,6 +426,15 @@ export default function Graficas() {
   return(
     <>
     <Container id="all-data" sx={{height: '100%'}}>
+
+      {showSuccessAlert && (
+            <Box position="absolute" top={20} right={20} sx={{width: 300}}>
+              <Alert severity="success">
+                <AlertTitle>Success</AlertTitle>
+                PDF Downloaded Successfully
+              </Alert>
+            </Box>
+      )}
       <Container id="title-and-chart">
 
       <Typography variant='h3' align='center' mt={2} sx={{fontWeight:400}}>Graphics</Typography>

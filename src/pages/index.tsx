@@ -18,11 +18,14 @@ import jsPDF from 'jspdf';
 import FileOpenIcon from '@mui/icons-material/FileOpen';
 import html2canvas from 'html2canvas';
 import Stack from '@mui/material/Stack';
+import Alert from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
 
 export default function Home(props:any) {
   const [fileName, setFileName] = useState(null);
 
   const [isLoading, setLoading] = useState(true);
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false); 
 
   //cards
   const [total, setTotal] = useState(0);
@@ -107,7 +110,7 @@ export default function Home(props:any) {
     // Simulating data fetching delay
     setTimeout(() => {
       setLoading(false);
-    }, 1500); // Replace this with your actual data fetching logic
+    }, 1500); 
   }, []);
 
   
@@ -534,6 +537,8 @@ export default function Home(props:any) {
           }
   
           pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+
+          setShowSuccessAlert(true);
         } catch (error) {
           console.error('Error generating image:', error);
         }
@@ -549,6 +554,10 @@ export default function Home(props:any) {
     } catch (error) {
       console.error('Error generating PDF:', error);
     }
+
+    setTimeout(() => {
+      setShowSuccessAlert(false);
+    }, 3000);
   };
   
 
@@ -557,6 +566,15 @@ export default function Home(props:any) {
         <>
         <Container id= "all-data" maxWidth="xl">
           <br />
+
+          {showSuccessAlert && (
+            <Box position="absolute" top={20} right={20} sx={{width: 300}}>
+              <Alert severity="success">
+                <AlertTitle>Success</AlertTitle>
+                PDF Downloaded Successfully
+              </Alert>
+            </Box>
+          )}
 
           <Container id="title-and-bar">
             <Box id="title" display="flex" justifyContent="center" alignItems="center">
@@ -583,7 +601,7 @@ export default function Home(props:any) {
                     </label>
 
               {fileName && (
-                <Tooltip title="Download all graphics as PDF" arrow>
+                <Tooltip title="Download Main Page as PDF" arrow>
                   <Button variant="contained" component="span"
                           style={{
                             backgroundColor: "#4D4D52",
@@ -597,36 +615,6 @@ export default function Home(props:any) {
               ) }
 
             </Stack>
-            {/* <Box width={"100%"} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', margin: 'auto', mt:1}}>   
-              <input id="select-button" type="file"  accept=".xlsx, .xls" style={{ display: 'none' }} onChange={handleFile}></input>
-                <label htmlFor="select-button">
-                    <Button variant="contained" component="span"
-                      style={{
-                        backgroundColor: "#4D4D52",
-                        padding: "18px 36px"
-                      }}
-
-                      //onClick={handleFile(e)}
-                      endIcon={<FileOpenIcon />}>
-                      Select a file
-                    </Button>
-                </label>
-            </Box>
-
-            <Box display="flex" justifyContent="center" alignItems="center" sx={{mt:3}}>
-              <Tooltip title="Download all graphics as PDF" arrow>
-                <Button variant="contained" component="span"
-                        style={{
-                          backgroundColor: "#4D4D52",
-                          padding: "18px 36px"
-                        }}
-                        onClick={() => handleDownloadPdf(["all-data"])}
-                        endIcon={<DownloadIcon />}>
-                        Download
-                      </Button>
-              </Tooltip>
-            </Box> */}
-
      
             <div className='center'>
                 {fileName && (
