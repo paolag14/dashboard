@@ -1083,7 +1083,7 @@ export default function Home(props:any) {
                       
                       <Card sx={{ maxWidth: 300, minHeight: 380 }}  >
                     
-                        <CardActionArea href="/">
+                        <CardActionArea>
                         <CardContent 
                                   onMouseOver={() => setHoverBacklog(true)}
                                   onMouseOut={() => setHoverBacklog(false)} >

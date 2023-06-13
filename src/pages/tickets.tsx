@@ -21,7 +21,7 @@ import Button from '@mui/material/Button';
 import ClearIcon from '@mui/icons-material/Clear';
 import Stack from '@mui/material/Stack';
 import TablePagination from '@mui/material/TablePagination';
-
+import { css } from "@emotion/react";
 
 const theme2 = createTheme();
 
@@ -45,6 +45,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
+    
   },
 }));
 
@@ -104,7 +105,6 @@ export default function Tickets() {
     concat(paginatedData[0].slice(6,11)));
  */
 
-
   const handleRowClick = (index:any) => {
     if (expandedRow === index) {
       setExpandedRow(-1);
@@ -143,7 +143,6 @@ export default function Tickets() {
     handleFilterChange(selectedService, selectedPriority, status);
     setSelectedStatus(status);
   };
-  
 
   const handleSearchChange = (event:any) => {
         const value = event.target.value;
@@ -156,8 +155,7 @@ export default function Tickets() {
         );
         setFilteredData(filtered);
   };
-      
-      
+         
   const handleResetFilters = () => {
     setResetFilters(true);
     };
@@ -183,7 +181,6 @@ export default function Tickets() {
                 concat(allData[0].slice(4,5)).
                 concat(allData[0].slice(6,11))
                  */
-  console.log("headers", headers);
 
   /* headers details 
   paginatedData.slice(0,3).
@@ -192,6 +189,14 @@ export default function Tickets() {
 
   const headersDetails = ["Open", "Solved", "Reopened", "Forwarded", "Assignee ID", "Assignee Name", "Category", "Forwarded to Group", "Reopened Reason", 
     "Last Assigned On", "Duration in Days"];
+
+  const assigneeName = Array.from(new Set(allData.slice(1).map((row:any) => {
+      if (row[4] === "Order Management Customizing and Services") {
+        return row[18] ? row[18] : null;
+      }
+  })));
+
+  console.log("team", assigneeName);
 
   return(
     <>
@@ -311,7 +316,7 @@ export default function Tickets() {
     <br /><br />
 
     <Paper elevation={3}>
-
+    
     <TableContainer component={Paper}>
     <Table  sx={{minWidth: 700}} aria-label="collapsible table">
         <TableHead>
@@ -338,7 +343,14 @@ export default function Tickets() {
                 {row.slice(0,3).
                     concat(row.slice(4,5)).
                     concat(row.slice(6,11)).map((cell:any) => (
-                  <TableCell>{cell}</TableCell>
+                      <TableCell
+                     
+                      style={{
+                        fontWeight: cell && cell.includes("Order Management Customizing and Services") ? "bold" : "normal"
+                      }}
+                    >
+                      {cell}
+                    </TableCell>
                 ))}
               </StyledTableRow>
               <StyledTableRow key={index} index={index}>
@@ -370,8 +382,14 @@ export default function Tickets() {
                                 <Typography display="inline" sx={{ fontSize: "13px", fontWeight: "bold" }}>
                                   {headersDetails[headerIndex]}:{" "} 
                                 </Typography>
-                                <Typography display="inline" sx={{ fontSize: "13px" }}>
-                                    {row[dataIndex]}
+                                <Typography display="inline"
+                                    sx={{
+                                      fontSize: "13px",
+                                      textDecoration: assigneeName.includes(row[dataIndex]) ? "underline" : "none"
+                                    }}>
+                                  {row[dataIndex] === "0" ? "No" : row[dataIndex] === "1" ? "Yes" : row[dataIndex]}
+                                  {assigneeName.includes(row[dataIndex]) ? " (OMCS Team)" : ""}
+
                                 </Typography>
                                 <Typography> </Typography>
                                 </TableCell>
