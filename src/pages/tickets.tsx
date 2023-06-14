@@ -92,13 +92,6 @@ export default function Tickets() {
    // state to clear filters
    const [resetFilters, setResetFilters] = useState(false);
 
-   const [page, setPage] = useState(0);
-   const [rowsPerPage, setRowsPerPage] = useState(10);
-
-   const indexOfLastRow = (page + 1) * rowsPerPage;
-   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
-   let paginatedData = filteredData.slice(indexOfFirstRow, indexOfLastRow);
-
 
 /*    console.log("data slice", paginatedData[0].slice(0, 3).
     concat(paginatedData[0].slice(4,5)).
@@ -329,30 +322,26 @@ export default function Tickets() {
           </StyledTableRow>
         </TableHead>
         <TableBody>
-          {paginatedData.slice(0,3).
-            concat(paginatedData.slice(4,5)).
-            concat(paginatedData.slice(6,11)).map((row:any, index:any) => (
-                
-            <>
-              <StyledTableRow key={index} index={index} onClick={() => handleRowClick(index)}>
-                <StyledTableCell>
-                  <IconButton aria-label="expand row" size="small" onClick={() => handleRowClick(index)}>
-                    {expandedRow === index ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-                  </IconButton>
-                </StyledTableCell>
-                {row.slice(0,3).
-                    concat(row.slice(4,5)).
-                    concat(row.slice(6,11)).map((cell:any) => (
-                      <TableCell
-                     
-                      style={{
-                        fontWeight: cell && cell.includes("Order Management Customizing and Services") ? "bold" : "normal"
-                      }}
-                    >
-                      {cell}
-                    </TableCell>
-                ))}
-              </StyledTableRow>
+              {filteredData.map((row, index) => (
+          <>
+            <StyledTableRow key={index} index={index} onClick={() => handleRowClick(index)}>
+              <StyledTableCell>
+                <IconButton aria-label="expand row" size="small" onClick={() => handleRowClick(index)}>
+                  {expandedRow === index ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                </IconButton>
+              </StyledTableCell>
+              {/* Map columns 0 to 2 */}
+              {row.slice(0, 3).map((cell, cellIndex) => (
+                <TableCell key={cellIndex}>{cell}</TableCell>
+              ))}
+              {/* Map column 4 */}
+              <TableCell>{row[4]}</TableCell>
+              {/* Map columns 6 to 10 */}
+              {row.slice(6, 11).map((cell, cellIndex) => (
+                <TableCell key={cellIndex}>{cell}</TableCell>
+              ))}
+            </StyledTableRow>
+
               <StyledTableRow key={index} index={index}>
                 <StyledTableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={allData[0].length}>
                   <Collapse in={expandedRow === index} timeout="auto" unmountOnExit>
@@ -409,24 +398,6 @@ export default function Tickets() {
         
       </Table>
     </TableContainer>
-
-    <TablePagination
-          component="div"
-          count={filteredData.length}
-          page={page}
-          onPageChange={(event, newPage) => setPage(newPage)}
-          rowsPerPage={rowsPerPage}
-          onRowsPerPageChange={(event) => {
-            const newRowsPerPage = parseInt(event.target.value, 10);
-            setRowsPerPage(newRowsPerPage);
-            setPage(0);
-            // Update the paginatedData when rowsPerPage is changed
-            const newIndexOfLastRow = (0 + 1) * newRowsPerPage;
-            const newIndexOfFirstRow = newIndexOfLastRow - newRowsPerPage;
-            paginatedData = filteredData.slice(newIndexOfFirstRow, newIndexOfLastRow);
-          }}
-          
-        />
 
     </Paper>
 
