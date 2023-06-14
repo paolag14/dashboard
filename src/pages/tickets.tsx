@@ -20,8 +20,10 @@ import { InputAdornment, OutlinedInput } from '@mui/material';
 import Button from '@mui/material/Button';
 import ClearIcon from '@mui/icons-material/Clear';
 import Stack from '@mui/material/Stack';
-import TablePagination from '@mui/material/TablePagination';
-import { css } from "@emotion/react";
+import Pagination from '@mui/material/Pagination';
+import PaginationItem from '@mui/material/PaginationItem';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 const theme2 = createTheme();
 
@@ -36,9 +38,18 @@ const useStyles = makeStyles({
     p: 2,
   },
   isSelected: {
-    backgroundColor: "blue", // Replace with your desired background color
-    // Add any other styling you want
+    backgroundColor: "#23237d", 
+    color: "white",
+    borderRadius: 6,
   },
+  notSelected:{
+    borderRadius: 6,
+  },
+  othersButtons:{
+    borderRadius: 6,
+    backgroundColor: "#4D4D52",
+  }
+
 });
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -221,11 +232,59 @@ export default function Tickets() {
 
   useEffect(() => {
     const start = currentPage * rowsPerPage;
-    const end = start + rowsPerPage;
+    const end = Math.min(start + rowsPerPage, filteredData.length); // Use Math.min to ensure the end index is not greater than the filtered data length
     setCurrentPageData(filteredData.slice(start, end));
   }, [currentPage, filteredData]);
+
+
+  const renderPaginationItems = (item) => {
+    const { type, page, selected, ...itemProps } = item;
+
+    if (type === 'previous') {
+      if (currentPage > 0) {
+        return (
+          <IconButton onClick={goToPreviousPage}>
+            <ArrowBackIcon />
+          </IconButton>
+        );
+      }
+      return null;
+    }
+
+    if (type === 'next') {
+      if (currentPage < totalPages - 1) {
+        return (
+          <IconButton onClick={goToNextPage}>
+            <ArrowForwardIcon />
+          </IconButton>
+        );
+      }
+      return null;
+    }
+
+    if (type === 'page') {
+      return (
+        <PaginationItem
+          {...itemProps}
+          page={page}
+          selected={selected || currentPage === page - 1}
+          sx={{
+            '&.Mui-selected': {
+              backgroundColor: '#d2d2e4',
+              color: 'black',
+              borderRadius: 6,
+            },
+          }}
+          onClick={() => goToPage(page - 1)}
+        />
+      );
+    }
+
+    return null;
+  };
+
   
-  
+
 
   return(
     <>
@@ -346,26 +405,115 @@ export default function Tickets() {
 
     <Paper elevation={3}>
     
-
-    <div>
+    {/* <div>
       {currentPage > 0 && (
-        <Button onClick={goToPreviousPage}>Previous</Button>
+        <Button onClick={goToPreviousPage}
+        variant="contained" component="span"
+          style={{
+             backgroundColor: "#000000",
+             color: "white",
+             borderRadius: 6,
+          }}>Previous</Button>
       )}
       {Array.from({ length: totalPages }, (_, index) => (
         <Button
-          className={`${currentPage === index ? classes.isSelected : ""}`}
+          className={`${currentPage === index ? classes.isSelected : classes.notSelected}`}
           key={index}
           onClick={() => goToPage(index)}
+          variant="contained" component="span"
         >        
          {index + 1}
         </Button>
       ))}
       {currentPage < totalPages - 1 && (
-        <Button onClick={goToNextPage}>Next</Button>
+        <Button 
+          variant="contained" component="span"
+          onClick={goToNextPage} 
+          style={{
+             backgroundColor: "#000000",
+             color: "white",
+             borderRadius: 6,
+          }}
+          >Next</Button>
       )}
-    </div>
+    </div> */}
+    
+    <Box width={'100%'} display="flex" justifyContent="center">
+      <Typography align='center'>Page: {currentPage + 1}</Typography>
+      <Stack spacing={2}>
+        <Pagination
+          variant="outlined"
+          size="large"
+          count={totalPages}
+          boundaryCount={totalPages - 1} // Set boundaryCount to the total number of pages minus 1
+          siblingCount={0} 
+         
+          renderItem={(item) => {
+            const { type, page, selected, ...itemProps } = item;
+
+            if (type === 'previous') {
+              if (currentPage > 0) {
+                return (
+                  <IconButton onClick={goToPreviousPage}>
+                    <ArrowBackIcon />
+                  </IconButton>
+                );
+              }
+              return null;
+            }
+
+            if (type === 'next') {
+              if (currentPage < totalPages - 1) {
+                return (
+                  <IconButton onClick={goToNextPage}>
+                    <ArrowForwardIcon />
+                  </IconButton>
+                );
+              }
+              return null;
+            }
+
+            if (type === 'page') {
+              return (
+                <PaginationItem
+              {...itemProps}
+              page={page}
+              selected={currentPage === page - 1}
+              sx={{
+                '&.Mui-selected': {
+                  backgroundColor: '#d2d2e4',
+                  color: 'black',
+                  borderRadius: 6,
+                },
+              }}
+              component="button"
+              onClick={() => goToPage(page - 1)}
+            />
+              );
+            }
 
 
+            return (
+              <PaginationItem
+                {...itemProps}
+                page={page}
+                selected={currentPage === page - 1}
+                sx={{
+                  '&.Mui-selected': {
+                    backgroundColor: '#d2d2e4',
+                    color: 'black',
+                    borderRadius: 6,
+                  },
+                }}
+                onClick={() => goToPage(page - 1)} // Subtract 1 from page to match index-based page numbering
+              />
+            );
+          }}
+        />
+      </Stack>
+    </Box>
+
+    
 
     <TableContainer component={Paper}>
     <Table  sx={{minWidth: 700}} aria-label="collapsible table">
