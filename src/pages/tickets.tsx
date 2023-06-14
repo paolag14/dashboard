@@ -388,13 +388,15 @@ export default function Tickets() {
                 </IconButton>
               </StyledTableCell>
               {/* Map columns 0 to 2 */}
-              {row.slice(0, 3).map((cell, cellIndex) => (
+              {row.slice(0, 3).map((cell:any, cellIndex:any) => (
                 <TableCell key={cellIndex}>{cell}</TableCell>
               ))}
               {/* Map column 4 */}
-              <TableCell>{row[4]}</TableCell>
+              <TableCell style={{
+                        fontWeight: row[4] && row[4].includes("Order Management Customizing and Services") ? "bold" : "normal"
+                }}>{row[4]}</TableCell>
               {/* Map columns 6 to 10 */}
-              {row.slice(6, 11).map((cell, cellIndex) => (
+              {row.slice(6, 11).map((cell:any, cellIndex:any) => (
                 <TableCell key={cellIndex}>{cell}</TableCell>
               ))}
             </StyledTableRow>
