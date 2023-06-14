@@ -263,7 +263,6 @@ export default function Home(props:any) {
     arrayClosed.push(jsonData[0]);
     arrayForwarded.push(jsonData[0]);
     arrayReopened.push(jsonData[0]);
-    arrayForwarded.push(jsonData[0]);
     arrayOpen2Weeks.push(jsonData[0]);
 
     for (let i = 1; i<jsonData.length; i++){
@@ -1021,7 +1020,7 @@ export default function Home(props:any) {
                               <CardContent 
                                       /* onMouseOver={() => setHoverReopened(true)}
                                       onMouseOut={() => setHoverReopened(false)} */ >
-                              <Link href={{ pathname: '/twoWeeks', query: { data: JSON.stringify(open2weeksData) } }}>
+                              <Link href={{ pathname: '/tickets', query: { data: JSON.stringify(open2weeksData) } }}>
 
                                   <Typography gutterBottom variant="h5" component="div">
                                       Open tickets more than 2 weeks
