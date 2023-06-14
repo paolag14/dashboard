@@ -92,6 +92,10 @@ export default function Tickets() {
    // state to clear filters
    const [resetFilters, setResetFilters] = useState(false);
 
+   const [page, setPage] = useState(0);
+   const [rowsPerPage, setRowsPerPage] = useState(10);
+
+   const [paginatedData, setPaginatedData] = useState([]);
 
 /*    console.log("data slice", paginatedData[0].slice(0, 3).
     concat(paginatedData[0].slice(4,5)).
@@ -161,6 +165,20 @@ export default function Tickets() {
     setSearchValue('');
     setResetFilters(false);
   }
+
+
+  const handlePageChange = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  
+
+  const handleRowsPerPageChange = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+  
+
   
    // create a set of services from the third column of allData
   const services = Array.from(new Set(allData.slice(1).map((row:any) => row[2] ? row[2] : null)))
@@ -190,6 +208,25 @@ export default function Tickets() {
   })));
 
   console.log("team", assigneeName);
+
+  useEffect(() => {
+    // Filter the data based on selected filters and search value
+    const filtered = allData.slice(1).filter((row) =>
+      Object.values(row).some((value) =>
+        String(value).toLowerCase().includes(searchValue.toLowerCase())
+      )
+    );
+    setFilteredData(filtered);
+  
+    // Reset the page to the first page when the filtered data changes
+    setPage(0);
+  }, [allData, searchValue, selectedService, selectedPriority, selectedStatus]);
+  
+
+  const startIndex = page * rowsPerPage;
+  const endIndex = startIndex + rowsPerPage;
+  const displayedData = filteredData.slice(startIndex, endIndex);
+
 
   return(
     <>
@@ -297,7 +334,6 @@ export default function Tickets() {
         </FormControl>
       </Paper>
 
-
       <Box marginLeft="auto">
         <Button variant="outlined" onClick={handleResetFilters} startIcon={<ClearIcon />}>
           Clear
@@ -322,7 +358,7 @@ export default function Tickets() {
           </StyledTableRow>
         </TableHead>
         <TableBody>
-              {filteredData.map((row, index) => (
+              {displayedData.map((row, index) => (
           <>
             <StyledTableRow key={index} index={index} onClick={() => handleRowClick(index)}>
               <StyledTableCell>
@@ -398,6 +434,16 @@ export default function Tickets() {
         
       </Table>
     </TableContainer>
+
+    <TablePagination
+      rowsPerPageOptions={[10, 25, 50, 100]}
+      component="div"
+      count={filteredData.length}
+      rowsPerPage={rowsPerPage}
+      page={page}
+      onPageChange={handlePageChange}
+      onRowsPerPageChange={handleRowsPerPageChange}
+    />
 
     </Paper>
 
