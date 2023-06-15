@@ -67,7 +67,6 @@ export default function Tickets() {
 
   const theme = useTheme();
 
-  
   // state to keep track of which rows are expanded
   const [expandedRow, setExpandedRow] = useState(-1);
 
@@ -86,7 +85,7 @@ export default function Tickets() {
   // state to keep track of the filtered data
    const [filteredData, setFilteredData] = useState(allData.slice(1));
 
-   console.log("data filtrada", filteredData);
+   //console.log("data filtrada", filteredData);
    //const [filteredData, setFilteredData] = useState(allData);
 
    // state to clear filters
@@ -95,10 +94,7 @@ export default function Tickets() {
    const [page, setPage] = useState(0);
    const [rowsPerPage, setRowsPerPage] = useState(10);
 
-   const indexOfLastRow = (page + 1) * rowsPerPage;
-   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
-   let paginatedData = filteredData.slice(indexOfFirstRow, indexOfLastRow);
-
+   const [paginatedData, setPaginatedData] = useState([]);
 
 /*    console.log("data slice", paginatedData[0].slice(0, 3).
     concat(paginatedData[0].slice(4,5)).
@@ -145,15 +141,15 @@ export default function Tickets() {
   };
 
   const handleSearchChange = (event:any) => {
-        const value = event.target.value;
-        setSearchValue(value);
+    const value = event.target.value;
+    setSearchValue(value);
       
-        const filtered = allData.slice(1).filter((row) =>
+     const filtered = allData.slice(1).filter((row) =>
           Object.values(row).some((value) =>
             String(value).toLowerCase().includes(searchValue.toLowerCase())
           )
-        );
-        setFilteredData(filtered);
+      );
+    setFilteredData(filtered);
   };
          
   const handleResetFilters = () => {
@@ -168,7 +164,18 @@ export default function Tickets() {
     setSearchValue('');
     setResetFilters(false);
   }
-  
+
+  const handlePageChange = (event:any, newPage:any) => {
+    setPage(newPage);
+    console.log("nueva pagina", newPage)
+  };
+
+  const handleRowsPerPageChange = (event:any) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+    console.log("rows per page", event.target.value)
+  };
+
    // create a set of services from the third column of allData
   const services = Array.from(new Set(allData.slice(1).map((row:any) => row[2] ? row[2] : null)))
   .filter(service => service !== null)
@@ -196,7 +203,33 @@ export default function Tickets() {
       }
   })));
 
-  console.log("team", assigneeName);
+  //console.log("team", assigneeName);
+
+  useEffect(() => {
+    // Filter the data based on selected filters and search value
+    const filtered = allData.slice(1).filter((row) =>
+      Object.values(row).some((value) =>
+        String(value).toLowerCase().includes(searchValue.toLowerCase())
+      )
+    );
+    setFilteredData(filtered);
+  
+    // Reset the page to the first page when the filtered data changes
+    //setPage(0);
+  }, [allData, searchValue, selectedService, selectedPriority, selectedStatus]);
+
+  const startIndex = page * rowsPerPage;
+  const endIndex = startIndex + rowsPerPage;
+  const displayedData = filteredData.slice(startIndex, endIndex);
+
+  useEffect(() => {
+    // Update paginatedData when filteredData or page changes
+    const startIndex = page * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+    const displayedData = filteredData.slice(startIndex, endIndex);
+    setPaginatedData(displayedData);
+  }, [filteredData, page, rowsPerPage]);
+
 
   return(
     <>
@@ -205,7 +238,6 @@ export default function Tickets() {
     <Typography variant='h3' align='center' mt={2} sx={{fontWeight:400}}>Tickets</Typography>
 
     <Box width="95%" sx={{ backgroundColor: "#EB1C24", height: 10, mt:3, marginLeft: "auto", marginRight: "auto" }}></Box>
-   
     
     <br />
     <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
@@ -304,7 +336,6 @@ export default function Tickets() {
         </FormControl>
       </Paper>
 
-
       <Box marginLeft="auto">
         <Button variant="outlined" onClick={handleResetFilters} startIcon={<ClearIcon />}>
           Clear
@@ -329,30 +360,28 @@ export default function Tickets() {
           </StyledTableRow>
         </TableHead>
         <TableBody>
-          {paginatedData.slice(0,3).
-            concat(paginatedData.slice(4,5)).
-            concat(paginatedData.slice(6,11)).map((row:any, index:any) => (
-                
-            <>
-              <StyledTableRow key={index} index={index} onClick={() => handleRowClick(index)}>
-                <StyledTableCell>
-                  <IconButton aria-label="expand row" size="small" onClick={() => handleRowClick(index)}>
-                    {expandedRow === index ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-                  </IconButton>
-                </StyledTableCell>
-                {row.slice(0,3).
-                    concat(row.slice(4,5)).
-                    concat(row.slice(6,11)).map((cell:any) => (
-                      <TableCell
-                     
-                      style={{
-                        fontWeight: cell && cell.includes("Order Management Customizing and Services") ? "bold" : "normal"
-                      }}
-                    >
-                      {cell}
-                    </TableCell>
-                ))}
-              </StyledTableRow>
+              {displayedData.map((row, index) => (
+          <>
+            <StyledTableRow key={index} index={index} onClick={() => handleRowClick(index)}>
+              <StyledTableCell>
+                <IconButton aria-label="expand row" size="small" onClick={() => handleRowClick(index)}>
+                  {expandedRow === index ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+                </IconButton>
+              </StyledTableCell>
+              {/* Map columns 0 to 2 */}
+              {row.slice(0, 3).map((cell, cellIndex) => (
+                <TableCell key={cellIndex}>{cell}</TableCell>
+              ))}
+              {/* Map column 4 */}
+              <TableCell style={{
+                        fontWeight: row[4] && row[4].includes("Order Management Customizing and Services") ? "bold" : "normal"
+                }}>{row[4]}</TableCell>
+              {/* Map columns 6 to 10 */}
+              {row.slice(6, 11).map((cell, cellIndex) => (
+                <TableCell key={cellIndex}>{cell}</TableCell>
+              ))}
+            </StyledTableRow>
+
               <StyledTableRow key={index} index={index}>
                 <StyledTableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={allData[0].length}>
                   <Collapse in={expandedRow === index} timeout="auto" unmountOnExit>
@@ -411,22 +440,14 @@ export default function Tickets() {
     </TableContainer>
 
     <TablePagination
-          component="div"
-          count={filteredData.length}
-          page={page}
-          onPageChange={(event, newPage) => setPage(newPage)}
-          rowsPerPage={rowsPerPage}
-          onRowsPerPageChange={(event) => {
-            const newRowsPerPage = parseInt(event.target.value, 10);
-            setRowsPerPage(newRowsPerPage);
-            setPage(0);
-            // Update the paginatedData when rowsPerPage is changed
-            const newIndexOfLastRow = (0 + 1) * newRowsPerPage;
-            const newIndexOfFirstRow = newIndexOfLastRow - newRowsPerPage;
-            paginatedData = filteredData.slice(newIndexOfFirstRow, newIndexOfLastRow);
-          }}
-          
-        />
+      rowsPerPageOptions={[10, 25, 50, 100]}
+      component="div"
+      count={filteredData.length}
+      rowsPerPage={rowsPerPage}
+      page={page}
+      onPageChange={handlePageChange}
+      onRowsPerPageChange={handleRowsPerPageChange}
+    />
 
     </Paper>
 
