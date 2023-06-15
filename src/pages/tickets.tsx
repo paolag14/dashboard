@@ -21,7 +21,6 @@ import Button from '@mui/material/Button';
 import ClearIcon from '@mui/icons-material/Clear';
 import Stack from '@mui/material/Stack';
 import TablePagination from '@mui/material/TablePagination';
-import { css } from "@emotion/react";
 
 const theme2 = createTheme();
 
@@ -82,8 +81,14 @@ export default function Tickets() {
    // state to keep track of the search input value
    const [searchValue, setSearchValue] = useState('');
 
+  // state to keep track of the team selected
+  const [selectedTeam, setSelectedTeam] = useState('');
+
   // state to keep track of the filtered data
-   const [filteredData, setFilteredData] = useState(allData.slice(1));
+  const [filteredData, setFilteredData] = useState(allData.slice(1));
+
+  const [displayedData, setDisplayedData] = useState(allData.slice(1));
+
 
    //console.log("data filtrada", filteredData);
    //const [filteredData, setFilteredData] = useState(allData);
@@ -110,46 +115,69 @@ export default function Tickets() {
     setSelectedService(selectedService);
     setSelectedPriority(selectedPriority);
     setSelectedStatus(selectedStatus);
+    setSelectedTeam(selectedTeam);
   }
 
-  const handleFilterChange = (service:any, priority:any, status:any) => {
+  const handleFilterChange = (service:any, priority:any, status:any, team:any) => {
     const filteredData = allData.slice(1).filter((row:any) => {
       const serviceMatch = service === "" || row[2] === service;
       const priorityMatch = priority === "" || row[6] === priority;
       const statusMatch = status === "" || row[7] === status;
-      return serviceMatch && priorityMatch && statusMatch;
+      const teamMatch = team === "" || row[4] === team;
+
+      return serviceMatch && priorityMatch && statusMatch && teamMatch;
+
+      /* const searchMatch = searchValue === "" || Object.values(row).some((value) =>
+      String(value).toLowerCase().includes(searchValue.toLowerCase())
+    );
+    return serviceMatch && priorityMatch && statusMatch && teamMatch && searchMatch; */
     });
     setFilteredData(filteredData);
+    console.log(" filtered data", filteredData);
+
+    const startIndex = page * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+    const paginatedData = filteredData.slice(startIndex, endIndex);
+    setDisplayedData(paginatedData);
+
   };
   
   const handleServiceChange = (event:any) => {
     const service = event.target.value;
-    handleFilterChange(service, selectedPriority, selectedStatus);
+    handleFilterChange(service, selectedPriority, selectedStatus, selectedTeam);
     setSelectedService(service);
   };
   
   const handlePriorityChange = (event:any) => {
     const priority = event.target.value;
-    handleFilterChange(selectedService, priority, selectedStatus);
+    handleFilterChange(selectedService, priority, selectedStatus, selectedTeam);
     setSelectedPriority(priority);
   };
   
   const handleStatusChange = (event:any) => {
     const status = event.target.value;
-    handleFilterChange(selectedService, selectedPriority, status);
+    handleFilterChange(selectedService, selectedPriority, status, selectedTeam);
     setSelectedStatus(status);
+  };
+
+  const handleTeamChange = (event:any) => {
+    const team = event.target.value;
+    handleFilterChange(selectedService, selectedPriority, selectedStatus, team);
+    setSelectedTeam(team);
   };
 
   const handleSearchChange = (event:any) => {
     const value = event.target.value;
     setSearchValue(value);
       
-     const filtered = allData.slice(1).filter((row) =>
+     const filtered = allData.slice(1).filter((row:any) =>
           Object.values(row).some((value) =>
             String(value).toLowerCase().includes(searchValue.toLowerCase())
           )
       );
+    
     setFilteredData(filtered);
+    setDisplayedData(filtered);
   };
          
   const handleResetFilters = () => {
@@ -158,28 +186,44 @@ export default function Tickets() {
 
     if (resetFilters) {
     setFilteredData(allData.slice(1));
+    setDisplayedData(allData.slice(1));
     setSelectedService('');
     setSelectedPriority('');
     setSelectedStatus('');
     setSearchValue('');
+    setSelectedTeam('');
     setResetFilters(false);
   }
 
   const handlePageChange = (event:any, newPage:any) => {
     setPage(newPage);
-    console.log("nueva pagina", newPage)
+    
+    handleFilterChange(selectedService, selectedPriority, selectedStatus, selectedTeam);
+     // Update displayedData based on filteredData and pagination
+     const startIndex = newPage * rowsPerPage;
+     const endIndex = startIndex + rowsPerPage;
+     const paginatedData = filteredData.slice(startIndex, endIndex);
+     setDisplayedData(paginatedData);
   };
 
   const handleRowsPerPageChange = (event:any) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
-    console.log("rows per page", event.target.value)
+
+     // Update displayedData based on filteredData and new pagination
+     const paginatedData = filteredData.slice(0, event.target.value);
+     setDisplayedData(paginatedData);
   };
 
    // create a set of services from the third column of allData
   const services = Array.from(new Set(allData.slice(1).map((row:any) => row[2] ? row[2] : null)))
   .filter(service => service !== null)
   .sort((a:any, b:any) => a.localeCompare(b));
+
+  const supportGroups = Array.from(new Set(allData.slice(1).map((row:any) => row[4] ? row[4] : null)))
+  .filter(team => team !== null)
+  .sort((a:any, b:any) => a.localeCompare(b));
+
 
   const headers = ["Incident Number", "Summary", "Service", "Support Group", "Priority", "Status", "Creation Date", "Reopened Date",
     "Solved Date"];
@@ -207,7 +251,7 @@ export default function Tickets() {
 
   useEffect(() => {
     // Filter the data based on selected filters and search value
-    const filtered = allData.slice(1).filter((row) =>
+    const filtered = allData.slice(1).filter((row:any) =>
       Object.values(row).some((value) =>
         String(value).toLowerCase().includes(searchValue.toLowerCase())
       )
@@ -216,11 +260,11 @@ export default function Tickets() {
   
     // Reset the page to the first page when the filtered data changes
     //setPage(0);
-  }, [allData, searchValue, selectedService, selectedPriority, selectedStatus]);
+  }, [allData, searchValue, selectedService, selectedPriority, selectedStatus, selectedTeam]);
 
   const startIndex = page * rowsPerPage;
   const endIndex = startIndex + rowsPerPage;
-  const displayedData = filteredData.slice(startIndex, endIndex);
+  //const displayedData = filteredData.slice(startIndex, endIndex);
 
   useEffect(() => {
     // Update paginatedData when filteredData or page changes
@@ -229,7 +273,8 @@ export default function Tickets() {
     const displayedData = filteredData.slice(startIndex, endIndex);
     setPaginatedData(displayedData);
   }, [filteredData, page, rowsPerPage]);
-
+  
+  
 
   return(
     <>
@@ -266,13 +311,13 @@ export default function Tickets() {
       {/* Service filter */}
       <Paper elevation={3}>
         <FormControl variant="outlined" className={classes.formControl}> 
-          <InputLabel id="service-select-label">Select a service</InputLabel>
+          <InputLabel id="service-select-label">Select a Service</InputLabel>
           <Select
             labelId="service-select-label"
             id="service-select"
             value={selectedService}
             onChange={handleServiceChange}
-            label="Select a service"
+            label="Select a Service"
             sx={{
               bgcolor: 'background.paper',
               boxShadow: 1,
@@ -292,17 +337,45 @@ export default function Tickets() {
         </FormControl>
       </Paper>
 
+      {/* Support Group filter */}
+      <Paper elevation={3}>
+        <FormControl variant="outlined" className={classes.formControl}> 
+          <InputLabel id="team-select-label">Select a Support Group</InputLabel>
+          <Select
+            labelId="team-select-label"
+            id="team-select"
+            value={selectedTeam}
+            onChange={handleTeamChange}
+            label="Select a Support Group"
+            sx={{
+              bgcolor: 'background.paper',
+              boxShadow: 1,
+              borderRadius: 2,
+              p: 2,
+              minWidth: 300,
+            }}
+          >
+            <MenuItem value="">
+              <em>None</em>
+            </MenuItem>
+            {Array.from(supportGroups).map((team:any) => (
+              <MenuItem key={team.toString()} value={team.toString()}>{team}</MenuItem>
+
+            ))}
+          </Select>
+        </FormControl>
+      </Paper>
 
       {/* Priority filter */}
       <Paper elevation={3}>
         <FormControl variant="outlined" className={classes.formControl}>
-            <InputLabel id="priority-select-label">Select a priority</InputLabel>
+            <InputLabel id="priority-select-label">Select a Priority</InputLabel>
             <Select
               labelId="priority-select-label"
               id="priority-select"
               value={selectedPriority}
               onChange={handlePriorityChange}
-              label="Select a priority"
+              label="Select a Priority"
             >
               <MenuItem value="">
                 <em>None</em>
@@ -317,13 +390,13 @@ export default function Tickets() {
       {/* Status filter */}
       <Paper elevation={3}>
         <FormControl variant="outlined" className={classes.formControl}>
-          <InputLabel id="status-select-label">Select a status</InputLabel>
+          <InputLabel id="status-select-label">Select a Status</InputLabel>
           <Select
             labelId="status-select-label"
             id="status-select"
             value={selectedStatus}
             onChange={handleStatusChange}
-            label="Select a status"
+            label="Select a Status"
           >
             <MenuItem value="">
               <em>None</em>
@@ -335,6 +408,8 @@ export default function Tickets() {
           </Select>
         </FormControl>
       </Paper>
+
+      
 
       <Box marginLeft="auto">
         <Button variant="outlined" onClick={handleResetFilters} startIcon={<ClearIcon />}>
@@ -416,7 +491,13 @@ export default function Tickets() {
                                       fontSize: "13px",
                                       textDecoration: assigneeName.includes(row[dataIndex]) ? "underline" : "none"
                                     }}>
-                                  {row[dataIndex] === "0" ? "No" : row[dataIndex] === "1" ? "Yes" : row[dataIndex]}
+                                  {row[dataIndex] && row[dataIndex].startsWith("OTHERS:")
+                                    ? row[dataIndex].substring(7)
+                                    : row[dataIndex] === "0"
+                                    ? "No"
+                                    : row[dataIndex] === "1"
+                                    ? "Yes"
+                                    : row[dataIndex]}
                                   {assigneeName.includes(row[dataIndex]) ? " (OMCS Team)" : ""}
 
                                 </Typography>
