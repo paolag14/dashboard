@@ -21,7 +21,6 @@ import Button from '@mui/material/Button';
 import ClearIcon from '@mui/icons-material/Clear';
 import Stack from '@mui/material/Stack';
 import TablePagination from '@mui/material/TablePagination';
-import { css } from "@emotion/react";
 
 const theme2 = createTheme();
 
@@ -176,7 +175,9 @@ export default function Tickets() {
             String(value).toLowerCase().includes(searchValue.toLowerCase())
           )
       );
+    
     setFilteredData(filtered);
+    setDisplayedData(filtered);
   };
          
   const handleResetFilters = () => {
@@ -210,7 +211,7 @@ export default function Tickets() {
     setPage(0);
 
      // Update displayedData based on filteredData and new pagination
-     const paginatedData = filteredData.slice(0, newRowsPerPage);
+     const paginatedData = filteredData.slice(0, event.target.value);
      setDisplayedData(paginatedData);
   };
 
@@ -250,7 +251,7 @@ export default function Tickets() {
 
   useEffect(() => {
     // Filter the data based on selected filters and search value
-    const filtered = allData.slice(1).filter((row) =>
+    const filtered = allData.slice(1).filter((row:any) =>
       Object.values(row).some((value) =>
         String(value).toLowerCase().includes(searchValue.toLowerCase())
       )
@@ -310,13 +311,13 @@ export default function Tickets() {
       {/* Service filter */}
       <Paper elevation={3}>
         <FormControl variant="outlined" className={classes.formControl}> 
-          <InputLabel id="service-select-label">Select a service</InputLabel>
+          <InputLabel id="service-select-label">Select a Service</InputLabel>
           <Select
             labelId="service-select-label"
             id="service-select"
             value={selectedService}
             onChange={handleServiceChange}
-            label="Select a service"
+            label="Select a Service"
             sx={{
               bgcolor: 'background.paper',
               boxShadow: 1,
@@ -336,60 +337,16 @@ export default function Tickets() {
         </FormControl>
       </Paper>
 
-
-      {/* Priority filter */}
-      <Paper elevation={3}>
-        <FormControl variant="outlined" className={classes.formControl}>
-            <InputLabel id="priority-select-label">Select a priority</InputLabel>
-            <Select
-              labelId="priority-select-label"
-              id="priority-select"
-              value={selectedPriority}
-              onChange={handlePriorityChange}
-              label="Select a priority"
-            >
-              <MenuItem value="">
-                <em>None</em>
-              </MenuItem>
-              <MenuItem value="Low">Low</MenuItem>
-              <MenuItem value="Medium">Medium</MenuItem>
-              <MenuItem value="High">High</MenuItem>
-            </Select>
-        </FormControl>
-      </Paper>
-
-      {/* Status filter */}
-      <Paper elevation={3}>
-        <FormControl variant="outlined" className={classes.formControl}>
-          <InputLabel id="status-select-label">Select a status</InputLabel>
-          <Select
-            labelId="status-select-label"
-            id="status-select"
-            value={selectedStatus}
-            onChange={handleStatusChange}
-            label="Select a status"
-          >
-            <MenuItem value="">
-              <em>None</em>
-            </MenuItem>
-            {/* Add menu items for each unique status in the "status" column of allData */}
-            {Array.from(new Set(allData.slice(1).map((row: any[]) => row[7]))).map(status => (
-              <MenuItem key={status} value={status}>{status}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Paper>
-
       {/* Support Group filter */}
       <Paper elevation={3}>
         <FormControl variant="outlined" className={classes.formControl}> 
-          <InputLabel id="team-select-label">Select a Suppor Group</InputLabel>
+          <InputLabel id="team-select-label">Select a Support Group</InputLabel>
           <Select
             labelId="team-select-label"
             id="team-select"
             value={selectedTeam}
             onChange={handleTeamChange}
-            label="Select a Suppot Group"
+            label="Select a Support Group"
             sx={{
               bgcolor: 'background.paper',
               boxShadow: 1,
@@ -408,6 +365,51 @@ export default function Tickets() {
           </Select>
         </FormControl>
       </Paper>
+
+      {/* Priority filter */}
+      <Paper elevation={3}>
+        <FormControl variant="outlined" className={classes.formControl}>
+            <InputLabel id="priority-select-label">Select a Priority</InputLabel>
+            <Select
+              labelId="priority-select-label"
+              id="priority-select"
+              value={selectedPriority}
+              onChange={handlePriorityChange}
+              label="Select a Priority"
+            >
+              <MenuItem value="">
+                <em>None</em>
+              </MenuItem>
+              <MenuItem value="Low">Low</MenuItem>
+              <MenuItem value="Medium">Medium</MenuItem>
+              <MenuItem value="High">High</MenuItem>
+            </Select>
+        </FormControl>
+      </Paper>
+
+      {/* Status filter */}
+      <Paper elevation={3}>
+        <FormControl variant="outlined" className={classes.formControl}>
+          <InputLabel id="status-select-label">Select a Status</InputLabel>
+          <Select
+            labelId="status-select-label"
+            id="status-select"
+            value={selectedStatus}
+            onChange={handleStatusChange}
+            label="Select a Status"
+          >
+            <MenuItem value="">
+              <em>None</em>
+            </MenuItem>
+            {/* Add menu items for each unique status in the "status" column of allData */}
+            {Array.from(new Set(allData.slice(1).map((row: any[]) => row[7]))).map(status => (
+              <MenuItem key={status} value={status}>{status}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Paper>
+
+      
 
       <Box marginLeft="auto">
         <Button variant="outlined" onClick={handleResetFilters} startIcon={<ClearIcon />}>
