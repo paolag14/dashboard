@@ -20,10 +20,8 @@ import { InputAdornment, OutlinedInput } from '@mui/material';
 import Button from '@mui/material/Button';
 import ClearIcon from '@mui/icons-material/Clear';
 import Stack from '@mui/material/Stack';
-import Pagination from '@mui/material/Pagination';
-import PaginationItem from '@mui/material/PaginationItem';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import TablePagination from '@mui/material/TablePagination';
+import { css } from "@emotion/react";
 
 const theme2 = createTheme();
 
@@ -37,19 +35,6 @@ const useStyles = makeStyles({
     borderRadius: 6,
     p: 2,
   },
-  isSelected: {
-    backgroundColor: "#23237d", 
-    color: "white",
-    borderRadius: 6,
-  },
-  notSelected:{
-    borderRadius: 6,
-  },
-  othersButtons:{
-    borderRadius: 6,
-    backgroundColor: "#4D4D52",
-  }
-
 });
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -82,7 +67,6 @@ export default function Tickets() {
 
   const theme = useTheme();
 
-  
   // state to keep track of which rows are expanded
   const [expandedRow, setExpandedRow] = useState(-1);
 
@@ -101,18 +85,16 @@ export default function Tickets() {
   // state to keep track of the filtered data
    const [filteredData, setFilteredData] = useState(allData.slice(1));
 
-   console.log("data filtrada", filteredData);
+   //console.log("data filtrada", filteredData);
    //const [filteredData, setFilteredData] = useState(allData);
 
    // state to clear filters
    const [resetFilters, setResetFilters] = useState(false);
 
-   const rowsPerPage = 10; // Define the number of rows to display per page
+   const [page, setPage] = useState(0);
+   const [rowsPerPage, setRowsPerPage] = useState(10);
 
-   const [currentPage, setCurrentPage] = useState(0);
-
-   const [currentPageData, setCurrentPageData] = useState([]);
-
+   const [paginatedData, setPaginatedData] = useState([]);
 
 /*    console.log("data slice", paginatedData[0].slice(0, 3).
     concat(paginatedData[0].slice(4,5)).
@@ -138,7 +120,6 @@ export default function Tickets() {
       return serviceMatch && priorityMatch && statusMatch;
     });
     setFilteredData(filteredData);
-    setCurrentPage(0);
   };
   
   const handleServiceChange = (event:any) => {
@@ -160,15 +141,15 @@ export default function Tickets() {
   };
 
   const handleSearchChange = (event:any) => {
-        const value = event.target.value;
-        setSearchValue(value);
+    const value = event.target.value;
+    setSearchValue(value);
       
-        const filtered = allData.slice(1).filter((row) =>
+     const filtered = allData.slice(1).filter((row) =>
           Object.values(row).some((value) =>
             String(value).toLowerCase().includes(searchValue.toLowerCase())
           )
-        );
-        setFilteredData(filtered);
+      );
+    setFilteredData(filtered);
   };
          
   const handleResetFilters = () => {
@@ -183,7 +164,18 @@ export default function Tickets() {
     setSearchValue('');
     setResetFilters(false);
   }
-  
+
+  const handlePageChange = (event:any, newPage:any) => {
+    setPage(newPage);
+    console.log("nueva pagina", newPage)
+  };
+
+  const handleRowsPerPageChange = (event:any) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+    console.log("rows per page", event.target.value)
+  };
+
    // create a set of services from the third column of allData
   const services = Array.from(new Set(allData.slice(1).map((row:any) => row[2] ? row[2] : null)))
   .filter(service => service !== null)
@@ -211,79 +203,32 @@ export default function Tickets() {
       }
   })));
 
-  console.log("team", assigneeName);
-
-  const totalPages = Math.ceil(filteredData.length / rowsPerPage);
-
-  const startIndex = currentPage * rowsPerPage;
-  const endIndex = (currentPage + 1) * rowsPerPage;
-
-  const goToPreviousPage = () => {
-    setCurrentPage((prevPage) => prevPage - 1);
-  };
-  
-  const goToNextPage = () => {
-    setCurrentPage((prevPage) => prevPage + 1);
-  };
-  
-  const goToPage = (page) => {
-    setCurrentPage(page);
-  };
+  //console.log("team", assigneeName);
 
   useEffect(() => {
-    const start = currentPage * rowsPerPage;
-    const end = Math.min(start + rowsPerPage, filteredData.length); // Use Math.min to ensure the end index is not greater than the filtered data length
-    setCurrentPageData(filteredData.slice(start, end));
-  }, [currentPage, filteredData]);
-
-
-  const renderPaginationItems = (item) => {
-    const { type, page, selected, ...itemProps } = item;
-
-    if (type === 'previous') {
-      if (currentPage > 0) {
-        return (
-          <IconButton onClick={goToPreviousPage}>
-            <ArrowBackIcon />
-          </IconButton>
-        );
-      }
-      return null;
-    }
-
-    if (type === 'next') {
-      if (currentPage < totalPages - 1) {
-        return (
-          <IconButton onClick={goToNextPage}>
-            <ArrowForwardIcon />
-          </IconButton>
-        );
-      }
-      return null;
-    }
-
-    if (type === 'page') {
-      return (
-        <PaginationItem
-          {...itemProps}
-          page={page}
-          selected={selected || currentPage === page - 1}
-          sx={{
-            '&.Mui-selected': {
-              backgroundColor: '#d2d2e4',
-              color: 'black',
-              borderRadius: 6,
-            },
-          }}
-          onClick={() => goToPage(page - 1)}
-        />
-      );
-    }
-
-    return null;
-  };
-
+    // Filter the data based on selected filters and search value
+    const filtered = allData.slice(1).filter((row) =>
+      Object.values(row).some((value) =>
+        String(value).toLowerCase().includes(searchValue.toLowerCase())
+      )
+    );
+    setFilteredData(filtered);
   
+    // Reset the page to the first page when the filtered data changes
+    //setPage(0);
+  }, [allData, searchValue, selectedService, selectedPriority, selectedStatus]);
+
+  const startIndex = page * rowsPerPage;
+  const endIndex = startIndex + rowsPerPage;
+  const displayedData = filteredData.slice(startIndex, endIndex);
+
+  useEffect(() => {
+    // Update paginatedData when filteredData or page changes
+    const startIndex = page * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+    const displayedData = filteredData.slice(startIndex, endIndex);
+    setPaginatedData(displayedData);
+  }, [filteredData, page, rowsPerPage]);
 
 
   return(
@@ -293,7 +238,6 @@ export default function Tickets() {
     <Typography variant='h3' align='center' mt={2} sx={{fontWeight:400}}>Tickets</Typography>
 
     <Box width="95%" sx={{ backgroundColor: "#EB1C24", height: 10, mt:3, marginLeft: "auto", marginRight: "auto" }}></Box>
-   
     
     <br />
     <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
@@ -392,7 +336,6 @@ export default function Tickets() {
         </FormControl>
       </Paper>
 
-
       <Box marginLeft="auto">
         <Button variant="outlined" onClick={handleResetFilters} startIcon={<ClearIcon />}>
           Clear
@@ -405,116 +348,6 @@ export default function Tickets() {
 
     <Paper elevation={3}>
     
-    {/* <div>
-      {currentPage > 0 && (
-        <Button onClick={goToPreviousPage}
-        variant="contained" component="span"
-          style={{
-             backgroundColor: "#000000",
-             color: "white",
-             borderRadius: 6,
-          }}>Previous</Button>
-      )}
-      {Array.from({ length: totalPages }, (_, index) => (
-        <Button
-          className={`${currentPage === index ? classes.isSelected : classes.notSelected}`}
-          key={index}
-          onClick={() => goToPage(index)}
-          variant="contained" component="span"
-        >        
-         {index + 1}
-        </Button>
-      ))}
-      {currentPage < totalPages - 1 && (
-        <Button 
-          variant="contained" component="span"
-          onClick={goToNextPage} 
-          style={{
-             backgroundColor: "#000000",
-             color: "white",
-             borderRadius: 6,
-          }}
-          >Next</Button>
-      )}
-    </div> */}
-    
-    <Box width={'100%'} display="flex" justifyContent="center">
-      <Typography align='center'>Page: {currentPage + 1}</Typography>
-      <Stack spacing={2}>
-        <Pagination
-          variant="outlined"
-          size="large"
-          count={totalPages}
-          boundaryCount={totalPages - 1} // Set boundaryCount to the total number of pages minus 1
-          siblingCount={0} 
-         
-          renderItem={(item) => {
-            const { type, page, selected, ...itemProps } = item;
-
-            if (type === 'previous') {
-              if (currentPage > 0) {
-                return (
-                  <IconButton onClick={goToPreviousPage}>
-                    <ArrowBackIcon />
-                  </IconButton>
-                );
-              }
-              return null;
-            }
-
-            if (type === 'next') {
-              if (currentPage < totalPages - 1) {
-                return (
-                  <IconButton onClick={goToNextPage}>
-                    <ArrowForwardIcon />
-                  </IconButton>
-                );
-              }
-              return null;
-            }
-
-            if (type === 'page') {
-              return (
-                <PaginationItem
-              {...itemProps}
-              page={page}
-              selected={currentPage === page - 1}
-              sx={{
-                '&.Mui-selected': {
-                  backgroundColor: '#d2d2e4',
-                  color: 'black',
-                  borderRadius: 6,
-                },
-              }}
-              component="button"
-              onClick={() => goToPage(page - 1)}
-            />
-              );
-            }
-
-
-            return (
-              <PaginationItem
-                {...itemProps}
-                page={page}
-                selected={currentPage === page - 1}
-                sx={{
-                  '&.Mui-selected': {
-                    backgroundColor: '#d2d2e4',
-                    color: 'black',
-                    borderRadius: 6,
-                  },
-                }}
-                onClick={() => goToPage(page - 1)} // Subtract 1 from page to match index-based page numbering
-              />
-            );
-          }}
-        />
-      </Stack>
-    </Box>
-
-    
-
     <TableContainer component={Paper}>
     <Table  sx={{minWidth: 700}} aria-label="collapsible table">
         <TableHead>
@@ -527,7 +360,7 @@ export default function Tickets() {
           </StyledTableRow>
         </TableHead>
         <TableBody>
-              {currentPageData.map((row, index) => (
+              {displayedData.map((row, index) => (
           <>
             <StyledTableRow key={index} index={index} onClick={() => handleRowClick(index)}>
               <StyledTableCell>
@@ -536,7 +369,7 @@ export default function Tickets() {
                 </IconButton>
               </StyledTableCell>
               {/* Map columns 0 to 2 */}
-              {row.slice(0, 3).map((cell:any, cellIndex:any) => (
+              {row.slice(0, 3).map((cell, cellIndex) => (
                 <TableCell key={cellIndex}>{cell}</TableCell>
               ))}
               {/* Map column 4 */}
@@ -544,7 +377,7 @@ export default function Tickets() {
                         fontWeight: row[4] && row[4].includes("Order Management Customizing and Services") ? "bold" : "normal"
                 }}>{row[4]}</TableCell>
               {/* Map columns 6 to 10 */}
-              {row.slice(6, 11).map((cell:any, cellIndex:any) => (
+              {row.slice(6, 11).map((cell, cellIndex) => (
                 <TableCell key={cellIndex}>{cell}</TableCell>
               ))}
             </StyledTableRow>
@@ -605,6 +438,16 @@ export default function Tickets() {
         
       </Table>
     </TableContainer>
+
+    <TablePagination
+      rowsPerPageOptions={[10, 25, 50, 100]}
+      component="div"
+      count={filteredData.length}
+      rowsPerPage={rowsPerPage}
+      page={page}
+      onPageChange={handlePageChange}
+      onRowsPerPageChange={handleRowsPerPageChange}
+    />
 
     </Paper>
 
