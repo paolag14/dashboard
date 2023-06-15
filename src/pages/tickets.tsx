@@ -82,8 +82,14 @@ export default function Tickets() {
    // state to keep track of the search input value
    const [searchValue, setSearchValue] = useState('');
 
+  // state to keep track of the team selected
+  const [selectedTeam, setSelectedTeam] = useState('');
+
   // state to keep track of the filtered data
-   const [filteredData, setFilteredData] = useState(allData.slice(1));
+  const [filteredData, setFilteredData] = useState(allData.slice(1));
+
+  const [displayedData, setDisplayedData] = useState(allData.slice(1));
+
 
    //console.log("data filtrada", filteredData);
    //const [filteredData, setFilteredData] = useState(allData);
@@ -110,41 +116,62 @@ export default function Tickets() {
     setSelectedService(selectedService);
     setSelectedPriority(selectedPriority);
     setSelectedStatus(selectedStatus);
+    setSelectedTeam(selectedTeam);
   }
 
-  const handleFilterChange = (service:any, priority:any, status:any) => {
+  const handleFilterChange = (service:any, priority:any, status:any, team:any) => {
     const filteredData = allData.slice(1).filter((row:any) => {
       const serviceMatch = service === "" || row[2] === service;
       const priorityMatch = priority === "" || row[6] === priority;
       const statusMatch = status === "" || row[7] === status;
-      return serviceMatch && priorityMatch && statusMatch;
+      const teamMatch = team === "" || row[4] === team;
+
+      return serviceMatch && priorityMatch && statusMatch && teamMatch;
+
+      /* const searchMatch = searchValue === "" || Object.values(row).some((value) =>
+      String(value).toLowerCase().includes(searchValue.toLowerCase())
+    );
+    return serviceMatch && priorityMatch && statusMatch && teamMatch && searchMatch; */
     });
     setFilteredData(filteredData);
+    console.log(" filtered data", filteredData);
+
+    const startIndex = page * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+    const paginatedData = filteredData.slice(startIndex, endIndex);
+    setDisplayedData(paginatedData);
+
   };
   
   const handleServiceChange = (event:any) => {
     const service = event.target.value;
-    handleFilterChange(service, selectedPriority, selectedStatus);
+    handleFilterChange(service, selectedPriority, selectedStatus, selectedTeam);
     setSelectedService(service);
   };
   
   const handlePriorityChange = (event:any) => {
     const priority = event.target.value;
-    handleFilterChange(selectedService, priority, selectedStatus);
+    handleFilterChange(selectedService, priority, selectedStatus, selectedTeam);
     setSelectedPriority(priority);
   };
   
   const handleStatusChange = (event:any) => {
     const status = event.target.value;
-    handleFilterChange(selectedService, selectedPriority, status);
+    handleFilterChange(selectedService, selectedPriority, status, selectedTeam);
     setSelectedStatus(status);
+  };
+
+  const handleTeamChange = (event:any) => {
+    const team = event.target.value;
+    handleFilterChange(selectedService, selectedPriority, selectedStatus, team);
+    setSelectedTeam(team);
   };
 
   const handleSearchChange = (event:any) => {
     const value = event.target.value;
     setSearchValue(value);
       
-     const filtered = allData.slice(1).filter((row) =>
+     const filtered = allData.slice(1).filter((row:any) =>
           Object.values(row).some((value) =>
             String(value).toLowerCase().includes(searchValue.toLowerCase())
           )
@@ -158,28 +185,44 @@ export default function Tickets() {
 
     if (resetFilters) {
     setFilteredData(allData.slice(1));
+    setDisplayedData(allData.slice(1));
     setSelectedService('');
     setSelectedPriority('');
     setSelectedStatus('');
     setSearchValue('');
+    setSelectedTeam('');
     setResetFilters(false);
   }
 
   const handlePageChange = (event:any, newPage:any) => {
     setPage(newPage);
-    console.log("nueva pagina", newPage)
+    
+    handleFilterChange(selectedService, selectedPriority, selectedStatus, selectedTeam);
+     // Update displayedData based on filteredData and pagination
+     const startIndex = newPage * rowsPerPage;
+     const endIndex = startIndex + rowsPerPage;
+     const paginatedData = filteredData.slice(startIndex, endIndex);
+     setDisplayedData(paginatedData);
   };
 
   const handleRowsPerPageChange = (event:any) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
-    console.log("rows per page", event.target.value)
+
+     // Update displayedData based on filteredData and new pagination
+     const paginatedData = filteredData.slice(0, newRowsPerPage);
+     setDisplayedData(paginatedData);
   };
 
    // create a set of services from the third column of allData
   const services = Array.from(new Set(allData.slice(1).map((row:any) => row[2] ? row[2] : null)))
   .filter(service => service !== null)
   .sort((a:any, b:any) => a.localeCompare(b));
+
+  const supportGroups = Array.from(new Set(allData.slice(1).map((row:any) => row[4] ? row[4] : null)))
+  .filter(team => team !== null)
+  .sort((a:any, b:any) => a.localeCompare(b));
+
 
   const headers = ["Incident Number", "Summary", "Service", "Support Group", "Priority", "Status", "Creation Date", "Reopened Date",
     "Solved Date"];
@@ -216,11 +259,11 @@ export default function Tickets() {
   
     // Reset the page to the first page when the filtered data changes
     //setPage(0);
-  }, [allData, searchValue, selectedService, selectedPriority, selectedStatus]);
+  }, [allData, searchValue, selectedService, selectedPriority, selectedStatus, selectedTeam]);
 
   const startIndex = page * rowsPerPage;
   const endIndex = startIndex + rowsPerPage;
-  const displayedData = filteredData.slice(startIndex, endIndex);
+  //const displayedData = filteredData.slice(startIndex, endIndex);
 
   useEffect(() => {
     // Update paginatedData when filteredData or page changes
@@ -229,7 +272,8 @@ export default function Tickets() {
     const displayedData = filteredData.slice(startIndex, endIndex);
     setPaginatedData(displayedData);
   }, [filteredData, page, rowsPerPage]);
-
+  
+  
 
   return(
     <>
@@ -331,6 +375,35 @@ export default function Tickets() {
             {/* Add menu items for each unique status in the "status" column of allData */}
             {Array.from(new Set(allData.slice(1).map((row: any[]) => row[7]))).map(status => (
               <MenuItem key={status} value={status}>{status}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Paper>
+
+      {/* Support Group filter */}
+      <Paper elevation={3}>
+        <FormControl variant="outlined" className={classes.formControl}> 
+          <InputLabel id="team-select-label">Select a Suppor Group</InputLabel>
+          <Select
+            labelId="team-select-label"
+            id="team-select"
+            value={selectedTeam}
+            onChange={handleTeamChange}
+            label="Select a Suppot Group"
+            sx={{
+              bgcolor: 'background.paper',
+              boxShadow: 1,
+              borderRadius: 2,
+              p: 2,
+              minWidth: 300,
+            }}
+          >
+            <MenuItem value="">
+              <em>None</em>
+            </MenuItem>
+            {Array.from(supportGroups).map((team:any) => (
+              <MenuItem key={team.toString()} value={team.toString()}>{team}</MenuItem>
+
             ))}
           </Select>
         </FormControl>
