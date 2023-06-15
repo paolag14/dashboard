@@ -491,7 +491,13 @@ export default function Tickets() {
                                       fontSize: "13px",
                                       textDecoration: assigneeName.includes(row[dataIndex]) ? "underline" : "none"
                                     }}>
-                                  {row[dataIndex] === "0" ? "No" : row[dataIndex] === "1" ? "Yes" : row[dataIndex]}
+                                  {row[dataIndex] && row[dataIndex].startsWith("OTHERS:")
+                                    ? row[dataIndex].substring(7)
+                                    : row[dataIndex] === "0"
+                                    ? "No"
+                                    : row[dataIndex] === "1"
+                                    ? "Yes"
+                                    : row[dataIndex]}
                                   {assigneeName.includes(row[dataIndex]) ? " (OMCS Team)" : ""}
 
                                 </Typography>
