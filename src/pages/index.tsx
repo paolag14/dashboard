@@ -194,7 +194,6 @@ export default function Home(props:any) {
       
       return false;
     });
-    console.log("Count:", cont2weeks);
     setCount2weeks(cont2weeks);
     setOpenNotSolved(contOpenNotSolved);
 
@@ -498,7 +497,6 @@ export default function Home(props:any) {
   
       for (let i = 0; i < elementIds.length; i++) {
         const elementId = elementIds[i];
-        console.log("elementid", elementId);
         const cardElement = document.getElementById(elementId);
   
         try {

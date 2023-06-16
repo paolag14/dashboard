@@ -89,7 +89,6 @@ export default function Tickets() {
 
   const [displayedData, setDisplayedData] = useState(allData.slice(1));
 
-
    //console.log("data filtrada", filteredData);
    //const [filteredData, setFilteredData] = useState(allData);
 
@@ -133,7 +132,6 @@ export default function Tickets() {
     return serviceMatch && priorityMatch && statusMatch && teamMatch && searchMatch; */
     });
     setFilteredData(filteredData);
-    console.log(" filtered data", filteredData);
 
     const startIndex = page * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
