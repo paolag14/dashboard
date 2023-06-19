@@ -662,8 +662,8 @@ export default function Graficas() {
 
 
       <Container id="charts4">
-      <Box width="95%" sx={{ backgroundColor: "#EB1C24", height: 10, mt:6, marginLeft: "auto", marginRight: "auto" }}></Box>
-      <Typography variant='h4' align='center' mt={3} mb={3} sx={{fontWeight:400}}>Order Management Graphics</Typography>
+        <Box width="95%" sx={{ backgroundColor: "#EB1C24", height: 10, mt:6, marginLeft: "auto", marginRight: "auto" }}></Box>
+        <Typography variant='h4' align='center' mt={3} mb={3} sx={{fontWeight:400}}>Order Management Graphics</Typography>
         
          {/* Tickets support group and team */}
          <Box  display="flex" width={"100%"} justifyContent="center" alignItems="stretch" sx={{height: '100%'}}>
@@ -783,6 +783,7 @@ export default function Graficas() {
           </Box>
 
         </Box>
+        <br /><br /><br />
 
       </Container>
     </Container>
