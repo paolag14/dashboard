@@ -189,7 +189,7 @@ export default function Graficas() {
     };
 
     //pie chart assignee name
-    const categories2 = Array.from(new Set(allData.slice(1).map((row: any) => row[19] ? row[19] : null)));
+    const categories2 = Array.from(new Set(allData.slice(1).map((row: any) => (row[19] && row[4] === "Order Management Customizing and Services") ? row[19] : null)));
 
     const categories: Category[] = categories2.map(type => ({ type }));
 
@@ -202,6 +202,8 @@ export default function Graficas() {
     };
 
     const categoryCounts = countCategories(categories, allData);
+
+
 
     //count forwarded tickets
     const forwardedToGroup = Array.from(
@@ -312,7 +314,7 @@ export default function Graficas() {
     //bar chart request, failure, reopened,complaints
     const countFailures = (allData:any) => {
       const requestCount = allData.filter(row => row[19] === "Request").length;
-      const failureCount = allData.filter(row => row[19] === "Failure").length; //cambiar todo esto
+      const failureCount = allData.filter(row => row[19] === "Failure").length; 
       const reopenedCount = allData.filter(row => row[15] === "1").length;
       const complaintsCount = allData.filter(row => row[5] === "Complaint").length;
 
@@ -326,10 +328,41 @@ export default function Graficas() {
     
     const failuresCount = countFailures(allData);    
 
+    
+    //bar chart team by status
+    const countStatusTeam = (allData:any) => {
+      const teamData = allData.filter(row => row[4] === "Order Management Customizing and Services");
+
+      const assignedCountTeam = teamData.filter(row => row[7] === "Assigned").length;
+      const closedCountTeam = teamData.filter(row => row[7] === "Closed").length;
+      const inProgressCountTeam = teamData.filter(row => row[7] === "In Progress").length;
+      const pendingCountTeam = teamData.filter(row => row[7] === "Pending").length;
+      const resolvedCountTeam = teamData.filter(row => row[7] === "Resolved").length;
+      const forwardedCountTeam = teamData.filter(row => row[16] === "1").length;
+      const reopenedCountTeam = teamData.filter(row => row[15] === "1").length;
+
+          return {
+            Assigned: assignedCountTeam,
+            Closed: closedCountTeam,
+            In_Progress: inProgressCountTeam,
+            Pending: pendingCountTeam,
+            Resolved: resolvedCountTeam,
+            Forwarded: forwardedCountTeam,
+            Reopened: reopenedCountTeam
+        };
+    };
+        
+    const teamStatusCount = countStatusTeam(allData);   
+
     const handleDownloadImage = (elementId:any) => {
       const chartContainer = document.getElementById(elementId); // Get the chart container element
       const containerStyle = chartContainer.style.boxShadow; // Store the original box shadow
-      chartContainer.style.boxShadow = 'none'; // Remove the box shadow temporarily
+      
+      if (containerStyle !== 'none') {
+        chartContainer.style.boxShadow = 'none'; // Remove the box shadow temporarily
+      }
+
+      //chartContainer.style.boxShadow = 'none'; // Remove the box shadow temporarily
       html2canvas(chartContainer, { useCORS: true }).then((canvas) => {
         const image = canvas.toDataURL('image/png'); // Convert canvas to image data URL
         const downloadLink = document.createElement('a'); // Create a download link element
@@ -337,33 +370,9 @@ export default function Graficas() {
         downloadLink.download = 'graph.png'; // Set the download filename
         downloadLink.click(); // Trigger the download
       });
+
     };
 
-    //anterior de github
-    /* const handleDownloadPdf = async (elementId: any) => {
-      const chartContainer = document.getElementById(elementId);
-    
-      const options = {
-        style: {
-          'transform-origin': 'center',
-        },
-        quality: 1,
-        height: chartContainer.offsetHeight * 2, // Increase the height to improve image quality
-        width: chartContainer.offsetWidth * 2, // Increase the width to improve image quality
-      };
-    
-      try {
-        const dataUrl = await domtoimage.toPng(chartContainer, options);
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const imgProps = pdf.getImageProperties(dataUrl);
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-        pdf.addImage(dataUrl, 'PNG', 0, 0, pdfWidth, pdfHeight);
-        pdf.save('graphs_pdf.pdf');
-      } catch (error) {
-        console.error('Error generating PDF:', error);
-      }
-    }; */
 
     const handleDownloadPdf = async (elementIds: string[]) => {
       try {
@@ -448,7 +457,7 @@ export default function Graficas() {
                       backgroundColor: "#4D4D52",
                       padding: "18px 36px"
                     }}
-                    onClick={() => handleDownloadPdf(["title-and-chart", "charts2", "charts3", "charts4"])}
+                    onClick={() => handleDownloadPdf(["title-and-chart", "charts2", "charts3", "charts4", "charts5"])}
                     endIcon={<DownloadIcon />}>
                     Download
                   </Button>
@@ -510,14 +519,12 @@ export default function Graficas() {
                       
               </Box>
 
-
             </Box>
           </Box>
         </Box>
       </Container>
 
       <Container id="charts2">
-       
         
         {/* Tickets by status and priority, tickets category and assigned, resolved*/}
         <Box  display="flex" width={"100%"} justifyContent="center" alignItems="stretch" sx={{ flexGrow: 1, height: '100%' }}>
@@ -532,34 +539,37 @@ export default function Graficas() {
             <br />
             <StackedBarChart data={transformedData} />
           </Box>
-         
 
           <Box  width="50%" m={2} sx={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-            <Box>
-              <Box id="chart-container3" width="100%" alignItems="center" sx={{ boxShadow: 3, borderRadius: '6px', backgroundColor: "white", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
-                <br />
-                <Box display="flex" justifyContent="flex-end" sx={{ marginTop: "-10px", marginBottom: "-20px", marginRight: "-85%", cursor: "pointer" }}>
-                  <Tooltip title= "Click to download graph image" arrow>
-                    <Button size="large" endIcon={<MoreVertIcon style={{ color: '#4D4D52' }} />} onClick={() => handleDownloadImage('chart-container3')}></Button>
-                  </Tooltip>
+            {/* Tickets request, failure, reopened, complaints*/}
+              <Box  display="flex" width={"100%"} justifyContent="center" alignItems="stretch" sx={{height: '100%'}}>
+
+                <Box id= "chart-container8" width="100%" mb={2} alignItems="center" sx={{ boxShadow: 3, borderRadius: '6px', backgroundColor: "white", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" , height: '100%'}}>
+                    <Box display="flex" justifyContent="flex-end" sx={{ marginTop: "-5px", marginBottom: "-20px", marginRight: "-85%", cursor: "pointer" }}>
+                        <Tooltip title= "Click to download graph image" arrow>
+                          <Button size="large" endIcon={<MoreVertIcon style={{ color: '#4D4D52' }} />} onClick={() => handleDownloadImage('chart-container8')}></Button>
+                        </Tooltip>
+                    </Box>
+                    <br />
+                    <Typography align='center' variant='h6'  sx={{ fontWeight: 'bold'  }}> Request, Failure, Reopened, and Complaints </Typography> 
+
+                    <br /> 
+                    <BarChart
+                      data={{
+                        labels: Object.keys(failuresCount).filter(type => failuresCount[type] !== 0),
+                        values: Object.values(failuresCount).filter(count => count !== 0),
+                        colors: Object.keys(failuresCount).map(() => {
+                          const r = Math.floor(Math.random() * 255);
+                          const g = Math.floor(Math.random() * 255);
+                          const b = Math.floor(Math.random() * 255);
+                          return `rgb(${r}, ${g}, ${b})`;
+                        })
+                      }}
+                    />
                 </Box>
-                
-                <Typography align='center' variant='h6' sx={{ fontWeight: 'bold' }}> Tickets category</Typography>
-                
-                <BarChart
-                  data={{
-                    labels: Object.keys(categoryCounts).filter(type => categoryCounts[type] !== 0),
-                    values: Object.values(categoryCounts).filter(count => count !== 0),
-                    colors: Object.keys(categoryCounts).map(() => {
-                      const r = Math.floor(Math.random() * 255);
-                      const g = Math.floor(Math.random() * 255);
-                      const b = Math.floor(Math.random() * 255);
-                      return `rgb(${r}, ${g}, ${b})`;
-                    })
-                  }}
-                />
-              </Box>
+
             </Box>
+
             <br />
             
             <Box id="chart-container4" width="100%" alignItems="center" sx={{ boxShadow: 3, borderRadius: '6px', backgroundColor: "white", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
@@ -588,10 +598,75 @@ export default function Graficas() {
           </Box>
 
         </Box>
+      
+      </Container>
+
+      <Container id="charts3">
+         {/* Tickets forwarded */}
+         <Box display="flex" width={"100%"} justifyContent="center" alignItems="center">
+            <Box id= "chart-container7" display="flex" m={2} flexDirection="row" width="100%"  alignItems="center" sx={{ boxShadow: 3, borderRadius: '6px', backgroundColor: "white" }} >
+                <Box display="flex" flexDirection="column" width="100%"  alignItems="center">
+                    <br />
+                    <Box display="flex" justifyContent="flex-end" sx={{ marginTop: "-10px", marginBottom: "-20px", marginRight: "-93%", cursor: "pointer" }}>
+                      <Tooltip title= "Click to download graph image" arrow>
+                        <Button size="large" endIcon={<MoreVertIcon style={{ color: '#4D4D52' }} />} onClick={() => handleDownloadImage('chart-container7')}></Button>
+                      </Tooltip>
+                    </Box>
+                    <Typography align='center' variant='h6'  sx={{ fontWeight: 'bold'  }}> Forwarded Tickets </Typography>
+
+                    <br />
+                    <Button variant="text" onClick={handleOpenGroups}>See Details</Button>
+                    <Modal
+                        open={openGroups}
+                        onClose={handleCloseGroups}
+                        aria-labelledby="modal-modal-title"
+                        aria-describedby="modal-modal-description"
+                    >
+                        <Box sx={style}>
+                        
+                        <Typography id="modal-modal-title" align='center' variant='h6' sx={{ fontWeight: 'bold' }}> Tickets forwarded from Team to Other Groups </Typography>
+                                {Object.entries(sortedNamesAll).map(([groupName, count]) => (
+                                    <Typography variant="body2" align='justify' display="inline" sx={{ fontSize: "12px", fontWeight: "bold" }}>
+                                        {groupName}: {" "}
+                                        <Typography variant="body2" align='justify' display="inline" sx={{ fontSize: "12px" }}>
+                                            {count}
+                                        </Typography>
+                                        <Typography> </Typography>
+                                    </Typography>
+                                ))}
+                                
+                        </Box>
+                    </Modal>
+
+                    <Box display="flex" width="100%" alignItems="center" justifyContent="center">
+
+                        <BarChart data={{ 
+                            labels: sortedNames.map(([name]) => name),
+                            values: sortedNames.map(([, count]) => count),
+                            colors: sortedNames.map(() => {
+                              const r = Math.floor(Math.random() * 255);
+                              const g = Math.floor(Math.random() * 255);
+                              const b = Math.floor(Math.random() * 255);
+                              return `rgb(${r}, ${g}, ${b})`;
+                            })
+                        }} />
+                      
+                    </Box>
+                </Box>
+
+            </Box>
+          
+        </Box>
+
+      </Container>
 
 
-        {/* Tickets support group and team */}
-        <Box  display="flex" width={"100%"} justifyContent="center" alignItems="stretch" sx={{height: '100%'}}>
+      <Container id="charts4">
+        <Box width="95%" sx={{ backgroundColor: "#EB1C24", height: 10, mt:6, marginLeft: "auto", marginRight: "auto" }}></Box>
+        <Typography variant='h4' align='center' mt={3} mb={3} sx={{fontWeight:400}}>Order Management Graphics</Typography>
+        
+         {/* Tickets support group and team */}
+         <Box  display="flex" width={"100%"} justifyContent="center" alignItems="stretch" sx={{height: '100%'}}>
 
           <Box id= "chart-container5" width="50%"  m={2} alignItems="center" sx={{ boxShadow: 3, borderRadius: '6px', backgroundColor: "white", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" , height: '100%'}}>
               <br />
@@ -650,160 +725,69 @@ export default function Graficas() {
                         <Typography> </Typography>
                       </Typography>
                       ))}
-                   </Box>
+                  </Box>
                   </Modal>
-             </Box>
-             <br />
+            </Box>
+            <br />
               <PieChart data={dataPie} ></PieChart>
           </Box>
-          
- 
-        </Box>
-      </Container>
-
-
-      <Container id="charts3">
-        {/* Tickets forwarded */}
-        <Box display="flex" width={"100%"} justifyContent="center" alignItems="center">
-            <Box id= "chart-container7" display="flex" m={2} flexDirection="row" width="100%"  alignItems="center" sx={{ boxShadow: 3, borderRadius: '6px', backgroundColor: "white" }} >
-                <Box display="flex" flexDirection="column" width="100%"  alignItems="center">
-                    <br />
-                    <Box display="flex" justifyContent="flex-end" sx={{ marginTop: "-10px", marginBottom: "-20px", marginRight: "-93%", cursor: "pointer" }}>
-                      <Tooltip title= "Click to download graph image" arrow>
-                        <Button size="large" endIcon={<MoreVertIcon style={{ color: '#4D4D52' }} />} onClick={() => handleDownloadImage('chart-container7')}></Button>
-                      </Tooltip>
-                    </Box>
-                    <Typography align='center' variant='h6'  sx={{ fontWeight: 'bold'  }}> Forwarded Tickets </Typography>
-
-                    <br />
-                    <Button variant="text" onClick={handleOpenGroups}>See Details</Button>
-                    <Modal
-                        open={openGroups}
-                        onClose={handleCloseGroups}
-                        aria-labelledby="modal-modal-title"
-                        aria-describedby="modal-modal-description"
-                    >
-                        <Box sx={style}>
-                        
-                        <Typography id="modal-modal-title" align='center' variant='h6' sx={{ fontWeight: 'bold' }}> Tickets forwarded from Team to Other Groups </Typography>
-                                {Object.entries(sortedNamesAll).map(([groupName, count]) => (
-                                    <Typography variant="body2" align='justify' display="inline" sx={{ fontSize: "12px", fontWeight: "bold" }}>
-                                        {groupName}: {" "}
-                                        <Typography variant="body2" align='justify' display="inline" sx={{ fontSize: "12px" }}>
-                                            {count}
-                                        </Typography>
-                                        <Typography> </Typography>
-                                    </Typography>
-                                ))}
-                                
-                        </Box>
-                    </Modal>
-
-                    <Box display="flex" width="100%" alignItems="center" justifyContent="center">
-
-                        <BarChart data={{ 
-                            labels: sortedNames.map(([name]) => name),
-                            values: sortedNames.map(([, count]) => count),
-                            colors: sortedNames.map(() => {
-                              const r = Math.floor(Math.random() * 255);
-                              const g = Math.floor(Math.random() * 255);
-                              const b = Math.floor(Math.random() * 255);
-                              return `rgb(${r}, ${g}, ${b})`;
-                            })
-                        }} />
-                      
-                    </Box>
-                </Box>
-
-            </Box>
-          
-        </Box>
-      </Container>
-
-      <Container id="charts4">
-      
-        {/* Tickets request, failure, reopened, complaints*/}
+          </Box>
+       
         <Box  display="flex" width={"100%"} justifyContent="center" alignItems="stretch" sx={{height: '100%'}}>
 
-          <Box id= "chart-container8" width="100%" m={2} alignItems="center" sx={{ boxShadow: 3, borderRadius: '6px', backgroundColor: "white", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" , height: '100%'}}>
-              <br />
-              <Box display="flex" justifyContent="flex-end" sx={{ marginTop: "-10px", marginBottom: "-20px", marginRight: "-93%", cursor: "pointer" }}>
-                  <Tooltip title= "Click to download graph image" arrow>
-                    <Button size="large" endIcon={<MoreVertIcon style={{ color: '#4D4D52' }} />} onClick={() => handleDownloadImage('chart-container8')}></Button>
-                  </Tooltip>
+        <Box id= "chart-container9" width="50%"  m={2} alignItems="center" sx={{ boxShadow: 3, borderRadius: '6px', backgroundColor: "white", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" , height: '100%'}}>
+            <br />
+            <Box display="flex" justifyContent="flex-end" sx={{ marginTop: "-10px", marginBottom: "-20px", marginRight: "-85%", cursor: "pointer" }}>
+                    <Tooltip title= "Click to download graph image" arrow>
+                      <Button size="large" endIcon={<MoreVertIcon style={{ color: '#4D4D52' }} />} onClick={() => handleDownloadImage('chart-container9')}></Button>
+                    </Tooltip>
               </Box>
-              <br />
-              <Typography align='center' variant='h6'  sx={{ fontWeight: 'bold'  }}> Request, Failure, Reopened, and Complaints </Typography> 
+                  <Typography align='center' variant='h6' sx={{ fontWeight: 'bold' }}> Order Management: Tickets category</Typography>
+                  
+                  <BarChart
+                    data={{
+                      labels: Object.keys(categoryCounts).filter(type => categoryCounts[type] !== 0),
+                      values: Object.values(categoryCounts).filter(count => count !== 0),
+                      colors: Object.keys(categoryCounts).map(() => {
+                        const r = Math.floor(Math.random() * 255);
+                        const g = Math.floor(Math.random() * 255);
+                        const b = Math.floor(Math.random() * 255);
+                        return `rgb(${r}, ${g}, ${b})`;
+                      })
+                    }}
+                  />
+          </Box>      
 
-              <br /> 
-              <BarChart
-                data={{
-                  labels: Object.keys(failuresCount).filter(type => failuresCount[type] !== 0),
-                  values: Object.values(failuresCount).filter(count => count !== 0),
-                  colors: Object.keys(failuresCount).map(() => {
-                    const r = Math.floor(Math.random() * 255);
-                    const g = Math.floor(Math.random() * 255);
-                    const b = Math.floor(Math.random() * 255);
-                    return `rgb(${r}, ${g}, ${b})`;
-                  })
-                }}
-              />
-              <br />
-              <br />
+          <Box id= "chart-container10" width="50%"  m={2} alignItems="center" sx={{ boxShadow: 3, borderRadius: '6px', backgroundColor: "white", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" , height: '100%'}}>
+            <br />
+                  <Box display="flex" justifyContent="flex-end" sx={{ marginTop: "-10px", marginBottom: "-20px", marginRight: "-85%", cursor: "pointer" }}>
+                    <Tooltip title= "Click to download graph image" arrow>
+                      <Button size="large" endIcon={<MoreVertIcon style={{ color: '#4D4D52' }} />} onClick={() => handleDownloadImage('chart-container10')}></Button>
+                    </Tooltip>
+                  </Box>
+                  
+                  <Typography align='center' variant='h6' sx={{ fontWeight: 'bold' }}> Order Management: Tickets Status</Typography>
+                  
+                  <BarChart
+                    data={{
+                      labels: Object.keys(teamStatusCount).filter(type => teamStatusCount[type] !== 0),
+                      values: Object.values(teamStatusCount).filter(count => count !== 0),
+                      colors: Object.keys(teamStatusCount).map(() => {
+                        const r = Math.floor(Math.random() * 255);
+                        const g = Math.floor(Math.random() * 255);
+                        const b = Math.floor(Math.random() * 255);
+                        return `rgb(${r}, ${g}, ${b})`;
+                      })
+                    }}
+                  />
           </Box>
 
-          {/* <Box id="chart-container6" width="50%"  m={2} alignItems="center" sx={{ backgroundColor: "white", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"  }}>
-            <br />
-            <Box display="flex" justifyContent="flex-end" sx={{ marginTop: "-10px", marginBottom: "1px", marginRight: "-85%", cursor: "pointer" }}>
-                  <Tooltip title= "Click to download graph image" arrow>
-                    <Button size="large" endIcon={<DownloadIcon />} onClick={() => handleDownloadImage('chart-container6')}></Button>
-                  </Tooltip>
-            </Box>
-            <Typography align='center' variant='h6'  sx={{ fontWeight: 'bold'  }}> Tickets handled by Order Management Customizing and Services </Typography> 
-            <Box display="flex" flexDirection="column" width="100%"  alignItems="center">
-              <Button variant="text" onClick={handleOpenAssignee}>See Details</Button>
-                <Modal
-                  open={openAssignee}
-                  onClose={handleCloseAssignee}
-                  aria-labelledby="modal-modal-title"
-                  aria-describedby="modal-modal-description"
-                >
-                  <Box sx={style}>
-                    <Typography id="modal-modal-title2" align='center' variant='h6' sx={{ fontWeight: 'bold' }}> Tickets handled by Team </Typography>
-                    <br />
-                        <Typography variant="body2" align='justify' display="inline" sx={{ fontSize: "14px", fontWeight: "bold" }}>
-                          Total tickets handled by Team: {" "}
-                        <Typography variant="body2" align='justify' display="inline" sx={{ fontSize: "14px" }}>
-                          {totalCount}
-                        </Typography>
-                        <Typography> </Typography>
-                      </Typography>
-                      <br />
-                        
-                      {Object.entries(asigneeNameCountsAll).map(([name, count]) => (
-                      <Typography variant="body2" align='justify' display="inline" sx={{ fontSize: "12px", fontWeight: "bold" }}>
-                          {name}: {" "}
-                        <Typography variant="body2" align='justify' display="inline" sx={{ fontSize: "12px" }}>
-                            {count}
-                        </Typography>
-                        <Typography> </Typography>
-                      </Typography>
-                      ))}
-                   </Box>
-                  </Modal>
-             </Box>
-             <br />
-              <PieChart data={dataPie} ></PieChart>
-          </Box> */}
-          
         </Box>
+        <br /><br /><br />
 
       </Container>
-
-     
-
     </Container>
-    
+
     </>
   )
 }

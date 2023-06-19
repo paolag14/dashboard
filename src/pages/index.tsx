@@ -194,7 +194,6 @@ export default function Home(props:any) {
       
       return false;
     });
-    console.log("Count:", cont2weeks);
     setCount2weeks(cont2weeks);
     setOpenNotSolved(contOpenNotSolved);
 
@@ -498,7 +497,6 @@ export default function Home(props:any) {
   
       for (let i = 0; i < elementIds.length; i++) {
         const elementId = elementIds[i];
-        console.log("elementid", elementId);
         const cardElement = document.getElementById(elementId);
   
         try {
@@ -517,19 +515,6 @@ export default function Home(props:any) {
           const imgData = canvas.toDataURL('image/png');
           const pdfWidth = pdf.internal.pageSize.getWidth();
           const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-          
-          /* if (i === 0) {
-            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-          } else {
-            if (currentPage === 1) {
-              pdf.addImage(imgData, 'PNG', 0, pdfHeight, pdfWidth, pdfHeight);
-              currentPage++;
-            } else {
-              pdf.addPage();
-              pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-              currentPage++;
-            }
-          } */
 
           if (i > 0) {
             pdf.addPage();
@@ -559,7 +544,6 @@ export default function Home(props:any) {
     }, 3000);
   };
   
-
 
     return( 
         <>
@@ -941,9 +925,7 @@ export default function Home(props:any) {
 
                     </Grid>
                   
-
-{/*                   <Grid id="cards2" container spacing={4} alignItems="center" justifyContent="center" sx={{mt:1}}>
- */}                    {/*Reopened tickets*/}
+                    {/*Reopened tickets*/}
                     <Grid item xs={3}>
                       <Tooltip title= { <Typography gutterBottom variant="subtitle2" component="div"> See Reopened Tickets</Typography>}  placement="top" arrow>
 
@@ -1039,37 +1021,6 @@ export default function Home(props:any) {
 
                                 )}
 
-                                  {/* <Typography variant="subtitle1" color="text.secondary">
-                                      {hoverReopened? 
-                                          <Box sx={{ fontWeight: 'bold' }}> Priority </Box>
-                                      : null} 
-                                  </Typography>
-
-                                  <Typography variant="subtitle1" color="text.secondary">
-                                      {hoverReopened? 
-                                          "Low: " + lowReopened.toString()
-                                      : null} 
-                                  </Typography>
-
-                                  <Typography variant="subtitle1" color="text.secondary">
-                                      {hoverReopened? 
-                                          "Medium: " + mediumReopened.toString()
-                                      : null} 
-                                  </Typography>
-
-                                  <Typography variant="subtitle1" color="text.secondary">
-                                      {hoverReopened? 
-                                          "High: " + highReopened.toString() 
-                                      : null} 
-                                  </Typography>
-
-                                  <Typography variant="subtitle1" color="text.secondary">
-                                      {hoverReopened? 
-                                          "Critical: " + criticalReopened.toString() 
-                                      : null} 
-                                  </Typography> */}
-
-
                                 </CardContent>
                             </CardActionArea>
                         </Card>
@@ -1110,8 +1061,6 @@ export default function Home(props:any) {
 
                                 {/* si no hay, si es false */}
 
-                              {/*  agregar un hover que enseñe tickets abiertos, assigned,
-                                el limite de 5% y cuánto queda el backlog */}
                                 <br />
                                 <br />
 
@@ -1177,7 +1126,6 @@ export default function Home(props:any) {
                     </Grid>
                   </Grid>
 
-                
               </Grid>
           
             </Container>
@@ -1186,7 +1134,6 @@ export default function Home(props:any) {
 
         </Container>
         <br />
-        
         
         </>
     );
