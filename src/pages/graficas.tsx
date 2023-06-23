@@ -16,6 +16,7 @@ import domtoimage from 'dom-to-image';
 import { MoreVert as MoreVertIcon, GetApp as DownloadIcon } from '@mui/icons-material';
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 interface Service {
     type: string;
@@ -178,45 +179,6 @@ export default function Graficas() {
     };
 
     //bar chart team tickets category
-    const categories2 = Array.from(new Set(allData.slice(1).map((row: any) => (row[19] && row[4] === "Order Management Customizing and Services") ? row[19] : null)));
-
-    const categories: Category[] = categories2.map(type => ({ type }));
-    console.log("categories", categories2);
-
-    const countCategories = (categories: Category[], data: any[]) => {
-      return categories.reduce((counts, category) => {
-        const type = category.type;
-        counts[type] = data.filter(row => row[19] === type).length;
-        return counts;
-      }, {});
-    };
-
-    const categoryCounts = countCategories(categories, allData);
-
- /*    const countStatusTeam = (allData:any) => {
-      const teamData = allData.filter(row => row[4] === "Order Management Customizing and Services");
-
-      const assignedCountTeam = teamData.filter(row => row[7] === "Assigned").length;
-      const closedCountTeam = teamData.filter(row => row[7] === "Closed").length;
-      const inProgressCountTeam = teamData.filter(row => row[7] === "In Progress").length;
-      const pendingCountTeam = teamData.filter(row => row[7] === "Pending").length;
-      const resolvedCountTeam = teamData.filter(row => row[7] === "Resolved").length;
-      const forwardedCountTeam = teamData.filter(row => row[16] === "1").length;
-      const reopenedCountTeam = teamData.filter(row => row[15] === "1").length;
-
-          return {
-            Assigned: assignedCountTeam,
-            Closed: closedCountTeam,
-            In_Progress: inProgressCountTeam,
-            Pending: pendingCountTeam,
-            Resolved: resolvedCountTeam,
-            Forwarded: forwardedCountTeam,
-            Reopened: reopenedCountTeam
-        };
-    };
-        
-    const teamStatusCount = countStatusTeam(allData);    */
-
     const countCategoryTeam = (allData:any) => {
       const teamData = allData.filter(row => row[4] === "Order Management Customizing and Services");
 
@@ -230,7 +192,6 @@ export default function Graficas() {
     };
         
     const teamCategoryCount = countCategoryTeam(allData);   
-
 
 
     //count forwarded tickets
@@ -473,6 +434,26 @@ export default function Graficas() {
             </Box>
       )}
       <Container id="title-and-chart">
+      
+      {/* back button */}
+      <Box position="absolute" top={30} left={50} sx={{ width: 300 }}>
+        <Button
+          variant="outlined"
+          component="span"
+          style={{
+            color: "#4D4D52",
+            padding: "9px 18px",
+            borderColor: "#4D4D52", 
+          }}
+          onClick={() => {
+            window.location.href = "/"; 
+          }}
+          startIcon={<ArrowBackIcon />}
+        >
+          Back
+        </Button>
+      </Box>
+
 
       <Typography variant='h3' align='center' mt={2} sx={{fontWeight:400}}>Graphics</Typography>
 
