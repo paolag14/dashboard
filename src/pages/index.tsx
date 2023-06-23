@@ -136,14 +136,25 @@ export default function Home(props:any) {
     }); */
 
     //leer como json
-    const jsonData = XLSX.utils.sheet_to_json(worksheet, {
+    let jsonData = XLSX.utils.sheet_to_json(worksheet, {
       //blankrows: "",
       header: 1,
       raw: false,
       //dateNF: "DD/MM/YYYY hh:mm:ss",
     });
 
+    const fileExtension = file.name.split('.').pop().toLowerCase();
+
+    if (fileExtension === 'csv') {
+      console.log('csv');
+      jsonData = jsonData.slice(1);
+    } else {
+      console.log('other');
+    }
+
     const moment = require('moment-timezone')
+
+    console.log("data", jsonData);
 
     const formattedData = jsonData.slice(1).map(row => {
       /* let dateString = String(row[8]);
@@ -569,7 +580,7 @@ export default function Home(props:any) {
             <br /> 
 
             <Stack direction="row" spacing={2} width={"100%"} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', margin: 'auto', mt:1, mb:2}}>
-              <input id="select-button" type="file"  accept=".xlsx, .xls" style={{ display: 'none' }} onChange={handleFile}></input>
+              <input id="select-button" type="file"  accept=".xlsx, .xls, .csv" style={{ display: 'none' }} onChange={handleFile}></input>
                   <label htmlFor="select-button">
                       <Button variant="contained" component="span"
                         style={{

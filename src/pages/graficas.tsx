@@ -72,17 +72,6 @@ export default function Graficas() {
     const handleOpenGroups = () => setOpenGroups(true);
     const handleCloseGroups = () => setOpenGroups(false);
 
-    //dropdown
-    const [anchorEl, setAnchorEl] = useState(null);
-
-    const handleOpenMenu = (event) => {
-      setAnchorEl(event.currentTarget);
-    };
-  
-    const handleCloseMenu = () => {
-      setAnchorEl(null);
-    };
-
     //bar chart services
     const services2 = Array.from(new Set(allData.slice(1).map((row:any) => row[2] ? row[2] : null)))
 
@@ -188,10 +177,11 @@ export default function Graficas() {
     }), 
     };
 
-    //pie chart assignee name
+    //bar chart team tickets category
     const categories2 = Array.from(new Set(allData.slice(1).map((row: any) => (row[19] && row[4] === "Order Management Customizing and Services") ? row[19] : null)));
 
     const categories: Category[] = categories2.map(type => ({ type }));
+    console.log("categories", categories2);
 
     const countCategories = (categories: Category[], data: any[]) => {
       return categories.reduce((counts, category) => {
@@ -202,6 +192,44 @@ export default function Graficas() {
     };
 
     const categoryCounts = countCategories(categories, allData);
+
+ /*    const countStatusTeam = (allData:any) => {
+      const teamData = allData.filter(row => row[4] === "Order Management Customizing and Services");
+
+      const assignedCountTeam = teamData.filter(row => row[7] === "Assigned").length;
+      const closedCountTeam = teamData.filter(row => row[7] === "Closed").length;
+      const inProgressCountTeam = teamData.filter(row => row[7] === "In Progress").length;
+      const pendingCountTeam = teamData.filter(row => row[7] === "Pending").length;
+      const resolvedCountTeam = teamData.filter(row => row[7] === "Resolved").length;
+      const forwardedCountTeam = teamData.filter(row => row[16] === "1").length;
+      const reopenedCountTeam = teamData.filter(row => row[15] === "1").length;
+
+          return {
+            Assigned: assignedCountTeam,
+            Closed: closedCountTeam,
+            In_Progress: inProgressCountTeam,
+            Pending: pendingCountTeam,
+            Resolved: resolvedCountTeam,
+            Forwarded: forwardedCountTeam,
+            Reopened: reopenedCountTeam
+        };
+    };
+        
+    const teamStatusCount = countStatusTeam(allData);    */
+
+    const countCategoryTeam = (allData:any) => {
+      const teamData = allData.filter(row => row[4] === "Order Management Customizing and Services");
+
+      const requestCountTeam = teamData.filter(row => row[19] === "Request").length;
+      const failureCountTeam = teamData.filter(row => row[19] === "Failure").length;
+     
+          return {
+            Request: requestCountTeam,
+            Failure: failureCountTeam
+        };
+    };
+        
+    const teamCategoryCount = countCategoryTeam(allData);   
 
 
 
@@ -746,9 +774,9 @@ export default function Graficas() {
                   
                   <BarChart
                     data={{
-                      labels: Object.keys(categoryCounts).filter(type => categoryCounts[type] !== 0),
-                      values: Object.values(categoryCounts).filter(count => count !== 0),
-                      colors: Object.keys(categoryCounts).map(() => {
+                      labels: Object.keys(teamCategoryCount).filter(type => teamCategoryCount[type] !== 0),
+                      values: Object.values(teamCategoryCount).filter(count => count !== 0),
+                      colors: Object.keys(teamCategoryCount).map(() => {
                         const r = Math.floor(Math.random() * 255);
                         const g = Math.floor(Math.random() * 255);
                         const b = Math.floor(Math.random() * 255);
