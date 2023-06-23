@@ -16,6 +16,7 @@ import domtoimage from 'dom-to-image';
 import { MoreVert as MoreVertIcon, GetApp as DownloadIcon } from '@mui/icons-material';
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 interface Service {
     type: string;
@@ -71,17 +72,6 @@ export default function Graficas() {
     const [openGroups, setOpenGroups] = useState(false);
     const handleOpenGroups = () => setOpenGroups(true);
     const handleCloseGroups = () => setOpenGroups(false);
-
-    //dropdown
-    const [anchorEl, setAnchorEl] = useState(null);
-
-    const handleOpenMenu = (event) => {
-      setAnchorEl(event.currentTarget);
-    };
-  
-    const handleCloseMenu = () => {
-      setAnchorEl(null);
-    };
 
     //bar chart services
     const services2 = Array.from(new Set(allData.slice(1).map((row:any) => row[2] ? row[2] : null)))
@@ -188,21 +178,20 @@ export default function Graficas() {
     }), 
     };
 
-    //pie chart assignee name
-    const categories2 = Array.from(new Set(allData.slice(1).map((row: any) => (row[19] && row[4] === "Order Management Customizing and Services") ? row[19] : null)));
+    //bar chart team tickets category
+    const countCategoryTeam = (allData:any) => {
+      const teamData = allData.filter(row => row[4] === "Order Management Customizing and Services");
 
-    const categories: Category[] = categories2.map(type => ({ type }));
-
-    const countCategories = (categories: Category[], data: any[]) => {
-      return categories.reduce((counts, category) => {
-        const type = category.type;
-        counts[type] = data.filter(row => row[19] === type).length;
-        return counts;
-      }, {});
+      const requestCountTeam = teamData.filter(row => row[19] === "Request").length;
+      const failureCountTeam = teamData.filter(row => row[19] === "Failure").length;
+     
+          return {
+            Request: requestCountTeam,
+            Failure: failureCountTeam
+        };
     };
-
-    const categoryCounts = countCategories(categories, allData);
-
+        
+    const teamCategoryCount = countCategoryTeam(allData);   
 
 
     //count forwarded tickets
@@ -445,6 +434,26 @@ export default function Graficas() {
             </Box>
       )}
       <Container id="title-and-chart">
+      
+      {/* back button */}
+      <Box position="absolute" top={30} left={50} sx={{ width: 300 }}>
+        <Button
+          variant="outlined"
+          component="span"
+          style={{
+            color: "#4D4D52",
+            padding: "9px 18px",
+            borderColor: "#4D4D52", 
+          }}
+          onClick={() => {
+            window.location.href = "/"; 
+          }}
+          startIcon={<ArrowBackIcon />}
+        >
+          Back
+        </Button>
+      </Box>
+
 
       <Typography variant='h3' align='center' mt={2} sx={{fontWeight:400}}>Graphics</Typography>
 
@@ -746,9 +755,9 @@ export default function Graficas() {
                   
                   <BarChart
                     data={{
-                      labels: Object.keys(categoryCounts).filter(type => categoryCounts[type] !== 0),
-                      values: Object.values(categoryCounts).filter(count => count !== 0),
-                      colors: Object.keys(categoryCounts).map(() => {
+                      labels: Object.keys(teamCategoryCount).filter(type => teamCategoryCount[type] !== 0),
+                      values: Object.values(teamCategoryCount).filter(count => count !== 0),
+                      colors: Object.keys(teamCategoryCount).map(() => {
                         const r = Math.floor(Math.random() * 255);
                         const g = Math.floor(Math.random() * 255);
                         const b = Math.floor(Math.random() * 255);

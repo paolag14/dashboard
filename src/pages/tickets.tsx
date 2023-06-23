@@ -21,6 +21,7 @@ import Button from '@mui/material/Button';
 import ClearIcon from '@mui/icons-material/Clear';
 import Stack from '@mui/material/Stack';
 import TablePagination from '@mui/material/TablePagination';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const theme2 = createTheme();
 
@@ -277,6 +278,25 @@ export default function Tickets() {
   return(
     <>
     <br />
+
+    {/* back button */}
+    <Box position="absolute" top={30} left={40} sx={{ width: 300 }}>
+        <Button
+          variant="outlined"
+          component="span"
+          style={{
+            color: "#4D4D52",
+            padding: "9px 18px",
+            borderColor: "#4D4D52", 
+          }}
+          onClick={() => {
+            window.location.href = "/"; 
+          }}
+          startIcon={<ArrowBackIcon />}
+        >
+          Back
+        </Button>
+    </Box>
     
     <Typography variant='h3' align='center' mt={2} sx={{fontWeight:400}}>Tickets</Typography>
 
