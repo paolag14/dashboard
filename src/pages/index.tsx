@@ -1,3 +1,4 @@
+//Imports
 import * as React from 'react';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
@@ -27,14 +28,14 @@ export default function Home(props:any) {
   const [isLoading, setLoading] = useState(true);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false); 
 
-  //cards
+  //Cards
   const [total, setTotal] = useState(0);
   const [solved, setSolved] = useState(0);
   const [closed, setClosed] = useState(0);
   const [forwarded, setForwarded] = useState(0);
   const [reopened, setReopened] = useState(0);
 
-  //inside card total
+  //Inside card total
   const [low, setLow] = useState(0);
   const [medium, setMedium] = useState(0);
   const [high, setHigh] = useState(0);
@@ -44,41 +45,41 @@ export default function Home(props:any) {
   const [pending, setPending] = useState(0);
   const [resolved, setResolved] = useState(0);
 
-  //inside card resolved
+  //Inside card resolved
   const [lowR, setLowR] = useState(0);
   const [mediumR, setMediumR] = useState(0);
   const [highR, setHighR] = useState(0);
   const [criticalR, setCriticalR] = useState(0);
 
-  //inside card closed
+  //Inside card closed
   const [lowC, setLowC] = useState(0);
   const [mediumC, setMediumC] = useState(0);
   const [highC, setHighC] = useState(0);
   const [criticalC, setCriticalC] = useState(0);
 
-  //inside card forwarded
+  //Inside card forwarded
   const [lowF, setLowF] = useState(0);
   const [mediumF, setMediumF] = useState(0);
   const [highF, setHighF] = useState(0);
   const [criticalF, setCriticalF] = useState(0);
 
-  //inside card reopened
+  //Inside card reopened
   const [lowReopened, setLowReopened] = useState(0);
   const [mediumReopened, setMediumReopened] = useState(0);
   const [highReopened, setHighReopened] = useState(0);
   const [criticalReopened, setCriticalReopened] = useState(0);
 
-  //inside card 2 weeks
+  //Inside card 2 weeks
   const [count2weeks, setCount2weeks] = useState(0);
   const [openNotSolved, setOpenNotSolved] = useState(0);
 
   // data
-  const [allData, setData] = useState("");
-  const [resolvedData, setResolvedData] = useState("");
-  const [closedData, setClosedData] = useState("");
-  const [forwardedData, setForwardedData] = useState("");
-  const [reopenedData, setReopenedData] = useState("");
-  const [open2weeksData, setOpen2weeksData] = useState("");
+  const [allData, setData] = useState<unknown[]>([]);
+  const [resolvedData, setResolvedData] = useState<unknown[]>([]);
+  const [closedData, setClosedData] = useState<unknown[]>([]);
+  const [forwardedData, setForwardedData] = useState<unknown[]>([]);
+  const [reopenedData, setReopenedData] = useState<unknown[]>([]);
+  const [open2weeksData, setOpen2weeksData] = useState<unknown[]>([]);
 
   const [backlog, setBacklog] = useState(false);
   const [openTickets, setOpenTickets] = useState(0);
@@ -98,8 +99,8 @@ export default function Home(props:any) {
   //hover card forwarded
   const [hoverF, setHoverF] = useState(false);
 
-   //hover card reopened
-   const [hoverReopened, setHoverReopened] = useState(false);
+  //hover card reopened
+  const [hoverReopened, setHoverReopened] = useState(false);
 
   //hover card backlog
   const [hoverBacklog, setHoverBacklog] = useState(false);
@@ -107,12 +108,11 @@ export default function Home(props:any) {
   const router = useRouter();
 
   useEffect(() => {
-    // Simulating data fetching delay
+    //Simulating data fetching delay
     setTimeout(() => {
       setLoading(false);
     }, 1500); 
   }, []);
-
   
   const handleFile = async (e:any) =>{
     
@@ -120,27 +120,15 @@ export default function Home(props:any) {
     setFileName(file.name);
     const data = await file.arrayBuffer();
 
-    //todo el archivo
     const workbook = XLSX.read(data);
 
-    //primeras 50 filas
-    //const workbook = XLSX.read(data, {sheetRows:50});
-
-    //esto da la primera página del excel
+    //First excel sheet
     const worksheet = workbook.Sheets[workbook.SheetNames[0]]
 
-    //convierte a array de arrays
-    /* const jsonData = XLSX.utils.sheet_to_json(worksheet, {
-      header: 1,
-      defval:"",
-    }); */
-
-    //leer como json
+    //Read as JSON
     let jsonData = XLSX.utils.sheet_to_json(worksheet, {
-      //blankrows: "",
       header: 1,
       raw: false,
-      //dateNF: "DD/MM/YYYY hh:mm:ss",
     });
 
     const fileExtension = file.name.split('.').pop().toLowerCase();
@@ -156,17 +144,9 @@ export default function Home(props:any) {
 
     console.log("data", jsonData);
 
+    //Format dates
     const formattedData = jsonData.slice(1).map(row => {
-      /* let dateString = String(row[8]);
-      const momentDate = moment(dateString, "DD/MM/YYYY hh:mm:ss a");
-      const isFormatDayFirst = momentDate.date() > 12;
-    
-      const formattedDate = momentDate
-        .tz('America/Mexico_City')
-        .format(`${isFormatDayFirst ? 'DD/MM/YYYY' : 'MM/DD/YYYY'} HH:mm:ss`);
-      row[8] = formattedDate; */
-    
-      // Format rows 9 and 10 as well
+
       for (let i = 8; i <= 10; i++) {
         const stringVal = row[i];
         if (stringVal !== null && stringVal !== '') {
@@ -184,21 +164,20 @@ export default function Home(props:any) {
       return row;
     });
     
-    // Tickets open more than 2 weeks
-    // Define the conditions
-    const daysThreshold = 14; // Number of days threshold since the date in row 8
-
-    // Filter the rows based on the conditions
+    //Tickets open more than 2 weeks
     let cont2weeks = 0;
     let contOpenNotSolved = 0;
 
     const filteredRows = jsonData.filter(row => {
-      if (row[13] === "1" && row[14] === "0" && row[37] > 14) {
+      let column = row as unknown[];
+
+      //Column open, column solved and column duration in days
+      if (column[13] === "1" && column[14] === "0" && column[37] > 14) {
         cont2weeks++;
         return true;
       }
 
-      if (row[13] === "1" && row[14] === "0") {
+      if (column[13] === "1" && column[14] === "0") {
         contOpenNotSolved++;
         return true;
       }
@@ -208,55 +187,54 @@ export default function Home(props:any) {
     setCount2weeks(cont2weeks);
     setOpenNotSolved(contOpenNotSolved);
 
-    //jsonData[0] son el nombre de todas las columnas cuando es array
 
     //set data
     setData(jsonData);
 
-    //obtener total de tickets en archivo
+    //total tickets
     let counter = 0;
     for (var item of jsonData){
       counter++;
     }
     setTotal(counter-1);
 
-    //contar 
+    //Counters 
     let contadorSolved = 0;
     let contadorClosed = 0;
     let contadorForwarded = 0;
     let contadorReopened = 0;
 
-    //contadores generales
+    //General counters
     let contadorLow = 0;
     let contadorMedium = 0;
     let contadorHigh = 0;
     let contadorCritical = 0;
 
-    //contadores card total
+    //Counters card total
     let contadorAssigned = 0;
     let contadorInProgress = 0;
     let contadorPending = 0;
     let contadorResolved = 0;
 
-    //contadores card resolved
+    //Counters card resolved
     let contadorLowR = 0;
     let contadorMediumR = 0;
     let contadorHighR = 0;
     let contadorCriticalR = 0;
 
-    //contadores card closed
+    //Counters card closed
     let contadorLowC = 0;
     let contadorMediumC = 0;
     let contadorHighC = 0;
     let contadorCriticalC = 0;
 
-    //contadores card forwarded
+    //Counters card forwarded
     let contadorLowF = 0;
     let contadorMediumF = 0;
     let contadorHighF = 0;
     let contadorCriticalF = 0;
 
-    //contadores card reopened
+    //Counters card reopened
     let contadorLowReopened = 0;
     let contadorMediumReopened  = 0;
     let contadorHighReopened  = 0;
@@ -275,150 +253,151 @@ export default function Home(props:any) {
     arrayReopened.push(jsonData[0]);
     arrayOpen2Weeks.push(jsonData[0]);
 
-    for (let i = 1; i<jsonData.length; i++){
+    for (let i = 1; i < jsonData.length; i++){
 
-      //backlog
-      if(jsonData[i][13] == "1"){
+      let row = jsonData[i] as unknown[];
+
+      //Backlog
+      if(row[13] == "1"){
         contadorOpenedTickets++;
       }
 
-        //total tickets 
-      if (jsonData[i][6] == "Low"){
+      //Total tickets 
+      if (row[6] == "Low"){
         contadorLow++;
       }
 
-      if (jsonData[i][6] == "Medium"){
+      if (row[6] == "Medium"){
         contadorMedium++;
       }
 
-      if (jsonData[i][6] == "High"){
+      if (row[6] == "High"){
         contadorHigh++;
       }
 
-      if (jsonData[i][6] == "Critical"){
+      if (row[6] == "Critical"){
         contadorCritical++;
       }
 
 
       //Assigned
-      if (jsonData[i][7] === "Assigned"){
+      if (row[7] === "Assigned"){
         contadorAssigned++;
       }
 
       //In progress
-      if (jsonData[i][7] === "In Progress"){
+      if (row[7] === "In Progress"){
         contadorInProgress++;
       }
 
       //Pending
-      if (jsonData[i][7] === "Pending"){
+      if (row[7] === "Pending"){
         contadorPending++;
       }
 
-      //solved
-      if (jsonData[i][14] === "1"){ //solved
+      //Solved
+      if (row[14] === "1"){ //solved
         contadorSolved++;
       }
 
-        //Resolved
-      if (jsonData[i][7] === "Resolved" ){ 
+      //Resolved
+      if (row[7] === "Resolved" ){ 
         contadorResolved++;
         arrayResolved.push(jsonData[i]);
 
-        if (jsonData[i][6] == "Low"){
+        if (row[6] == "Low"){
           contadorLowR++;
         }
   
-        if (jsonData[i][6] == "Medium"){
+        if (row[6] == "Medium"){
           contadorMediumR++;
         }
   
-        if (jsonData[i][6] == "High"){
+        if (row[6] == "High"){
           contadorHighR++;
         }
   
-        if (jsonData[i][6] == "Critical"){
+        if (row[6] == "Critical"){
           contadorCriticalR++;
         }
         
       }
 
-
-        //closed
-      if (jsonData[i][7] === "Closed"){
+      //Closed
+      if (row[7] === "Closed"){
         contadorClosed++;
         arrayClosed.push(jsonData[i]);
 
-        if (jsonData[i][6] == "Low"){
+        if (row[6] == "Low"){
           contadorLowC++;
         }
   
-        if (jsonData[i][6] == "Medium"){
+        if (row[6] == "Medium"){
           contadorMediumC++;
         }
   
-        if (jsonData[i][6] == "High"){
+        if (row[6] == "High"){
           contadorHighC++;
         }
   
-        if (jsonData[i][6] == "Critical"){
+        if (row[6] == "Critical"){
           contadorCriticalC++;
         }
       }
 
 
-        //forwarded
-      if (jsonData[i][16] === "1"){
+      //Forwarded
+      if (row[16] === "1"){
         contadorForwarded++;
         arrayForwarded.push(jsonData[i]);
 
-        if (jsonData[i][6] == "Low"){
+        if (row[6] == "Low"){
           contadorLowF++;
         }
   
-        if (jsonData[i][6] == "Medium"){
+        if (row[6] == "Medium"){
           contadorMediumF++;
         }
   
-        if (jsonData[i][6] == "High"){
+        if (row[6] == "High"){
           contadorHighF++;
         }
   
-        if (jsonData[i][6] == "Critical"){
+        if (row[6] == "Critical"){
           contadorCriticalF++;
         }
       }
 
-        //reoponed
-      if (jsonData[i][15] === "1"){
+      //Reoponed
+      if (row[15] === "1"){
         contadorReopened++;
         arrayReopened.push(jsonData[i]);
 
-        if (jsonData[i][6] == "Low"){
+        if (row[6] == "Low"){
           contadorLowReopened++;
         }
   
-        if (jsonData[i][6] == "Medium"){
+        if (row[6] == "Medium"){
           contadorMediumReopened++;
         }
   
-        if (jsonData[i][6] == "High"){
+        if (row[6] == "High"){
           contadorHighReopened++;
         }
   
-        if (jsonData[i][6] == "Critical"){
+        if (row[6] == "Critical"){
           contadorCriticalReopened++;
         }
       }
 
-      //tickets open more than 2 weeks
-      if (jsonData[i][13] === "1" && jsonData[i][14] === "0" && jsonData[i][37] > 14) {
+      //Tickets open more than 2 weeks
+      if (row[13] === "1" && row[14] === "0" && row[37] > 14) {
         arrayOpen2Weeks.push(jsonData[i]);
       }
       
     }
 
-    //set generales
+    //General setters
     setSolved(contadorSolved);
     setClosed(contadorClosed);
     setForwarded(contadorForwarded);
@@ -468,11 +447,8 @@ export default function Home(props:any) {
     setReopenedData(arrayReopened);
     setOpen2weeksData(arrayOpen2Weeks);
 
+    //Backlog: how many were opened vs how many were assinged. This number should not exceed more than 5% of month total.
     let restriction = (counter-1) * 0.5;
-
-    //Backlog: cuantos quedaron abiertos contra cuantos fueron asignados. Esto no debe exceder más del 5% del total del mes. 
-    
-    //setBacklog(((contadorOpenedTickets/contadorAssigned)*100));
 
     if (((contadorOpenedTickets/contadorAssigned)*100) > restriction){
       setBacklog(true);
@@ -484,6 +460,7 @@ export default function Home(props:any) {
   
   }
 
+  //Style loading
   if (isLoading) {
     return <div 
     style={{
@@ -499,8 +476,10 @@ export default function Home(props:any) {
     </div>;
   }
 
-  const newColors = ['#ffed1a', '#fa9b00', '#009be1', '#FF0000']; // Example new colors
+  //Bosch secondary colors
+  const newColors = ['#ffed1a', '#fa9b00', '#009be1', '#FF0000']; 
 
+  //Create PDF
   const handleDownloadPdf = async (elementIds: string[]) => {
     try {
       const pdf = new jsPDF('p', 'mm', 'a4');
@@ -509,33 +488,35 @@ export default function Home(props:any) {
       for (let i = 0; i < elementIds.length; i++) {
         const elementId = elementIds[i];
         const cardElement = document.getElementById(elementId);
-  
-        try {
 
-          setHover(true);
-          setHoverR(true);
-          setHoverC(true);
-          setHoverF(true);
+        if (cardElement !== null) {
 
-          setHoverReopened(true);
-          setHoverBacklog(true);
+          try {
 
-          await new Promise((resolve) => setTimeout(resolve, 1500));
+            setHover(true);
+            setHoverR(true);
+            setHoverC(true);
+            setHoverF(true);
+            setHoverReopened(true);
+            setHoverBacklog(true);
 
-          const canvas = await html2canvas(cardElement, { scrollX: -window.scrollX -100 , scrollY: -window.scrollY-100000 });
-          const imgData = canvas.toDataURL('image/png');
-          const pdfWidth = pdf.internal.pageSize.getWidth();
-          const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+            await new Promise((resolve) => setTimeout(resolve, 1500));
 
-          if (i > 0) {
-            pdf.addPage();
+            const canvas = await html2canvas(cardElement, { scrollX: -window.scrollX -100 , scrollY: -window.scrollY-100000 });
+            const imgData = canvas.toDataURL('image/png');
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+            if (i > 0) {
+              pdf.addPage();
+            }
+    
+            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+
+            setShowSuccessAlert(true);
+          } catch (error) {
+            console.error('Error generating image:', error);
           }
-  
-          pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-
-          setShowSuccessAlert(true);
-        } catch (error) {
-          console.error('Error generating image:', error);
         }
       }
   
@@ -561,11 +542,12 @@ export default function Home(props:any) {
         <Container id= "all-data" maxWidth="xl">
           <br />
 
+          {/* Success alert */}
           {showSuccessAlert && (
             <Box position="absolute" top={20} right={20} sx={{width: 300}}>
               <Alert severity="success">
                 <AlertTitle>Success</AlertTitle>
-                PDF Downloaded Successfully
+                PDF Generated Successfully
               </Alert>
             </Box>
           )}
@@ -579,6 +561,7 @@ export default function Home(props:any) {
 
             <br /> 
 
+            {/* Select and download buttons */}
             <Stack direction="row" spacing={2} width={"100%"} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', margin: 'auto', mt:1, mb:2}}>
               <input id="select-button" type="file"  accept=".xlsx, .xls, .csv" style={{ display: 'none' }} onChange={handleFile}></input>
                   <label htmlFor="select-button">
@@ -587,8 +570,6 @@ export default function Home(props:any) {
                           backgroundColor: "#4D4D52",
                           padding: "18px 36px"
                         }}
-
-                        //onClick={handleFile(e)}
                         endIcon={<FileOpenIcon />}>
                         Select a file
                       </Button>
@@ -622,6 +603,7 @@ export default function Home(props:any) {
 
           <Container maxWidth="lg" sx={{mt:1}}>
 
+            {/* Cards */}
             <Container disableGutters maxWidth="xl" component="main" sx={{ pt: 1, pb: 1 }}>
                 
               <Grid container spacing={4} alignItems="center" justifyContent="center">

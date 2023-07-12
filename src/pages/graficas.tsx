@@ -1,3 +1,4 @@
+//Imports
 import { useEffect, useState } from 'react';
 import Typography from '@mui/material/Typography';
 import { useRouter } from 'next/router';
@@ -18,6 +19,7 @@ import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
+//Interfaces
 interface Service {
     type: string;
 }
@@ -68,24 +70,24 @@ export default function Graficas() {
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
 
-    //forwared gropus modal
+    //forwared groups modal
     const [openGroups, setOpenGroups] = useState(false);
     const handleOpenGroups = () => setOpenGroups(true);
     const handleCloseGroups = () => setOpenGroups(false);
 
-    //bar chart services
+    // Create array of services
     const services2 = Array.from(new Set(allData.slice(1).map((row:any) => row[2] ? row[2] : null)))
 
     const services: Service[] = services2.map(type => ({ type }));
 
+    // Count services
     const countServices = (services: Service[], data: any[]) => {
     return services.reduce((counts, service) => {
         const type = service.type;
         counts[type] = data.filter(row => row[2] === type).length;
         return counts;
-    }, {});
+    }, {} as Record<string, number>);
     };
-
     const serviceCounts = countServices(services, allData);
 
     // Sort services in descending order 
@@ -94,44 +96,46 @@ export default function Graficas() {
     .reduce((sortedObj, [type, count]) => {
       sortedObj[type] = count;
       return sortedObj;
-    }, {});
+    }, {} as Record<string, number>);
 
-    //top 10 services
+    // Get top 10 services
     const topServices = Object.entries(serviceCounts)
     .sort(([, countA], [, countB]) => countB - countA)
     .slice(0, 10)
     .map(([type, count]) => ({ type, count }));
 
-    //pie chart assignee name
+    // Create array of OMCS assignee names
     const assigneeName = Array.from(new Set(allData.slice(1).map((row:any) => {
       if (row[4] === "Order Management Customizing and Services") {
         return row[18] ? row[18] : null;
       }
     })));
     
-    const assigneeNames: Asignee[] = assigneeName.map(type => ({ type })).sort((a, b) => {
+    // Sort names in ascending order
+    const assigneeNames: Asignee[] = assigneeName.map(type => ({ type: type as string })).sort((a, b) => {
       if (a.type < b.type) return -1;
       if (a.type > b.type) return 1;
       return 0;
     });
 
+    // Count OMCS assigne names
     const countAsigneeNamesAll = (assigneeNames: Asignee[], data: any[]) => {
     return assigneeNames.reduce((counts, name) => {
         const type = name.type;
         counts[type] = data.filter(row => row[18] === type && row[4] === "Order Management Customizing and Services").length;
         return counts;
-    }, {});
+    }, {} as Record<string, number>);
     };
 
     const asigneeNameCountsAll = countAsigneeNamesAll(assigneeNames, allData);
 
-    //count total sum of tickets handled by team
+    // Count total sum of tickets handled by team
     const countTeamAll = (assigneeNames: Asignee[], data:any[]) => {
       const counts = assigneeNames.reduce((counts, name) => {
         const type = name.type; 
         counts[type] = data.filter(row => row[18] === type && row[4] === "Order Management Customizing and Services").length;
         return counts;
-      }, {});
+      }, {} as Record<string, number>);
     
       const totalCount = Object.values(counts).reduce((sum, count) => sum + count, 0);
       
@@ -148,7 +152,7 @@ export default function Graficas() {
         const type = name.type;
         counts[type] = data.filter(row => row[18] === type && row[4] === "Order Management Customizing and Services").length;
         return counts;
-      }, {});
+      }, {} as Record<string, number>);
       const entries = Object.entries(counts);
       const sortedEntries = entries.sort((a, b) => b[1] - a[1]).slice(0, 10);
       return Object.fromEntries(sortedEntries);
@@ -165,7 +169,7 @@ export default function Graficas() {
     // Create an array of the counts corresponding to the top names
     const topCounts = topNames.map(name => asigneeNameCounts[name]);
     
-    // data for pie chart tickets handled by team
+    // Data for pie chart tickets handled by team
     const dataPie = {
     labels: topNames,
     values: topCounts,
@@ -178,12 +182,12 @@ export default function Graficas() {
     }), 
     };
 
-    //bar chart team tickets category
+    // Bar chart team tickets category
     const countCategoryTeam = (allData:any) => {
-      const teamData = allData.filter(row => row[4] === "Order Management Customizing and Services");
 
-      const requestCountTeam = teamData.filter(row => row[19] === "Request").length;
-      const failureCountTeam = teamData.filter(row => row[19] === "Failure").length;
+      const teamData = allData.filter((row: string[]) => row[4] === "Order Management Customizing and Services");
+      const requestCountTeam = teamData.filter((row: string[]) => row[19] === "Request").length;
+      const failureCountTeam = teamData.filter((row: string[]) => row[19] === "Failure").length;
      
           return {
             Request: requestCountTeam,
@@ -193,8 +197,7 @@ export default function Graficas() {
         
     const teamCategoryCount = countCategoryTeam(allData);   
 
-
-    //count forwarded tickets
+    // Create array of groups to be forwarded
     const forwardedToGroup = Array.from(
       new Set(
         allData.slice(1).map((row: any) => {
@@ -207,15 +210,17 @@ export default function Graficas() {
         })
       )
     );
-
+    
+    // Sort groups
     const forwardedToGroups: SupportGroup[] = forwardedToGroup
-      .map((type) => ({ type }))
+      .map((type) => ({ type: type as string }))
       .sort((a, b) => {
         if (a.type < b.type) return -1;
         if (a.type > b.type) return 1;
         return 0;
     });
 
+    // Count forwarded tickets
     const countForwardedToGroups = (forwardedToGroups: SupportGroup[], data: any[]) => {
       return forwardedToGroups.reduce((counts, name) => {
         const type = name.type;
@@ -226,13 +231,13 @@ export default function Graficas() {
             row[16] === "1"
         ).length;
         return counts;
-      }, {});
+      }, {} as Record<string, number>);
     };
 
     const countAllForwardedToGropus = countForwardedToGroups(forwardedToGroups, allData);
 
     // Remove first 7 characters of each name
-    const modifiedCounts = {};
+    const modifiedCounts: Record<string, number> = {};
     for (const [name, count] of Object.entries(countAllForwardedToGropus)) {
       const modifiedName = name.substring(7, name.length - 1);
       modifiedCounts[modifiedName] = count;
@@ -244,17 +249,16 @@ export default function Graficas() {
       .slice(0, 10);
 
     // Get groups and counts in descending order
-    const sortedNamesAll = Object.entries(modifiedCounts)
+    const sortedNamesAll: Record<string, number> = Object.entries(modifiedCounts)
       .sort((a, b) => b[1] - a[1])
-      .reduce((obj, [groupName, count]) => {
+      .reduce((obj: Record<string, number>, [groupName, count]) => {
         obj[groupName] = count;
         return obj;
-      }, {});
+    }, {});
 
-
-     //priority and status stacked bar chart 
+     // Priority and status stacked bar chart 
      const countByStatusAndPriority = (data:any) => {
-      const counts = {};
+      const counts: Record<string, number> = {};
       data.forEach((row: any[]) => {
         const status = row[7];
         const priority = row[6];
@@ -267,6 +271,7 @@ export default function Graficas() {
       return counts;
     };
 
+    // Transform data into graph format
     const transformData = (counts: any) => {
       const labels = ['Assigned', 'Closed', 'In Progress', 'Pending', 'Resolved'];
       const priorities = ['High', 'Medium', 'Low'];
@@ -285,11 +290,11 @@ export default function Graficas() {
     const statusPriorityCounts = countByStatusAndPriority(allData);
     const transformedData = transformData(statusPriorityCounts);
 
-    //bar chart assigned, resolved and forwarded
+    // Bar chart assigned, resolved and forwarded
     const countRows = (allData:any) => {
-      const assignedCount = allData.filter(row => row[7] === "Assigned").length;
-      const resolvedCount = allData.filter(row => row[7] === "Resolved").length;
-      const row16Count = allData.filter(row => row[16] === "1").length;
+      const assignedCount = allData.filter((row: string[]) => row[7] === "Assigned").length;
+      const resolvedCount = allData.filter((row: string[]) => row[7] === "Resolved").length;
+      const row16Count = allData.filter((row: string[]) => row[16] === "1").length;
     
       return {
         Assigned: assignedCount,
@@ -300,12 +305,12 @@ export default function Graficas() {
     
     const rowCounts = countRows(allData);    
 
-    //bar chart request, failure, reopened,complaints
+    // Bar chart request, failure, reopened,complaints
     const countFailures = (allData:any) => {
-      const requestCount = allData.filter(row => row[19] === "Request").length;
-      const failureCount = allData.filter(row => row[19] === "Failure").length; 
-      const reopenedCount = allData.filter(row => row[15] === "1").length;
-      const complaintsCount = allData.filter(row => row[5] === "Complaint").length;
+      const requestCount = allData.filter((row: string[]) => row[19] === "Request").length;
+      const failureCount = allData.filter((row: string[]) => row[19] === "Failure").length; 
+      const reopenedCount = allData.filter((row: string[]) => row[15] === "1").length;
+      const complaintsCount = allData.filter((row: string[]) => row[5] === "Complaint").length;
 
       return {
         Request: requestCount,
@@ -318,17 +323,17 @@ export default function Graficas() {
     const failuresCount = countFailures(allData);    
 
     
-    //bar chart team by status
+    // Bar chart team by status
     const countStatusTeam = (allData:any) => {
-      const teamData = allData.filter(row => row[4] === "Order Management Customizing and Services");
+      const teamData = allData.filter((row: string[]) => row[4] === "Order Management Customizing and Services");
 
-      const assignedCountTeam = teamData.filter(row => row[7] === "Assigned").length;
-      const closedCountTeam = teamData.filter(row => row[7] === "Closed").length;
-      const inProgressCountTeam = teamData.filter(row => row[7] === "In Progress").length;
-      const pendingCountTeam = teamData.filter(row => row[7] === "Pending").length;
-      const resolvedCountTeam = teamData.filter(row => row[7] === "Resolved").length;
-      const forwardedCountTeam = teamData.filter(row => row[16] === "1").length;
-      const reopenedCountTeam = teamData.filter(row => row[15] === "1").length;
+      const assignedCountTeam = teamData.filter((row: string[]) => row[7] === "Assigned").length;
+      const closedCountTeam = teamData.filter((row: string[]) => row[7] === "Closed").length;
+      const inProgressCountTeam = teamData.filter((row: string[]) => row[7] === "In Progress").length;
+      const pendingCountTeam = teamData.filter((row: string[]) => row[7] === "Pending").length;
+      const resolvedCountTeam = teamData.filter((row: string[]) => row[7] === "Resolved").length;
+      const forwardedCountTeam = teamData.filter((row: string[]) => row[16] === "1").length;
+      const reopenedCountTeam = teamData.filter((row: string[]) => row[15] === "1").length;
 
           return {
             Assigned: assignedCountTeam,
@@ -343,26 +348,29 @@ export default function Graficas() {
         
     const teamStatusCount = countStatusTeam(allData);   
 
+    // Download graphs as image
     const handleDownloadImage = (elementId:any) => {
       const chartContainer = document.getElementById(elementId); // Get the chart container element
-      const containerStyle = chartContainer.style.boxShadow; // Store the original box shadow
-      
-      if (containerStyle !== 'none') {
-        chartContainer.style.boxShadow = 'none'; // Remove the box shadow temporarily
+
+      if (chartContainer){
+        const containerStyle = chartContainer.style.boxShadow; // Store the original box shadow
+        
+        if (containerStyle !== 'none') {
+          chartContainer.style.boxShadow = 'none'; // Remove the box shadow 
+        }
+
+        //chartContainer.style.boxShadow = 'none'; // Remove the box shadow temporarily
+        html2canvas(chartContainer, { useCORS: true }).then((canvas) => {
+          const image = canvas.toDataURL('image/png'); // Convert canvas to image data URL
+          const downloadLink = document.createElement('a'); // Create a download link element
+          downloadLink.href = image; // Set the image data URL as the link's href
+          downloadLink.download = 'graph.png'; // Set the download filename
+          downloadLink.click(); // Trigger the download
+        });
       }
-
-      //chartContainer.style.boxShadow = 'none'; // Remove the box shadow temporarily
-      html2canvas(chartContainer, { useCORS: true }).then((canvas) => {
-        const image = canvas.toDataURL('image/png'); // Convert canvas to image data URL
-        const downloadLink = document.createElement('a'); // Create a download link element
-        downloadLink.href = image; // Set the image data URL as the link's href
-        downloadLink.download = 'graph.png'; // Set the download filename
-        downloadLink.click(); // Trigger the download
-      });
-
     };
 
-
+    // Download all graphs as PDF
     const handleDownloadPdf = async (elementIds: string[]) => {
       try {
         const pdf = new jsPDF('p', 'mm', 'a4');
@@ -376,8 +384,6 @@ export default function Graficas() {
               'transform-origin': 'center',
             },
             quality: 1,
-            //height: chartContainer.offsetHeight * 2, // Increase the height to improve image quality
-            //width: chartContainer.offsetWidth * 2, // Increase the width to improve image quality
           };
     
           try {
@@ -429,13 +435,13 @@ export default function Graficas() {
             <Box position="absolute" top={20} right={20} sx={{width: 300}}>
               <Alert severity="success">
                 <AlertTitle>Success</AlertTitle>
-                PDF Downloaded Successfully
+                PDF Generated Successfully
               </Alert>
             </Box>
       )}
       <Container id="title-and-chart">
       
-      {/* back button */}
+      {/* Back button */}
       <Box position="absolute" top={30} left={50} sx={{ width: 300 }}>
         <Button
           variant="outlined"

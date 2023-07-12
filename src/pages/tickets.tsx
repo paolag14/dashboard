@@ -1,5 +1,6 @@
+//Imports
 import { useEffect, useState } from 'react';
-import { makeStyles, ThemeProvider, createTheme } from '@material-ui/core/styles';
+import { makeStyles, createTheme } from '@material-ui/core/styles';
 import { Table, TableBody, TableContainer, TableHead, TableRow } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
@@ -23,8 +24,10 @@ import Stack from '@mui/material/Stack';
 import TablePagination from '@mui/material/TablePagination';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
+
 const theme2 = createTheme();
 
+//Style forms
 const useStyles = makeStyles({
   table: {
     minWidth: 650,
@@ -37,6 +40,7 @@ const useStyles = makeStyles({
   },
 });
 
+//Style table cells
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: "#4D4D52",
@@ -49,6 +53,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
 }));
 
+//Style table rows
 const StyledTableRow = styled(TableRow)(({ theme, index }) => ({
   backgroundColor: index % 2 === 0 ? "#D2D8D9" : theme.palette.action.hover,
   color: index % 2 === 0 ? theme.palette.common.white : '',
@@ -88,10 +93,8 @@ export default function Tickets() {
   // state to keep track of the filtered data
   const [filteredData, setFilteredData] = useState(allData.slice(1));
 
+  // state to keep track of the displayed data
   const [displayedData, setDisplayedData] = useState(allData.slice(1));
-
-   //console.log("data filtrada", filteredData);
-   //const [filteredData, setFilteredData] = useState(allData);
 
    // state to clear filters
    const [resetFilters, setResetFilters] = useState(false);
@@ -101,11 +104,7 @@ export default function Tickets() {
 
    const [paginatedData, setPaginatedData] = useState([]);
 
-/*    console.log("data slice", paginatedData[0].slice(0, 3).
-    concat(paginatedData[0].slice(4,5)).
-    concat(paginatedData[0].slice(6,11)));
- */
-
+  // Handle actions on row click
   const handleRowClick = (index:any) => {
     if (expandedRow === index) {
       setExpandedRow(-1);
@@ -118,6 +117,7 @@ export default function Tickets() {
     setSelectedTeam(selectedTeam);
   }
 
+  // Handle actions of filters change
   const handleFilterChange = (service:any, priority:any, status:any, team:any) => {
     const filteredData = allData.slice(1).filter((row:any) => {
       const serviceMatch = service === "" || row[2] === service;
@@ -127,10 +127,6 @@ export default function Tickets() {
 
       return serviceMatch && priorityMatch && statusMatch && teamMatch;
 
-      /* const searchMatch = searchValue === "" || Object.values(row).some((value) =>
-      String(value).toLowerCase().includes(searchValue.toLowerCase())
-    );
-    return serviceMatch && priorityMatch && statusMatch && teamMatch && searchMatch; */
     });
     setFilteredData(filteredData);
 
@@ -141,30 +137,35 @@ export default function Tickets() {
 
   };
   
+  // Handle actions when service filter changes
   const handleServiceChange = (event:any) => {
     const service = event.target.value;
     handleFilterChange(service, selectedPriority, selectedStatus, selectedTeam);
     setSelectedService(service);
   };
   
+  // Handle actions when priority filter changes
   const handlePriorityChange = (event:any) => {
     const priority = event.target.value;
     handleFilterChange(selectedService, priority, selectedStatus, selectedTeam);
     setSelectedPriority(priority);
   };
-  
+
+  // Handle actions when status filter changes
   const handleStatusChange = (event:any) => {
     const status = event.target.value;
     handleFilterChange(selectedService, selectedPriority, status, selectedTeam);
     setSelectedStatus(status);
   };
 
+  // Handle actions when team (Support group) filter changes
   const handleTeamChange = (event:any) => {
     const team = event.target.value;
     handleFilterChange(selectedService, selectedPriority, selectedStatus, team);
     setSelectedTeam(team);
   };
 
+  // Handle actions when search bar filter changes
   const handleSearchChange = (event:any) => {
     const value = event.target.value;
     setSearchValue(value);
@@ -214,39 +215,30 @@ export default function Tickets() {
      setDisplayedData(paginatedData);
   };
 
-   // create a set of services from the third column of allData
+  // Create a set of services 
   const services = Array.from(new Set(allData.slice(1).map((row:any) => row[2] ? row[2] : null)))
   .filter(service => service !== null)
   .sort((a:any, b:any) => a.localeCompare(b));
 
+  // Create set of support groups
   const supportGroups = Array.from(new Set(allData.slice(1).map((row:any) => row[4] ? row[4] : null)))
   .filter(team => team !== null)
   .sort((a:any, b:any) => a.localeCompare(b));
 
+  // Create set of OMCS support group assignee names
+  const assigneeName = Array.from(new Set(allData.slice(1).map((row:any) => {
+    if (row[4] === "Order Management Customizing and Services") {
+      return row[18] ? row[18] : null;
+    }
+  })));
+
 
   const headers = ["Incident Number", "Summary", "Service", "Support Group", "Priority", "Status", "Creation Date", "Reopened Date",
     "Solved Date"];
-  /* headers
-  allData[0].slice(0, 3).
-                concat(allData[0].slice(4,5)).
-                concat(allData[0].slice(6,11))
-                 */
-
-  /* headers details 
-  paginatedData.slice(0,3).
-            concat(paginatedData.slice(4,5)).
-            concat(paginatedData.slice(6,11)) */
-
+ 
   const headersDetails = ["Open", "Solved", "Reopened", "Forwarded", "Assignee ID", "Assignee Name", "Category", "Forwarded to Group", "Reopened Reason", 
     "Last Assigned On", "Duration in Days"];
 
-  const assigneeName = Array.from(new Set(allData.slice(1).map((row:any) => {
-      if (row[4] === "Order Management Customizing and Services") {
-        return row[18] ? row[18] : null;
-      }
-  })));
-
-  //console.log("team", assigneeName);
 
   useEffect(() => {
     // Filter the data based on selected filters and search value
@@ -258,12 +250,10 @@ export default function Tickets() {
     setFilteredData(filtered);
   
     // Reset the page to the first page when the filtered data changes
-    //setPage(0);
   }, [allData, searchValue, selectedService, selectedPriority, selectedStatus, selectedTeam]);
 
   const startIndex = page * rowsPerPage;
   const endIndex = startIndex + rowsPerPage;
-  //const displayedData = filteredData.slice(startIndex, endIndex);
 
   useEffect(() => {
     // Update paginatedData when filteredData or page changes
@@ -279,7 +269,7 @@ export default function Tickets() {
     <>
     <br />
 
-    {/* back button */}
+    {/* Back button */}
     <Box position="absolute" top={30} left={40} sx={{ width: 300 }}>
         <Button
           variant="outlined"
@@ -305,7 +295,7 @@ export default function Tickets() {
     <br />
     <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
 
-      <Paper elevation={3} sx={{ margin: 0 , width: '100%'}}>
+      <Paper elevation={3} style={{ margin: 0 , width: '100%'}}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <OutlinedInput
             value={searchValue}
@@ -342,6 +332,7 @@ export default function Tickets() {
               borderRadius: 2,
               p: 2,
               minWidth: 300,
+              maxHeight: 57,
             }}
           >
             <MenuItem value="">
@@ -371,6 +362,7 @@ export default function Tickets() {
               borderRadius: 2,
               p: 2,
               minWidth: 300,
+              maxHeight: 57,
             }}
           >
             <MenuItem value="">
@@ -421,14 +413,13 @@ export default function Tickets() {
             </MenuItem>
             {/* Add menu items for each unique status in the "status" column of allData */}
             {Array.from(new Set(allData.slice(1).map((row: any[]) => row[7]))).map(status => (
-              <MenuItem key={status} value={status}>{status}</MenuItem>
+              <MenuItem key={status as string} value={status as string}>{status}</MenuItem>
             ))}
           </Select>
         </FormControl>
       </Paper>
 
-      
-
+      {/* Clear button */}
       <Box marginLeft="auto">
         <Button variant="outlined" onClick={handleResetFilters} startIcon={<ClearIcon />}>
           Clear
@@ -453,7 +444,7 @@ export default function Tickets() {
           </StyledTableRow>
         </TableHead>
         <TableBody>
-              {displayedData.map((row, index) => (
+          {displayedData.map((row:any, index:any) => (
           <>
             <StyledTableRow key={index} index={index} onClick={() => handleRowClick(index)}>
               <StyledTableCell>
@@ -462,7 +453,7 @@ export default function Tickets() {
                 </IconButton>
               </StyledTableCell>
               {/* Map columns 0 to 2 */}
-              {row.slice(0, 3).map((cell, cellIndex) => (
+              {row.slice(0, 3).map((cell:any, cellIndex:any) => (
                 <TableCell key={cellIndex}>{cell}</TableCell>
               ))}
               {/* Map column 4 */}
@@ -470,7 +461,7 @@ export default function Tickets() {
                         fontWeight: row[4] && row[4].includes("Order Management Customizing and Services") ? "bold" : "normal"
                 }}>{row[4]}</TableCell>
               {/* Map columns 6 to 10 */}
-              {row.slice(6, 11).map((cell, cellIndex) => (
+              {row.slice(6, 11).map((cell:any, cellIndex:any) => (
                 <TableCell key={cellIndex}>{cell}</TableCell>
               ))}
             </StyledTableRow>
